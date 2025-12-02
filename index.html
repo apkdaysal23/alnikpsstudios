@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Al&Ni KPSS Studio | Ultimate V10 (Stable)</title>
+    <title>Al&Ni KPSS Studio | Ultimate V11 (Mobile Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -85,12 +85,27 @@
         }
 
         .tab-active { border-bottom: 2px solid #f97316; color: #f97316; font-weight: bold; }
+        
+        /* Mobile Sidebar Transitions */
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar-open {
+            transform: translateX(0);
+        }
+        .sidebar-closed {
+            transform: translateX(-100%);
+        }
+        /* Desktop fix */
+        @media (min-width: 768px) {
+            .sidebar-closed { transform: translateX(0); }
+        }
     </style>
 </head>
 <body class="text-slate-800 h-screen overflow-hidden flex flex-col">
 
-    <div id="authScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
-        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-4 border-primary">
+    <div id="authScreen" class="fixed inset-0 z-[60] flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-4 border-primary mx-4">
             <div class="text-center mb-6">
                 <h1 class="text-3xl font-bold text-slate-800">Al&Ni <span class="text-primary">KPSS Studio</span></h1>
                 <p class="text-slate-500 text-sm mt-1">Yapay Zeka Destekli Hazırlık</p>
@@ -119,16 +134,24 @@
         </div>
     </div>
 
-    <div id="appContainer" class="hidden flex h-full">
-        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col hidden md:flex z-20 justify-between">
+    <div id="appContainer" class="hidden flex h-full relative">
+        
+        <div id="mobileOverlay" onclick="window.toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden glass-effect transition-opacity"></div>
+
+        <aside id="mainSidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-300 md:static md:flex shrink-0 h-full shadow-2xl md:shadow-none">
             
             <div class="flex-1 flex flex-col overflow-hidden">
-                <div class="p-6 border-b border-slate-100 flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">A</div>
-                    <div>
-                        <h2 class="font-bold text-slate-800 leading-tight">Al&Ni KPSS</h2>
-                        <p class="text-xs text-slate-500">Ultimate Pro Max</p>
+                <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">A</div>
+                        <div>
+                            <h2 class="font-bold text-slate-800 leading-tight">Al&Ni KPSS</h2>
+                            <p class="text-xs text-slate-500">Ultimate Pro Max</p>
+                        </div>
                     </div>
+                    <button onclick="window.toggleSidebar()" class="md:hidden text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
                 </div>
                 
                 <div class="p-4 bg-secondary m-4 rounded-xl border border-orange-100 text-center shrink-0">
@@ -184,17 +207,29 @@
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col h-full relative">
-            <header class="md:hidden h-16 bg-white border-b flex items-center justify-between px-4 z-20">
-                <div class="font-bold text-primary">Al&Ni AI</div>
-                <button onclick="window.logout()" class="text-slate-500"><i class="fa-solid fa-right-from-bracket"></i></button>
+        <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-slate-50">
+            <header class="md:hidden h-16 bg-white border-b flex items-center justify-between px-4 z-30 shrink-0 shadow-sm">
+                <div class="flex items-center space-x-3">
+                    <button onclick="window.toggleSidebar()" class="text-slate-600 hover:text-primary transition p-2">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <div class="font-bold text-primary text-lg">Al&Ni KPSS</div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="window.loadPage('notifications')" class="text-slate-500 relative">
+                         <i class="fa-solid fa-bell"></i>
+                         <span id="mobileNotifBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-3 h-3 flex items-center justify-center rounded-full">0</span>
+                    </button>
+                    <img id="mobileAvatar" src="" class="w-8 h-8 rounded-full border border-slate-200">
+                </div>
             </header>
+            
             <div id="contentArea" class="flex-1 overflow-y-auto p-4 md:p-8 relative"></div>
         </main>
     </div>
 
     <div id="privacyModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col mx-4">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center">
                 <h3 class="text-xl font-bold text-slate-800">Gizlilik Politikası ve Kullanım Şartları</h3>
                 <button onclick="window.closePrivacyModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -316,12 +351,35 @@
             }
         });
 
+        // --- MOBILE MENU LOGIC ---
+        window.toggleSidebar = () => {
+            const sidebar = document.getElementById('mainSidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            // Check if sidebar is currently closed (has -translate-x-full)
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                overlay.classList.add('hidden');
+            }
+        };
+
         // --- NAVIGATION LOGIC ---
         window.loadPage = (page) => {
             const content = document.getElementById('contentArea');
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-nav'));
             const activeBtn = document.getElementById('nav-' + page);
             if(activeBtn) activeBtn.classList.add('active-nav');
+            
+            // Auto close sidebar on mobile when navigating
+            const sidebar = document.getElementById('mainSidebar');
+            if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+                window.toggleSidebar();
+            }
 
             // Admin Guard
             if(page === 'admin' && (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL)) {
@@ -434,7 +492,7 @@
             return html + `</div>`;
         }
 
-        // --- 4. LEADERBOARD (Real Data) ---
+        // --- 4. LEADERBOARD (Real Data + Admin Badge) ---
         function renderLeaderboard() {
             return `
                 <div class="max-w-2xl mx-auto">
@@ -462,16 +520,26 @@
                 snap.forEach(doc => {
                     const u = doc.data();
                     const isMe = doc.id === currentUser.uid;
+                    const isAdmin = u.title === 'Yönetici' || u.email === ADMIN_EMAIL;
+                    
                     html += `
                         <div class="p-4 grid grid-cols-4 items-center ${isMe ? 'bg-orange-50' : ''}">
                             <div class="col-span-2 flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">${rank++}</div>
                                 <div class="flex items-center gap-2">
                                     <img src="${u.avatar}" class="w-6 h-6 rounded-full">
-                                    <span class="font-medium ${isMe ? 'text-primary font-bold' : 'text-slate-700'}">${u.name} ${isMe ? '(Sen)' : ''}</span>
+                                    <span class="font-medium ${isMe ? 'text-primary font-bold' : 'text-slate-700'}">
+                                        ${u.name} ${isMe ? '(Sen)' : ''}
+                                        ${isAdmin ? '<i class="fa-solid fa-shield-halved text-red-500 ml-1" title="Yönetici"></i>' : ''}
+                                    </span>
                                 </div>
                             </div>
-                            <div class="text-center text-xs text-slate-500 bg-slate-100 rounded py-1">${u.title || '-'}</div>
+                            <div class="text-center flex justify-center">
+                                ${isAdmin 
+                                    ? '<span class="bg-red-100 text-red-600 px-2 py-0.5 rounded text-[10px] font-bold border border-red-200">YÖNETİCİ</span>' 
+                                    : `<span class="text-xs text-slate-500 bg-slate-100 rounded py-1 px-2">${u.title || '-'}</span>`
+                                }
+                            </div>
                             <div class="text-right font-bold text-slate-800">${u.totalScore || 0}</div>
                         </div>
                     `;
@@ -594,7 +662,7 @@
             `;
         }
 
-        // --- 7. FORUM MODULE ---
+        // --- 7. FORUM MODULE (Admin Badge Added) ---
         function renderForum() {
             return `
                 <div class="max-w-4xl mx-auto">
@@ -626,7 +694,10 @@
             if(!title || !content) return alert("Eksik alan var.");
             
             await addDoc(collection(db, "forumPosts"), {
-                uid: currentUser.uid, authorName: userData.name, avatar: userData.avatar,
+                uid: currentUser.uid, 
+                authorName: userData.name, 
+                authorTitle: userData.title, // Save title for badge
+                avatar: userData.avatar,
                 title, content, category, status: 'pending', createdAt: serverTimestamp()
             });
             alert("Konu onaya gönderildi.");
@@ -636,22 +707,27 @@
         async function loadForumPosts() {
             const q = query(collection(db, "forumPosts"), where("status", "==", "approved"), orderBy("createdAt", "desc"));
             const snap = await getDocs(q);
-            const isAdmin = currentUser.email.toLowerCase() === ADMIN_EMAIL;
+            const isAdminUser = currentUser.email.toLowerCase() === ADMIN_EMAIL;
             
             document.getElementById('forumFeed').innerHTML = snap.docs.map(d => {
                 const p = d.data();
+                const isAuthorAdmin = p.authorTitle === 'Yönetici';
+                
                 return `
                     <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm relative group">
                         <div class="flex items-center gap-3 mb-3">
                             <img src="${p.avatar}" class="w-10 h-10 rounded-full">
                             <div>
-                                <div class="font-bold text-slate-800">${p.authorName}</div>
+                                <div class="font-bold text-slate-800 flex items-center gap-2">
+                                    ${p.authorName}
+                                    ${isAuthorAdmin ? '<span class="bg-red-100 text-red-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-red-200"><i class="fa-solid fa-shield-halved mr-1"></i>YÖNETİCİ</span>' : ''}
+                                </div>
                                 <div class="text-xs text-slate-500">${p.category} • ${new Date(p.createdAt?.seconds*1000).toLocaleDateString()}</div>
                             </div>
                         </div>
                         <h4 class="font-bold text-lg text-slate-900 mb-2">${p.title}</h4>
                         <p class="text-slate-600">${p.content}</p>
-                        ${isAdmin ? `<button onclick="window.deleteForumPost('${d.id}')" class="absolute top-4 right-4 text-red-500 hover:bg-red-50 p-2 rounded"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        ${isAdminUser ? `<button onclick="window.deleteForumPost('${d.id}')" class="absolute top-4 right-4 text-red-500 hover:bg-red-50 p-2 rounded"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
                 `;
             }).join('') || '<div class="text-center p-8 text-slate-500">Henüz konu yok.</div>';
@@ -695,12 +771,14 @@
             const q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid), where("read", "==", false));
             unsubscribeNotifications = onSnapshot(q, (snap) => {
                 const badge = document.getElementById('notifBadge');
-                if(!badge) return;
+                const mobileBadge = document.getElementById('mobileNotifBadge');
+                
                 if(snap.size > 0) {
-                    badge.innerText = snap.size;
-                    badge.classList.remove('hidden');
+                    if(badge) { badge.innerText = snap.size; badge.classList.remove('hidden'); }
+                    if(mobileBadge) { mobileBadge.innerText = snap.size; mobileBadge.classList.remove('hidden'); }
                 } else {
-                    badge.classList.add('hidden');
+                    if(badge) badge.classList.add('hidden');
+                    if(mobileBadge) mobileBadge.classList.add('hidden');
                 }
             });
         }
@@ -858,14 +936,14 @@
                 const snap = await getDocs(q);
                 if(snap.empty) html = '<div class="p-8 text-center">Bekleyen soru yok.</div>';
                 else {
-                     snap.forEach(doc => { const d=doc.data(); html += `
+                      snap.forEach(doc => { const d=doc.data(); html += `
                         <div class="p-6">
                              <div class="flex justify-between mb-2"><span class="badge bg-blue-100 text-blue-800 px-2 rounded">${d.lesson}</span> <span class="text-xs text-slate-500">${d.authorName}</span></div>
                              <p class="font-bold mb-2">${d.text}</p>
                              <div class="grid grid-cols-2 text-sm gap-2 mb-4">${d.options.map((o,i)=>`<div class="${i===d.correct?'text-green-600 font-bold':''}">${String.fromCharCode(65+i)}) ${o}</div>`).join('')}</div>
                              <div class="flex gap-2"><button onclick="window.adminAction('question', '${doc.id}', 'approve')" class="bg-green-500 text-white px-3 py-1 rounded">Onayla</button><button onclick="window.adminAction('question', '${doc.id}', 'reject')" class="bg-red-500 text-white px-3 py-1 rounded">Reddet</button></div>
                         </div>`; 
-                     });
+                      });
                 }
             } else if (type === 'cards') {
                 const q = query(collection(db, "flashcardSubmissions"), where("status", "==", "pending"));
@@ -1064,7 +1142,7 @@
         // --- FIXED LOGOUT ---
         window.logout = async () => { 
             await signOut(auth);
-            window.location.reload(); // Force refresh to clear all JS state variables
+            window.location.reload(); 
         };
         
         window.toggleAuth = (type) => { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.add('hidden'); document.getElementById(type === 'login' ? 'loginForm' : 'registerForm').classList.remove('hidden'); };
@@ -1072,7 +1150,7 @@
         window.closePrivacyModal = () => document.getElementById('privacyModal').classList.add('hidden');
         async function loadMyNotes() { const q = query(collection(db, `users/${currentUser.uid}/notes`), orderBy("createdAt", "desc")); const snap = await getDocs(q); myNotes = []; snap.forEach(d => myNotes.push({ id: d.id, text: d.data().text, date: new Date(d.data().createdAt?.seconds * 1000).toLocaleDateString() })); if(document.getElementById('nav-notes').classList.contains('active-nav')) window.loadPage('notes'); }
         function calculateStats() { let totalTopics = 0, completed = 0, started = 0; for(let les in CURRICULUM) { totalTopics += CURRICULUM[les].length; CURRICULUM[les].forEach(t => { const s = (userData.progress || {})[les+"_"+t]; if(s === 'completed') completed++; if(s === 'started') started++; }); } const totalProgress = Math.round((completed/totalTopics)*100) || 0; const avgScore = mockExamsHistory.length > 0 ? Math.round(mockExamsHistory.reduce((a,b)=>a+b.totalScore,0)/mockExamsHistory.length) : 0; let situation = "Veri girişi bekleniyor.", strategy = "Önce konulara başla.", shortAdvice = "Başlamak bitirmenin yarısıdır.", weakness = "Veri yok.", motivation = "Yolun başındasın."; if(totalProgress < 10) { situation = "Henüz yolun başındasın."; strategy = "Konulara yüklen."; shortAdvice = "Konu eksiğin çok."; } else if(totalProgress < 50) { situation = "Orta seviye."; strategy = "Tekrarlara başla."; shortAdvice = "Yarılamak üzeresin."; } else { situation = "Konular bitiyor."; strategy = "Deneme çöz."; shortAdvice = "Deneme vakti!"; } if(mockExamsHistory.length > 0 && avgScore < 70) weakness = "Netlerin düşük."; else if(avgScore > 85) motivation = "Derece yapabilirsin!"; return { totalProgress, avgScore, completedCount: completed, startedCount: started, situationAnalysis: situation, strategyAdvice: strategy, weaknessAnalysis: weakness, motivationMsg: motivation, shortAdvice }; }
-        function updateSidebar() { if(!userData) return; document.getElementById('sidebarName').innerText = userData.name; document.getElementById('sidebarAvatar').src = userData.avatar; document.getElementById('sidebarTitle').innerText = userData.title || 'Öğrenci'; document.getElementById('pomodoroCount').innerText = (userData.pomodoroSessions || 0) + " Seans"; }
+        function updateSidebar() { if(!userData) return; document.getElementById('sidebarName').innerText = userData.name; document.getElementById('sidebarAvatar').src = userData.avatar; document.getElementById('sidebarTitle').innerText = userData.title || 'Öğrenci'; document.getElementById('pomodoroCount').innerText = (userData.pomodoroSessions || 0) + " Seans"; document.getElementById('mobileAvatar').src = userData.avatar; }
     </script>
 </body>
 </html>
