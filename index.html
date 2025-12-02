@@ -102,7 +102,7 @@
     <div id="authScreen" class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-50 overflow-y-auto">
         <div class="w-full h-full md:h-[90vh] md:max-w-[1400px] bg-white md:rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden relative">
             
-            <div class="w-full md:w-1/2 bg-slate-900 text-white relative flex flex-col justify-between shrink-0 h-[50vh] md:h-full">
+            <div class="w-full md:w-1/2 bg-slate-900 text-white relative flex flex-col justify-between shrink-0 h-[90vh] md:h-full">
                 <div class="p-6 md:p-8 flex items-center gap-3 z-10">
                     <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-bold text-xl">A</div>
                     <div>
@@ -149,6 +149,7 @@
                                 <span class="block mb-2"><strong class="text-white">LifeCalc Pro:</strong> Kişisel yaşam ve finans yönetiminde devrim yaratan süper uygulama.</span>
                                 <span class="block mb-2"><strong class="text-white">Menu Architect:</strong> Kafeler için yeni nesil SaaS dijital menü çözümleri.</span>
                                 <span class="block"><strong class="text-white">Web & Mobil:</strong> İhtiyaca özel, yüksek performanslı yazılım mimarileri.</span>
+                                <span class="block"><strong class="text-white">Mini Games Studios:1 :</strong> Birden fazla eğlenceli oyunun tek adresi! Google Play'de mevcut.</span>
                             </p>
                         </div>
 
@@ -164,9 +165,15 @@
                 
                 <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
                 <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+                <div class="absolute bottom-12 left-0 w-full flex flex-col items-center justify-center md:hidden z-50 animate-bounce cursor-pointer" onclick="this.parentElement.nextElementSibling.scrollIntoView({behavior: 'smooth'})">
+                    <span class="text-[10px] text-white/80 font-bold mb-2 tracking-widest uppercase drop-shadow-md">Giriş Yapmak İçin Kaydır</span>
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/20 transition">
+                        <i class="fa-solid fa-chevron-down text-white text-lg"></i>
+                    </div>
+                </div>
             </div>
 
-            <div class="w-full md:w-1/2 bg-white flex flex-col justify-center items-center p-8 md:p-12 overflow-y-auto h-[50vh] md:h-full">
+            <div id="loginFormArea" class="w-full md:w-1/2 bg-white flex flex-col justify-center items-center p-8 md:p-12 overflow-y-auto min-h-[60vh] md:h-full">
                 <div class="w-full max-w-md">
                     <div class="text-center mb-8">
                         <h2 class="text-3xl font-bold text-slate-800">Hoş Geldin!</h2>
