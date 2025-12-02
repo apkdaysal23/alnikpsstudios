@@ -99,14 +99,15 @@
 </head>
 <body class="text-slate-800 h-screen overflow-hidden flex flex-col">
 
-    <div id="authScreen" class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-50 overflow-y-auto">
+<div id="authScreen" class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-50 overflow-y-auto">
         <div class="w-full min-h-screen md:h-[90vh] md:max-w-[1400px] bg-white md:rounded-3xl shadow-2xl flex flex-col md:flex-row md:overflow-hidden relative">
             
-            <div class="w-full md:w-1/2 bg-slate-900 text-white relative flex flex-col justify-between shrink-0 h-screen md:h-full">
-                <div class="p-6 md:p-8 flex items-center gap-3 z-10">
-                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-bold text-xl">A</div>
+            <div class="w-full md:w-1/2 h-[45vh] md:h-full bg-slate-900 text-white relative flex flex-col justify-between shrink-0">
+                
+                <div class="p-6 md:p-8 flex items-center gap-3 z-20 relative">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-bold text-xl shadow-lg shadow-orange-500/50">A</div>
                     <div>
-                        <h1 class="text-xl font-bold tracking-wider">Al&Ni STUDIOS</h1>
+                        <h1 class="text-xl font-bold tracking-wider drop-shadow-md">Al&Ni STUDIOS</h1>
                         <p class="text-xs text-slate-400">Next Gen Software</p>
                     </div>
                 </div>
@@ -114,94 +115,80 @@
                 <div class="flex-1 relative overflow-hidden flex items-center">
                     <div id="sliderTrack" class="carousel-track flex w-full h-full absolute top-0 left-0">
                         
-                        <div class="min-w-full h-full flex flex-col justify-start md:justify-center pt-24 md:pt-0 overflow-y-auto items-center p-8 text-center bg-gradient-to-br from-slate-900 to-slate-800">
-                            <i class="fa-solid fa-graduation-cap text-6xl text-primary mb-6 animate-bounce"></i>
-                            <h2 class="text-3xl font-bold mb-4">KPSS Studio Nedir?</h2>
-                            <p class="text-slate-300 leading-relaxed max-w-md">
-                                Al&Ni KPSS Studio, yapay zeka destekli altyapısı ile sınav hazırlık sürecinizi dijitalleştirir. 
-                                Konu takibi, deneme analizi, flashcard sistemi ve akıllı koçluk modülü ile rakiplerinizin önüne geçin.
-                                <br><br>
+                        <div class="min-w-full h-full flex flex-col justify-center pt-16 md:pt-0 items-center p-8 text-center bg-gradient-to-br from-slate-900 to-slate-800">
+                            <i class="fa-solid fa-graduation-cap text-5xl md:text-6xl text-primary mb-4 md:mb-6 animate-bounce"></i>
+                            <h2 class="text-2xl md:text-3xl font-bold mb-2 md:mb-4">KPSS Studio Nedir?</h2>
+                            <p class="text-slate-300 text-sm md:text-base leading-relaxed max-w-md">
+                                Al&Ni KPSS Studio, yapay zeka destekli altyapısı ile sınav hazırlık sürecinizi dijitalleştirir.
+                                <br><span class="hidden md:inline"><br></span>
                                 <strong>Hedef:</strong> Minimum çalışma ile maksimum verim.
                             </p>
                         </div>
 
-                        <div class="min-w-full h-full flex flex-col justify-start md:justify-center pt-24 md:pt-0 overflow-y-auto items-center p-8 text-center bg-gradient-to-br from-indigo-900 to-slate-900">
-                            <i class="fa-solid fa-book-open-reader text-6xl text-blue-400 mb-6"></i>
-                            <h2 class="text-3xl font-bold mb-4">KPSS'ye Nasıl Çalışılır?</h2>
-                            <p class="text-slate-300 leading-relaxed max-w-md text-sm md:text-base">
-                                Kamu Personeli Seçme Sınavı (KPSS), disiplin ve strateji gerektirir.
-                                <br><br>
-                                <ul class="text-left text-slate-400 space-y-2 list-disc pl-4 inline-block">
-                                    <li>Konu eksiklerini erkenden tamamla.</li>
-                                    <li>Düzenli deneme çöz ve analiz et.</li>
-                                    <li>Pomodoro tekniği ile odaklan (Sistemimizde mevcut!).</li>
-                                    <li>Çıkmış soruları mutlaka çöz.</li>
+                        <div class="min-w-full h-full flex flex-col justify-center pt-16 md:pt-0 items-center p-8 text-center bg-gradient-to-br from-indigo-900 to-slate-900">
+                            <i class="fa-solid fa-book-open-reader text-5xl md:text-6xl text-blue-400 mb-4 md:mb-6"></i>
+                            <h2 class="text-2xl md:text-3xl font-bold mb-2 md:mb-4">Nasıl Çalışılır?</h2>
+                            <div class="text-slate-300 text-sm md:text-base leading-relaxed max-w-md text-left inline-block">
+                                <ul class="space-y-1 list-disc pl-4">
+                                    <li>Konu eksiklerini tamamla.</li>
+                                    <li>Düzenli deneme çöz.</li>
+                                    <li>Pomodoro ile odaklan.</li>
                                 </ul>
-                            </p>
+                            </div>
                         </div>
 
-                        <div class="min-w-full h-full flex flex-col justify-start md:justify-center pt-24 md:pt-0 overflow-y-auto items-center p-8 text-center bg-gradient-to-br from-orange-900 to-slate-900">
-                            <i class="fa-solid fa-layer-group text-6xl text-warning mb-6"></i>
-                            <h2 class="text-3xl font-bold mb-4">Al&Ni Ekosistemi</h2>
-                            <p class="text-slate-300 leading-relaxed max-w-md">
-                                Biz sadece bir sınav uygulaması değiliz. Al&Ni Studios olarak;
-                                <br><br>
-                                <span class="block mb-2"><strong class="text-white">LifeCalc Pro:</strong> Kişisel yaşam ve finans yönetiminde devrim yaratan süper uygulama.</span>
-                                <span class="block mb-2"><strong class="text-white">Menu Architect:</strong> Kafeler için yeni nesil SaaS dijital menü çözümleri.</span>
-                                <span class="block"><strong class="text-white">Web & Mobil:</strong> İhtiyaca özel, yüksek performanslı yazılım mimarileri.</span>
-                                <span class="block"><strong class="text-white">Mini Games Studios:1 :</strong> Birden fazla eğlenceli oyunun tek adresi! Google Play'de mevcut.</span>
+                        <div class="min-w-full h-full flex flex-col justify-center pt-16 md:pt-0 items-center p-8 text-center bg-gradient-to-br from-orange-900 to-slate-900">
+                            <i class="fa-solid fa-layer-group text-5xl md:text-6xl text-warning mb-4 md:mb-6"></i>
+                            <h2 class="text-2xl md:text-3xl font-bold mb-2 md:mb-4">Al&Ni Ekosistemi</h2>
+                            <p class="text-slate-300 text-sm md:text-base leading-relaxed max-w-md">
+                                <span class="block mb-1"><strong>LifeCalc Pro:</strong> Finans yönetimi.</span>
+                                <span class="block mb-1"><strong>Menu Architect:</strong> Dijital menü.</span>
+                                <span class="block"><strong>Mini Games:</strong> Eğlence dünyası.</span>
                             </p>
                         </div>
 
                     </div>
                     
-                    <button onclick="moveSlide(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-3 rounded-full text-white backdrop-blur-sm"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button onclick="moveSlide(1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-3 rounded-full text-white backdrop-blur-sm"><i class="fa-solid fa-chevron-right"></i></button>
+                    <button onclick="moveSlide(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-2 md:p-3 rounded-full text-white backdrop-blur-sm z-30"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button onclick="moveSlide(1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-2 md:p-3 rounded-full text-white backdrop-blur-sm z-30"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
 
-                <div class="p-6 text-center text-xs text-slate-500 z-10">
-                    &copy; 2025 Al&Ni Game Studios. All Rights Reserved.
+                <div class="p-4 md:p-6 text-center text-[10px] md:text-xs text-slate-500 z-20 relative">
+                    &copy; 2025 Al&Ni Game Studios.
                 </div>
                 
-                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-                <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
-                <div class="absolute bottom-12 left-0 w-full flex flex-col items-center justify-center md:hidden z-50 animate-bounce cursor-pointer" onclick="this.parentElement.nextElementSibling.scrollIntoView({behavior: 'smooth'})">
-                    <span class="text-[10px] text-white/80 font-bold mb-2 tracking-widest uppercase drop-shadow-md">Giriş Yapmak İçin Kaydır</span>
-                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/20 transition">
-                        <i class="fa-solid fa-chevron-down text-white text-lg"></i>
-                    </div>
-                </div>
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none z-10"></div>
+                <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none z-10"></div>
             </div>
 
-            <div id="loginFormArea" class="w-full md:w-1/2 bg-white flex flex-col justify-center items-center p-8 md:p-12 h-auto md:h-full md:overflow-y-auto">
-                <div class="w-full max-w-md">
-                    <div class="text-center mb-8">
-                        <h2 class="text-3xl font-bold text-slate-800">Hoş Geldin!</h2>
-                        <p class="text-slate-500 mt-2">Hesabına giriş yap ve çalışmaya başla.</p>
+            <div id="loginFormArea" class="w-full md:w-1/2 bg-white flex flex-col justify-center items-center p-6 md:p-12 flex-1 md:h-full md:overflow-y-auto">
+                <div class="w-full max-w-md py-8"> <div class="text-center mb-6 md:mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-slate-800">Hoş Geldin!</h2>
+                        <p class="text-slate-500 mt-2 text-sm md:text-base">Hesabına giriş yap ve çalışmaya başla.</p>
                     </div>
 
                     <div id="loginForm">
                         <div class="mb-4">
                             <label class="block text-sm font-bold text-slate-700 mb-2">E-Posta</label>
-                            <input type="email" id="loginEmail" class="w-full p-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-orange-100 outline-none transition" placeholder="ornek@alni.com">
+                            <input type="email" id="loginEmail" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-orange-100 outline-none transition" placeholder="ornek@alni.com">
                         </div>
                         <div class="mb-6">
                             <label class="block text-sm font-bold text-slate-700 mb-2">Şifre</label>
-                            <input type="password" id="loginPassword" class="w-full p-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-orange-100 outline-none transition" placeholder="••••••••">
+                            <input type="password" id="loginPassword" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-orange-100 outline-none transition" placeholder="••••••••">
                         </div>
-                        <button onclick="window.handleLogin()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-4 rounded-xl transition shadow-xl shadow-orange-200 transform hover:-translate-y-1">Giriş Yap</button>
+                        <button onclick="window.handleLogin()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3 md:py-4 rounded-xl transition shadow-xl shadow-orange-200 transform hover:-translate-y-1">Giriş Yap</button>
                         <p class="mt-6 text-center text-sm text-slate-600">Hesabın yok mu? <a href="#" onclick="window.toggleAuth('register')" class="text-primary font-bold hover:underline">Hemen Kayıt Ol</a></p>
                     </div>
                     
                     <div id="registerForm" class="hidden">
                         <div class="mb-3">
-                            <input type="text" id="regName" class="w-full p-4 rounded-xl border border-slate-200 outline-none" placeholder="Ad Soyad">
+                            <input type="text" id="regName" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 outline-none" placeholder="Ad Soyad">
                         </div>
                         <div class="mb-3">
-                            <input type="email" id="regEmail" class="w-full p-4 rounded-xl border border-slate-200 outline-none" placeholder="E-Posta">
+                            <input type="email" id="regEmail" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 outline-none" placeholder="E-Posta">
                         </div>
                         <div class="mb-3">
-                            <input type="password" id="regPassword" class="w-full p-4 rounded-xl border border-slate-200 outline-none" placeholder="Şifre">
+                            <input type="password" id="regPassword" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 outline-none" placeholder="Şifre">
                         </div>
                         <div class="flex items-start space-x-2 mb-6">
                             <input type="checkbox" id="privacyCheck" class="mt-1 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary">
@@ -209,7 +196,7 @@
                                 <span onclick="window.showPrivacyModal()" class="text-primary font-bold underline">Gizlilik Politikasını</span> okudum, anladım ve onaylıyorum.
                             </label>
                         </div>
-                        <button onclick="window.handleRegister()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl transition shadow-xl">Ücretsiz Kayıt Ol</button>
+                        <button onclick="window.handleRegister()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 md:py-4 rounded-xl transition shadow-xl">Ücretsiz Kayıt Ol</button>
                         <p class="mt-6 text-center text-sm text-slate-600">Zaten üye misin? <a href="#" onclick="window.toggleAuth('login')" class="text-primary font-bold hover:underline">Giriş Yap</a></p>
                     </div>
 
