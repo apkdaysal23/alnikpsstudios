@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Al&Ni KPSS Studio | Ultimate V11 (Mobile Pro)</title>
+    <title>Al&Ni KPSS Studio | Ultimate V13 (AdSense Ready)</title>
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1105930817107200"
+     crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -19,7 +22,8 @@
                         secondary: '#fff7ed',
                         success: '#22c55e',
                         warning: '#eab308',
-                        danger: '#ef4444'
+                        danger: '#ef4444',
+                        studio: '#1e293b' // Al&Ni Studios Brand Color
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -38,10 +42,9 @@
         .status-btn { transition: all 0.2s; }
         .status-btn:active { transform: scale(0.95); }
         
-        /* Aktif Menü Stili */
         .nav-item.active-nav {
-            background-color: #fff7ed; /* orange-50 */
-            color: #f97316; /* primary */
+            background-color: #fff7ed;
+            color: #f97316;
             border-right: 3px solid #f97316;
             font-weight: 600;
         }
@@ -49,7 +52,6 @@
         .avatar-option:hover { transform: scale(1.1); border-color: #f97316; }
         .avatar-option.selected { border-color: #f97316; ring: 2px solid #f97316; transform: scale(1.1); }
 
-        /* Flashcard Styles */
         .perspective { perspective: 1000px; }
         .flip-card-inner {
             transition: transform 0.6s;
@@ -77,7 +79,6 @@
             transform: rotateY(180deg);
         }
         
-        /* Note Sticky Look */
         .sticky-note {
             background: #fef3c7;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
@@ -86,50 +87,133 @@
 
         .tab-active { border-bottom: 2px solid #f97316; color: #f97316; font-weight: bold; }
         
-        /* Mobile Sidebar Transitions */
-        .sidebar-transition {
-            transition: transform 0.3s ease-in-out;
-        }
-        .sidebar-open {
-            transform: translateX(0);
-        }
-        .sidebar-closed {
-            transform: translateX(-100%);
-        }
-        /* Desktop fix */
-        @media (min-width: 768px) {
-            .sidebar-closed { transform: translateX(0); }
-        }
+        .sidebar-transition { transition: transform 0.3s ease-in-out; }
+        .sidebar-open { transform: translateX(0); }
+        .sidebar-closed { transform: translateX(-100%); }
+        @media (min-width: 768px) { .sidebar-closed { transform: translateX(0); } }
+
+        /* Carousel Styles */
+        .carousel-track { transition: transform 0.5s ease-in-out; }
+        .glass-panel { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
     </style>
 </head>
 <body class="text-slate-800 h-screen overflow-hidden flex flex-col">
 
-    <div id="authScreen" class="fixed inset-0 z-[60] flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
-        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-4 border-primary mx-4">
-            <div class="text-center mb-6">
-                <h1 class="text-3xl font-bold text-slate-800">Al&Ni <span class="text-primary">KPSS Studio</span></h1>
-                <p class="text-slate-500 text-sm mt-1">Yapay Zeka Destekli Hazırlık</p>
-            </div>
+    <div id="authScreen" class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-50 overflow-y-auto">
+        <div class="w-full h-full md:h-[90vh] md:max-w-[1400px] bg-white md:rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden relative">
             
-            <div id="loginForm">
-                <input type="email" id="loginEmail" class="w-full mb-3 p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none" placeholder="E-Posta">
-                <input type="password" id="loginPassword" class="w-full mb-4 p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none" placeholder="Şifre">
-                <button onclick="window.handleLogin()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3 rounded-lg transition shadow-lg shadow-orange-200">Giriş Yap</button>
-                <p class="mt-4 text-center text-sm">Hesabın yok mu? <a href="#" onclick="window.toggleAuth('register')" class="text-primary font-bold">Kayıt Ol</a></p>
-            </div>
-            
-            <div id="registerForm" class="hidden">
-                <input type="text" id="regName" class="w-full mb-3 p-3 rounded-lg border border-slate-300 outline-none" placeholder="Ad Soyad">
-                <input type="email" id="regEmail" class="w-full mb-3 p-3 rounded-lg border border-slate-300 outline-none" placeholder="E-Posta">
-                <input type="password" id="regPassword" class="w-full mb-3 p-3 rounded-lg border border-slate-300 outline-none" placeholder="Şifre">
-                <div class="flex items-start space-x-2 mb-4">
-                    <input type="checkbox" id="privacyCheck" class="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
-                    <label for="privacyCheck" class="text-xs text-slate-600 cursor-pointer">
-                        <span onclick="window.showPrivacyModal()" class="text-primary font-bold underline">Gizlilik Politikasını</span> okudum ve onaylıyorum.
-                    </label>
+            <div class="w-full md:w-1/2 bg-slate-900 text-white relative flex flex-col justify-between shrink-0 h-[50vh] md:h-full">
+                <div class="p-6 md:p-8 flex items-center gap-3 z-10">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-bold text-xl">A</div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-wider">Al&Ni STUDIOS</h1>
+                        <p class="text-xs text-slate-400">Next Gen Software</p>
+                    </div>
                 </div>
-                <button onclick="window.handleRegister()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg transition">Kayıt Ol</button>
-                <p class="mt-4 text-center text-sm">Zaten üye misin? <a href="#" onclick="window.toggleAuth('login')" class="text-primary font-bold">Giriş Yap</a></p>
+
+                <div class="flex-1 relative overflow-hidden flex items-center">
+                    <div id="sliderTrack" class="carousel-track flex w-full h-full absolute top-0 left-0">
+                        
+                        <div class="min-w-full h-full flex flex-col justify-center items-center p-8 text-center bg-gradient-to-br from-slate-900 to-slate-800">
+                            <i class="fa-solid fa-graduation-cap text-6xl text-primary mb-6 animate-bounce"></i>
+                            <h2 class="text-3xl font-bold mb-4">KPSS Studio Nedir?</h2>
+                            <p class="text-slate-300 leading-relaxed max-w-md">
+                                Al&Ni KPSS Studio, yapay zeka destekli altyapısı ile sınav hazırlık sürecinizi dijitalleştirir. 
+                                Konu takibi, deneme analizi, flashcard sistemi ve akıllı koçluk modülü ile rakiplerinizin önüne geçin.
+                                <br><br>
+                                <strong>Hedef:</strong> Minimum çalışma ile maksimum verim.
+                            </p>
+                        </div>
+
+                        <div class="min-w-full h-full flex flex-col justify-center items-center p-8 text-center bg-gradient-to-br from-indigo-900 to-slate-900">
+                            <i class="fa-solid fa-book-open-reader text-6xl text-blue-400 mb-6"></i>
+                            <h2 class="text-3xl font-bold mb-4">KPSS'ye Nasıl Çalışılır?</h2>
+                            <p class="text-slate-300 leading-relaxed max-w-md text-sm md:text-base">
+                                Kamu Personeli Seçme Sınavı (KPSS), disiplin ve strateji gerektirir.
+                                <br><br>
+                                <ul class="text-left text-slate-400 space-y-2 list-disc pl-4 inline-block">
+                                    <li>Konu eksiklerini erkenden tamamla.</li>
+                                    <li>Düzenli deneme çöz ve analiz et.</li>
+                                    <li>Pomodoro tekniği ile odaklan (Sistemimizde mevcut!).</li>
+                                    <li>Çıkmış soruları mutlaka çöz.</li>
+                                </ul>
+                            </p>
+                        </div>
+
+                        <div class="min-w-full h-full flex flex-col justify-center items-center p-8 text-center bg-gradient-to-br from-orange-900 to-slate-900">
+                            <i class="fa-solid fa-layer-group text-6xl text-warning mb-6"></i>
+                            <h2 class="text-3xl font-bold mb-4">Al&Ni Ekosistemi</h2>
+                            <p class="text-slate-300 leading-relaxed max-w-md">
+                                Biz sadece bir sınav uygulaması değiliz. Al&Ni Studios olarak;
+                                <br><br>
+                                <span class="block mb-2"><strong class="text-white">LifeCalc Pro:</strong> Kişisel yaşam ve finans yönetiminde devrim yaratan süper uygulama.</span>
+                                <span class="block mb-2"><strong class="text-white">Menu Architect:</strong> Kafeler için yeni nesil SaaS dijital menü çözümleri.</span>
+                                <span class="block"><strong class="text-white">Web & Mobil:</strong> İhtiyaca özel, yüksek performanslı yazılım mimarileri.</span>
+                            </p>
+                        </div>
+
+                    </div>
+                    
+                    <button onclick="moveSlide(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-3 rounded-full text-white backdrop-blur-sm"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button onclick="moveSlide(1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-3 rounded-full text-white backdrop-blur-sm"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+
+                <div class="p-6 text-center text-xs text-slate-500 z-10">
+                    &copy; 2025 Al&Ni Game Studios. All Rights Reserved.
+                </div>
+                
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+            </div>
+
+            <div class="w-full md:w-1/2 bg-white flex flex-col justify-center items-center p-8 md:p-12 overflow-y-auto h-[50vh] md:h-full">
+                <div class="w-full max-w-md">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-slate-800">Hoş Geldin!</h2>
+                        <p class="text-slate-500 mt-2">Hesabına giriş yap ve çalışmaya başla.</p>
+                    </div>
+
+                    <div id="loginForm">
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold text-slate-700 mb-2">E-Posta</label>
+                            <input type="email" id="loginEmail" class="w-full p-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-orange-100 outline-none transition" placeholder="ornek@alni.com">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Şifre</label>
+                            <input type="password" id="loginPassword" class="w-full p-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-orange-100 outline-none transition" placeholder="••••••••">
+                        </div>
+                        <button onclick="window.handleLogin()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-4 rounded-xl transition shadow-xl shadow-orange-200 transform hover:-translate-y-1">Giriş Yap</button>
+                        <p class="mt-6 text-center text-sm text-slate-600">Hesabın yok mu? <a href="#" onclick="window.toggleAuth('register')" class="text-primary font-bold hover:underline">Hemen Kayıt Ol</a></p>
+                    </div>
+                    
+                    <div id="registerForm" class="hidden">
+                        <div class="mb-3">
+                            <input type="text" id="regName" class="w-full p-4 rounded-xl border border-slate-200 outline-none" placeholder="Ad Soyad">
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" id="regEmail" class="w-full p-4 rounded-xl border border-slate-200 outline-none" placeholder="E-Posta">
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" id="regPassword" class="w-full p-4 rounded-xl border border-slate-200 outline-none" placeholder="Şifre">
+                        </div>
+                        <div class="flex items-start space-x-2 mb-6">
+                            <input type="checkbox" id="privacyCheck" class="mt-1 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary">
+                            <label for="privacyCheck" class="text-xs text-slate-600 cursor-pointer leading-tight">
+                                <span onclick="window.showPrivacyModal()" class="text-primary font-bold underline">Gizlilik Politikasını</span> okudum, anladım ve onaylıyorum.
+                            </label>
+                        </div>
+                        <button onclick="window.handleRegister()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl transition shadow-xl">Ücretsiz Kayıt Ol</button>
+                        <p class="mt-6 text-center text-sm text-slate-600">Zaten üye misin? <a href="#" onclick="window.toggleAuth('login')" class="text-primary font-bold hover:underline">Giriş Yap</a></p>
+                    </div>
+
+                    <div class="mt-8 pt-8 border-t border-slate-100 flex justify-center space-x-4 text-xs text-slate-400">
+                        <a href="#" class="hover:text-primary">Yardım</a>
+                        <span>•</span>
+                        <a href="#" class="hover:text-primary">İletişim</a>
+                        <span>•</span>
+                        <a href="#" onclick="window.showPrivacyModal()" class="hover:text-primary">Gizlilik</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -264,6 +348,19 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // --- SLIDER LOGIC ---
+        let currentSlide = 0;
+        const totalSlides = 3;
+        
+        window.moveSlide = (n) => {
+            currentSlide = (currentSlide + n + totalSlides) % totalSlides;
+            const track = document.getElementById('sliderTrack');
+            if(track) track.style.transform = `translateX(-${currentSlide * 100}%)`;
+        };
+        
+        // Auto slide
+        setInterval(() => { if(!currentUser) window.moveSlide(1); }, 5000);
 
         // --- CONSTANTS ---
         const CURRICULUM = {
@@ -492,7 +589,7 @@
             return html + `</div>`;
         }
 
-        // --- 4. LEADERBOARD (Real Data + Admin Badge) ---
+        // --- 4. LEADERBOARD (FIXED: CLIENT-SIDE SORTING) ---
         function renderLeaderboard() {
             return `
                 <div class="max-w-2xl mx-auto">
@@ -512,14 +609,23 @@
         }
 
         async function loadLeaderboardData() {
-            const q = query(collection(db, "users"), orderBy("totalScore", "desc"), limit(20));
+            // FIX: Removed 'orderBy' from Firestore query to avoid Index/Permission errors.
+            // We fetch users and sort them in JavaScript instead.
+            const q = query(collection(db, "users"), limit(50));
+            
             try {
                 const snap = await getDocs(q);
+                let users = [];
+                snap.forEach(doc => { users.push({ id: doc.id, ...doc.data() }); });
+                
+                // Client-side Sorting (Descending Order by TotalScore)
+                users.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+                
                 let html = '';
                 let rank = 1;
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    const isMe = doc.id === currentUser.uid;
+                
+                users.forEach(u => {
+                    const isMe = u.id === currentUser.uid;
                     const isAdmin = u.title === 'Yönetici' || u.email === ADMIN_EMAIL;
                     
                     html += `
@@ -544,14 +650,17 @@
                         </div>
                     `;
                 });
+                
+                if(users.length === 0) html = '<div class="p-4 text-center text-slate-500">Henüz kayıtlı kullanıcı yok.</div>';
+                
                 document.getElementById('leaderboardList').innerHTML = html;
             } catch (error) {
                 console.error("Leaderboard Error:", error);
-                document.getElementById('leaderboardList').innerHTML = '<div class="p-4 text-center text-red-500">Sıralama yüklenirken hata oluştu. (Henüz yeterli deneme çözülmedi)</div>';
+                document.getElementById('leaderboardList').innerHTML = '<div class="p-4 text-center text-red-500">Sıralama yüklenirken hata oluştu. (Veritabanı erişim izni gerekebilir)</div>';
             }
         }
 
-        // --- 5. FLASHCARDS (Updated Logic) ---
+        // --- 5. FLASHCARDS ---
         function renderCards() {
             return `
                 <div class="max-w-4xl mx-auto">
@@ -662,7 +771,7 @@
             `;
         }
 
-        // --- 7. FORUM MODULE (Admin Badge Added) ---
+        // --- 7. FORUM MODULE ---
         function renderForum() {
             return `
                 <div class="max-w-4xl mx-auto">
@@ -1062,7 +1171,10 @@
 
             const gy = tr + mat;
             const gk = hist + geo + cit;
-            const score = Math.round(55 + (gy * 0.4) + (gk * 0.4)); 
+            let score = Math.round(55 + (gy * 0.4) + (gk * 0.4)); 
+            
+            // NEW RULE: Cap score at 100
+            if(score > 100) score = 100;
 
             const data = {
                 trNet: tr, mathNet: mat, histNet: hist, geoNet: geo, citNet: cit,
