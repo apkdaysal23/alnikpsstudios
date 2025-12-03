@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Al&Ni KPSS Studio | Al&Ni Studios </title>
+    <title>Al&Ni KPSS Studio | Al&Ni Studios</title>
     
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1105930817107200"
-     crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1105930817107200" crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -14,6 +13,7 @@
     
     <script>
         tailwind.config = {
+            darkMode: 'class', // Dark mode sınıf tabanlı çalışacak
             theme: {
                 extend: {
                     colors: {
@@ -23,7 +23,10 @@
                         success: '#22c55e',
                         warning: '#eab308',
                         danger: '#ef4444',
-                        studio: '#1e293b' // Al&Ni Studios Brand Color
+                        studio: '#1e293b',
+                        darkBg: '#0f172a', // Dark mode ana arka plan
+                        darkCard: '#1e293b', // Dark mode kart arka planı
+                        darkText: '#f1f5f9'  // Dark mode yazı rengi
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -33,11 +36,13 @@
         }
     </script>
     <style>
-        body { background-color: #f8fafc; }
+        body { transition: background-color 0.3s, color 0.3s; }
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #f97316; }
+        
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
         
         .status-btn { transition: all 0.2s; }
         .status-btn:active { transform: scale(0.95); }
@@ -47,6 +52,13 @@
             color: #f97316;
             border-right: 3px solid #f97316;
             font-weight: 600;
+        }
+        
+        /* Dark Mode Active Nav */
+        .dark .nav-item.active-nav {
+            background-color: #334155;
+            color: #fb923c;
+            border-right: 3px solid #fb923c;
         }
         
         .avatar-option:hover { transform: scale(1.1); border-color: #f97316; }
@@ -84,6 +96,11 @@
             box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
             border-bottom-right-radius: 20px;
         }
+        /* Dark mode sticky note adjustment */
+        .dark .sticky-note {
+            background: #f59e0b; 
+            color: #000;
+        }
 
         .tab-active { border-bottom: 2px solid #f97316; color: #f97316; font-weight: bold; }
         
@@ -92,15 +109,14 @@
         .sidebar-closed { transform: translateX(-100%); }
         @media (min-width: 768px) { .sidebar-closed { transform: translateX(0); } }
 
-        /* Carousel Styles */
         .carousel-track { transition: transform 0.5s ease-in-out; }
         .glass-panel { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
     </style>
 </head>
-<body class="text-slate-800 h-screen overflow-hidden flex flex-col">
+<body class="text-slate-800 bg-slate-50 dark:bg-darkBg dark:text-darkText h-screen overflow-hidden flex flex-col transition-colors duration-300">
 
-<div id="authScreen" class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-50 overflow-y-auto">
-        <div class="w-full min-h-screen md:h-[90vh] md:max-w-[1400px] bg-white md:rounded-3xl shadow-2xl flex flex-col md:flex-row md:overflow-hidden relative">
+<div id="authScreen" class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-50 dark:bg-darkBg overflow-y-auto">
+        <div class="w-full min-h-screen md:h-[90vh] md:max-w-[1400px] bg-white dark:bg-darkCard md:rounded-3xl shadow-2xl flex flex-col md:flex-row md:overflow-hidden relative transition-colors duration-300">
             
             <div class="w-full md:w-1/2 h-[45vh] md:h-full bg-slate-900 text-white relative flex flex-col justify-between shrink-0">
                 
@@ -161,46 +177,47 @@
                 <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none z-10"></div>
             </div>
 
-            <div id="loginFormArea" class="w-full md:w-1/2 bg-white flex flex-col justify-center items-center p-6 md:p-12 flex-1 md:h-full md:overflow-y-auto">
-                <div class="w-full max-w-md py-8"> <div class="text-center mb-6 md:mb-8">
-                        <h2 class="text-2xl md:text-3xl font-bold text-slate-800">Hoş Geldin!</h2>
-                        <p class="text-slate-500 mt-2 text-sm md:text-base">Hesabına giriş yap ve çalışmaya başla.</p>
+            <div id="loginFormArea" class="w-full md:w-1/2 bg-white dark:bg-darkCard flex flex-col justify-center items-center p-6 md:p-12 flex-1 md:h-full md:overflow-y-auto transition-colors duration-300">
+                <div class="w-full max-w-md py-8"> 
+                    <div class="text-center mb-6 md:mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">Hoş Geldin!</h2>
+                        <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm md:text-base">Hesabına giriş yap ve çalışmaya başla.</p>
                     </div>
 
                     <div id="loginForm">
                         <div class="mb-4">
-                            <label class="block text-sm font-bold text-slate-700 mb-2">E-Posta</label>
-                            <input type="email" id="loginEmail" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-orange-100 outline-none transition" placeholder="ornek@alni.com">
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">E-Posta</label>
+                            <input type="email" id="loginEmail" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white focus:border-primary focus:ring-2 focus:ring-orange-100 dark:focus:ring-orange-900 outline-none transition" placeholder="ornek@alni.com">
                         </div>
                         <div class="mb-6">
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Şifre</label>
-                            <input type="password" id="loginPassword" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-orange-100 outline-none transition" placeholder="••••••••">
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Şifre</label>
+                            <input type="password" id="loginPassword" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white focus:border-primary focus:ring-2 focus:ring-orange-100 dark:focus:ring-orange-900 outline-none transition" placeholder="••••••••">
                         </div>
-                        <button onclick="window.handleLogin()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3 md:py-4 rounded-xl transition shadow-xl shadow-orange-200 transform hover:-translate-y-1">Giriş Yap</button>
-                        <p class="mt-6 text-center text-sm text-slate-600">Hesabın yok mu? <a href="#" onclick="window.toggleAuth('register')" class="text-primary font-bold hover:underline">Hemen Kayıt Ol</a></p>
+                        <button onclick="window.handleLogin()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3 md:py-4 rounded-xl transition shadow-xl shadow-orange-200 dark:shadow-none transform hover:-translate-y-1">Giriş Yap</button>
+                        <p class="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">Hesabın yok mu? <a href="#" onclick="window.toggleAuth('register')" class="text-primary font-bold hover:underline">Hemen Kayıt Ol</a></p>
                     </div>
                     
                     <div id="registerForm" class="hidden">
                         <div class="mb-3">
-                            <input type="text" id="regName" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 outline-none" placeholder="Ad Soyad">
+                            <input type="text" id="regName" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white outline-none" placeholder="Ad Soyad">
                         </div>
                         <div class="mb-3">
-                            <input type="email" id="regEmail" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 outline-none" placeholder="E-Posta">
+                            <input type="email" id="regEmail" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white outline-none" placeholder="E-Posta">
                         </div>
                         <div class="mb-3">
-                            <input type="password" id="regPassword" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 outline-none" placeholder="Şifre">
+                            <input type="password" id="regPassword" class="w-full p-3 md:p-4 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white outline-none" placeholder="Şifre">
                         </div>
                         <div class="flex items-start space-x-2 mb-6">
                             <input type="checkbox" id="privacyCheck" class="mt-1 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary">
-                            <label for="privacyCheck" class="text-xs text-slate-600 cursor-pointer leading-tight">
+                            <label for="privacyCheck" class="text-xs text-slate-600 dark:text-slate-400 cursor-pointer leading-tight">
                                 <span onclick="window.showPrivacyModal()" class="text-primary font-bold underline">Gizlilik Politikasını</span> okudum, anladım ve onaylıyorum.
                             </label>
                         </div>
-                        <button onclick="window.handleRegister()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 md:py-4 rounded-xl transition shadow-xl">Ücretsiz Kayıt Ol</button>
-                        <p class="mt-6 text-center text-sm text-slate-600">Zaten üye misin? <a href="#" onclick="window.toggleAuth('login')" class="text-primary font-bold hover:underline">Giriş Yap</a></p>
+                        <button onclick="window.handleRegister()" class="w-full bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-3 md:py-4 rounded-xl transition shadow-xl">Ücretsiz Kayıt Ol</button>
+                        <p class="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">Zaten üye misin? <a href="#" onclick="window.toggleAuth('login')" class="text-primary font-bold hover:underline">Giriş Yap</a></p>
                     </div>
 
-                    <div class="mt-8 pt-8 border-t border-slate-100 flex justify-center space-x-4 text-xs text-slate-400">
+                    <div class="mt-8 pt-8 border-t border-slate-100 dark:border-slate-700 flex justify-center space-x-4 text-xs text-slate-400">
                         <a href="#" class="hover:text-primary">Yardım</a>
                         <span>•</span>
                         <a href="#" class="hover:text-primary">İletişim</a>
@@ -216,57 +233,57 @@
         
         <div id="mobileOverlay" onclick="window.toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden glass-effect transition-opacity"></div>
 
-        <aside id="mainSidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-300 md:static md:flex shrink-0 h-full shadow-2xl md:shadow-none">
+        <aside id="mainSidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-darkCard border-r border-slate-200 dark:border-slate-700 flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-300 md:static md:flex shrink-0 h-full shadow-2xl md:shadow-none transition-colors duration-300">
             
             <div class="flex-1 flex flex-col overflow-hidden">
-                <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">A</div>
                         <div>
-                            <h2 class="font-bold text-slate-800 leading-tight">Al&Ni KPSS</h2>
-                            <p class="text-xs text-slate-500">Ultimate Pro Max</p>
+                            <h2 class="font-bold text-slate-800 dark:text-white leading-tight">Al&Ni KPSS</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Ultimate Pro Max</p>
                         </div>
                     </div>
-                    <button onclick="window.toggleSidebar()" class="md:hidden text-slate-400 hover:text-slate-600">
+                    <button onclick="window.toggleSidebar()" class="md:hidden text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                         <i class="fa-solid fa-xmark text-xl"></i>
                     </button>
                 </div>
                 
-                <div class="p-4 bg-secondary m-4 rounded-xl border border-orange-100 text-center shrink-0">
-                    <img id="sidebarAvatar" src="" class="w-12 h-12 rounded-full mx-auto border-2 border-white shadow-sm mb-2 bg-white">
-                    <div id="sidebarName" class="text-sm font-bold text-slate-800">...</div>
+                <div class="p-4 bg-secondary dark:bg-slate-800 m-4 rounded-xl border border-orange-100 dark:border-slate-600 text-center shrink-0">
+                    <img id="sidebarAvatar" src="" class="w-12 h-12 rounded-full mx-auto border-2 border-white dark:border-slate-700 shadow-sm mb-2 bg-white dark:bg-slate-600">
+                    <div id="sidebarName" class="text-sm font-bold text-slate-800 dark:text-white">...</div>
                     <div id="sidebarTitle" class="text-xs text-primary font-semibold">...</div>
                 </div>
 
                 <nav class="px-4 space-y-1 text-sm mt-2 flex-1 overflow-y-auto pb-4">
-                    <button id="nav-dashboard" onclick="window.loadPage('dashboard')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-chart-pie w-5"></i><span>Genel Bakış</span></button>
-                    <button id="nav-smartcoach" onclick="window.loadPage('smartcoach')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-brain w-5 text-purple-600"></i><span class="font-bold text-purple-700">SmartCoach AI</span></button>
+                    <button id="nav-dashboard" onclick="window.loadPage('dashboard')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-chart-pie w-5"></i><span>Genel Bakış</span></button>
+                    <button id="nav-smartcoach" onclick="window.loadPage('smartcoach')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-brain w-5 text-purple-600"></i><span class="font-bold text-purple-700 dark:text-purple-400">SmartCoach AI</span></button>
                     
                     <div class="pt-2 pb-1 text-xs font-bold text-slate-400 px-4">ÇALIŞMA</div>
-                    <button id="nav-subjects" onclick="window.loadPage('subjects')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-list-check w-5"></i><span>Konu Takip</span></button>
-                    <button id="nav-quiz" onclick="window.loadPage('quiz')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-pen-nib w-5"></i><span>Soru Merkezi</span></button>
-                    <button id="nav-cards" onclick="window.loadPage('cards')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-layer-group w-5"></i><span>Flashcards</span></button>
-                    <button id="nav-mocks" onclick="window.loadPage('mocks')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-chart-line w-5"></i><span>Deneme & Analiz</span></button>
+                    <button id="nav-subjects" onclick="window.loadPage('subjects')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-list-check w-5"></i><span>Konu Takip</span></button>
+                    <button id="nav-quiz" onclick="window.loadPage('quiz')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-pen-nib w-5"></i><span>Soru Merkezi</span></button>
+                    <button id="nav-cards" onclick="window.loadPage('cards')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-layer-group w-5"></i><span>Flashcards</span></button>
+                    <button id="nav-mocks" onclick="window.loadPage('mocks')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-chart-line w-5"></i><span>Deneme & Analiz</span></button>
                     
                     <div class="pt-2 pb-1 text-xs font-bold text-slate-400 px-4">SOSYAL & EKSTRA</div>
-                    <button id="nav-forum" onclick="window.loadPage('forum')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-comments w-5"></i><span>Forum</span></button>
-                    <button id="nav-leaderboard" onclick="window.loadPage('leaderboard')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-trophy w-5 text-yellow-500"></i><span>Liderlik Tablosu</span></button>
-                    <button id="nav-notes" onclick="window.loadPage('notes')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-sticky-note w-5"></i><span>Not Defterim</span></button>
-                    <button id="nav-feedback" onclick="window.loadPage('feedback')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-paper-plane w-5"></i><span>Öneri / Şikayet</span></button>
+                    <button id="nav-forum" onclick="window.loadPage('forum')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-comments w-5"></i><span>Forum</span></button>
+                    <button id="nav-leaderboard" onclick="window.loadPage('leaderboard')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-trophy w-5 text-yellow-500"></i><span>Liderlik Tablosu</span></button>
+                    <button id="nav-notes" onclick="window.loadPage('notes')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-sticky-note w-5"></i><span>Not Defterim</span></button>
+                    <button id="nav-feedback" onclick="window.loadPage('feedback')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-paper-plane w-5"></i><span>Öneri / Şikayet</span></button>
 
                     <div class="pt-2 pb-1 text-xs font-bold text-slate-400 px-4">KİŞİSEL</div>
-                    <button id="nav-notifications" onclick="window.loadPage('notifications')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition relative">
+                    <button id="nav-notifications" onclick="window.loadPage('notifications')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition relative">
                         <i class="fa-solid fa-bell w-5"></i><span>Bildirimler</span>
-                        <span id="notifBadge" class="hidden absolute top-2 right-4 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full border border-white">0</span>
+                        <span id="notifBadge" class="hidden absolute top-2 right-4 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full border border-white dark:border-slate-800">0</span>
                     </button>
-                    <button id="nav-profile" onclick="window.loadPage('profile')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 rounded-lg hover:bg-orange-50 hover:text-primary transition"><i class="fa-solid fa-user-gear w-5"></i><span>Ayarlar</span></button>
+                    <button id="nav-profile" onclick="window.loadPage('profile')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-user-gear w-5"></i><span>Ayarlar</span></button>
                     
-                    <button id="adminLink" onclick="window.loadPage('admin')" class="hidden nav-item w-full flex items-center space-x-3 px-4 py-3 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition mt-4"><i class="fa-solid fa-shield-halved w-5"></i><span>Yönetim Paneli</span></button>
+                    <button id="adminLink" onclick="window.loadPage('admin')" class="hidden nav-item w-full flex items-center space-x-3 px-4 py-3 text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/40 transition mt-4"><i class="fa-solid fa-shield-halved w-5"></i><span>Yönetim Paneli</span></button>
                 </nav>
             </div>
 
-            <div class="bg-slate-50 border-t border-slate-200 p-4">
-                 <div class="bg-slate-800 rounded-xl p-3 text-white text-center mb-3">
+            <div class="bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 p-4">
+                 <div class="bg-slate-800 dark:bg-slate-700 rounded-xl p-3 text-white text-center mb-3">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] text-slate-400">POMODORO</span>
                         <span class="text-[10px] text-green-400" id="pomodoroCount">0 Seans</span>
@@ -277,28 +294,39 @@
                         <button onclick="window.resetTimer()" class="w-6 h-6 rounded-full bg-slate-600 hover:bg-slate-500 flex items-center justify-center"><i class="fa-solid fa-rotate-right text-[10px]"></i></button>
                     </div>
                 </div>
+                
+                <button onclick="window.toggleTheme()" class="w-full flex items-center justify-center space-x-2 text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-orange-50 dark:hover:bg-slate-700 p-2 rounded-lg transition text-sm font-medium mb-2">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline"></i>
+                    <span class="dark:hidden">Karanlık Mod</span>
+                    <span class="hidden dark:inline">Aydınlık Mod</span>
+                </button>
 
-                <button onclick="window.logout()" class="w-full flex items-center justify-center space-x-2 text-slate-500 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition text-sm font-medium">
+                <button onclick="window.logout()" class="w-full flex items-center justify-center space-x-2 text-slate-500 dark:text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition text-sm font-medium">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     <span>Çıkış Yap</span>
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-slate-50">
-            <header class="md:hidden h-16 bg-white border-b flex items-center justify-between px-4 z-30 shrink-0 shadow-sm">
+        <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-slate-50 dark:bg-darkBg transition-colors duration-300">
+            <header class="md:hidden h-16 bg-white dark:bg-darkCard border-b dark:border-slate-700 flex items-center justify-between px-4 z-30 shrink-0 shadow-sm transition-colors duration-300">
                 <div class="flex items-center space-x-3">
-                    <button onclick="window.toggleSidebar()" class="text-slate-600 hover:text-primary transition p-2">
+                    <button onclick="window.toggleSidebar()" class="text-slate-600 dark:text-slate-300 hover:text-primary transition p-2">
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
                     <div class="font-bold text-primary text-lg">Al&Ni KPSS</div>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <button onclick="window.loadPage('notifications')" class="text-slate-500 relative">
+                    <button onclick="window.toggleTheme()" class="text-slate-500 dark:text-slate-300 p-2">
+                         <i class="fa-solid fa-moon dark:hidden"></i>
+                         <i class="fa-solid fa-sun hidden dark:inline"></i>
+                    </button>
+                    <button onclick="window.loadPage('notifications')" class="text-slate-500 dark:text-slate-300 relative">
                          <i class="fa-solid fa-bell"></i>
                          <span id="mobileNotifBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-3 h-3 flex items-center justify-center rounded-full">0</span>
                     </button>
-                    <img id="mobileAvatar" src="" class="w-8 h-8 rounded-full border border-slate-200">
+                    <img id="mobileAvatar" src="" class="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-600">
                 </div>
             </header>
             
@@ -307,23 +335,22 @@
     </div>
 
     <div id="privacyModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col mx-4">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-slate-800">Gizlilik Politikası ve Kullanım Şartları</h3>
+        <div class="bg-white dark:bg-darkCard rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col mx-4 transition-colors duration-300">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white">Gizlilik Politikası ve Kullanım Şartları</h3>
                 <button onclick="window.closePrivacyModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-6 overflow-y-auto text-sm text-slate-600 space-y-4">
+            <div class="p-6 overflow-y-auto text-sm text-slate-600 dark:text-slate-300 space-y-4">
                 <p><strong>1. Veri Toplama:</strong> Al&Ni KPSS Studio, ilerleme durumunuzu takip etmek için e-posta, çalışma istatistikleri ve hedef puan verilerini saklar.</p>
                 <p><strong>2. Güvenlik:</strong> Verileriniz Firebase altyapısında şifrelenmiş olarak saklanır. 3. şahıslarla paylaşılmaz.</p>
                 <p><strong>3. Hesap Silme:</strong> Kullanıcı dilediği zaman profil ayarlarından "Hesabımı Sil" talebinde bulunabilir.</p>
                 <p><strong>4. Sorumluluk Reddi:</strong> Bu uygulama bir hazırlık aracıdır.</p>
             </div>
-            <div class="p-6 border-t border-slate-100 bg-slate-50 rounded-b-xl flex justify-end">
+            <div class="p-6 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-b-xl flex justify-end">
                 <button onclick="window.closePrivacyModal()" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primaryDark">Anladım</button>
             </div>
         </div>
     </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -342,6 +369,29 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // --- DARK MODE LOGIC ---
+        window.initializeTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        };
+        
+        window.toggleTheme = () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        };
+
+        // Initialize immediately
+        window.initializeTheme();
 
         // --- SLIDER LOGIC ---
         let currentSlide = 0;
@@ -366,10 +416,10 @@
         };
 
         const STATUS_TYPES = {
-            'not_started': { label: 'Başlamadı', color: 'bg-slate-100 text-slate-500', icon: 'fa-circle' },
-            'started': { label: 'Çalışıyorum', color: 'bg-yellow-100 text-yellow-700', icon: 'fa-person-digging' },
-            'completed': { label: 'Bitti', color: 'bg-green-100 text-green-700', icon: 'fa-check-circle' },
-            'needs_review': { label: 'Tekrar Lazım', color: 'bg-red-100 text-red-700', icon: 'fa-rotate-right' }
+            'not_started': { label: 'Başlamadı', color: 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300', icon: 'fa-circle' },
+            'started': { label: 'Çalışıyorum', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200', icon: 'fa-person-digging' },
+            'completed': { label: 'Bitti', color: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200', icon: 'fa-check-circle' },
+            'needs_review': { label: 'Tekrar Lazım', color: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200', icon: 'fa-rotate-right' }
         };
 
         const AVATAR_OPTIONS = [
@@ -394,7 +444,7 @@
         let isTimerRunning = false;
         let unsubscribeNotifications = null;
 
-        // --- AUTH & INIT (FIXED) ---
+        // --- AUTH & INIT ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
@@ -407,7 +457,6 @@
                     if (snap.exists()) {
                         userData = snap.data();
                     } else {
-                        // FORCE CREATE PROFILE FOR ADMIN/USER TO PREVENT CRASH
                         userData = { 
                             name: user.displayName || (user.email.split('@')[0]), 
                             email: user.email, 
@@ -425,7 +474,6 @@
                     document.getElementById('appContainer').classList.remove('hidden');
                     updateSidebar();
                     
-                    // Initial Loads
                     loadMocks();
                     loadMyQuestions();
                     loadMyNotes();
@@ -447,7 +495,6 @@
             const sidebar = document.getElementById('mainSidebar');
             const overlay = document.getElementById('mobileOverlay');
             
-            // Check if sidebar is currently closed (has -translate-x-full)
             if (sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.remove('-translate-x-full');
                 sidebar.classList.add('translate-x-0');
@@ -466,13 +513,11 @@
             const activeBtn = document.getElementById('nav-' + page);
             if(activeBtn) activeBtn.classList.add('active-nav');
             
-            // Auto close sidebar on mobile when navigating
             const sidebar = document.getElementById('mainSidebar');
             if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 768) {
                 window.toggleSidebar();
             }
 
-            // Admin Guard
             if(page === 'admin' && (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL)) {
                 content.innerHTML = '<div class="p-8 text-center text-red-500 font-bold">Yetkisiz Erişim!</div>';
                 return;
@@ -504,8 +549,8 @@
             return `
                 <div class="mb-6 flex justify-between items-end">
                     <div>
-                        <h1 class="text-2xl font-bold text-slate-800">Merhaba, ${userData.name} 👋</h1>
-                        <p class="text-slate-500">Bugün kazanmak için harika bir gün!</p>
+                        <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Merhaba, ${userData.name} 👋</h1>
+                        <p class="text-slate-500 dark:text-slate-400">Bugün kazanmak için harika bir gün!</p>
                     </div>
                 </div>
                 
@@ -522,22 +567,22 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="text-sm text-slate-500">Genel Tamamlanma</div>
-                        <div class="text-3xl font-bold text-slate-800">%${stats.totalProgress}</div>
-                        <div class="w-full bg-slate-100 h-2 mt-2 rounded-full overflow-hidden"><div class="bg-primary h-2" style="width:${stats.totalProgress}%"></div></div>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">Genel Tamamlanma</div>
+                        <div class="text-3xl font-bold text-slate-800 dark:text-white">%${stats.totalProgress}</div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-700 h-2 mt-2 rounded-full overflow-hidden"><div class="bg-primary h-2" style="width:${stats.totalProgress}%"></div></div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="text-sm text-slate-500">Çözülen Deneme</div>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">Çözülen Deneme</div>
                         <div class="text-3xl font-bold text-primary">${mockExamsHistory.length}</div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="text-sm text-slate-500">Pomodoro Seansı</div>
-                        <div class="text-3xl font-bold text-green-600">${userData.pomodoroSessions || 0}</div>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">Pomodoro Seansı</div>
+                        <div class="text-3xl font-bold text-green-600 dark:text-green-400">${userData.pomodoroSessions || 0}</div>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-80">
-                    <h3 class="font-bold mb-4">Puan Grafiği</h3>
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm h-80">
+                    <h3 class="font-bold mb-4 dark:text-white">Puan Grafiği</h3>
                     <canvas id="dashboardChart"></canvas>
                 </div>
             `;
@@ -549,15 +594,15 @@
             return `
                 <div class="max-w-4xl mx-auto">
                     <div class="text-center mb-10">
-                        <div class="inline-block p-4 bg-purple-100 rounded-full mb-4"><i class="fa-solid fa-brain text-4xl text-purple-600"></i></div>
-                        <h1 class="text-3xl font-bold text-slate-800">SmartCoach AI Analizi</h1>
-                        <p class="text-slate-500">Veritabanındaki tüm hareketlerin taranarak oluşturulmuştur.</p>
+                        <div class="inline-block p-4 bg-purple-100 dark:bg-purple-900 rounded-full mb-4"><i class="fa-solid fa-brain text-4xl text-purple-600 dark:text-purple-300"></i></div>
+                        <h1 class="text-3xl font-bold text-slate-800 dark:text-white">SmartCoach AI Analizi</h1>
+                        <p class="text-slate-500 dark:text-slate-400">Veritabanındaki tüm hareketlerin taranarak oluşturulmuştur.</p>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white p-6 rounded-xl border-l-4 border-blue-500 shadow-sm"><h3 class="font-bold text-slate-700 mb-2">Durum Tespiti</h3><p class="text-sm text-slate-600">${s.situationAnalysis}</p></div>
-                        <div class="bg-white p-6 rounded-xl border-l-4 border-yellow-500 shadow-sm"><h3 class="font-bold text-slate-700 mb-2">Strateji Önerisi</h3><p class="text-sm text-slate-600">${s.strategyAdvice}</p></div>
-                        <div class="bg-white p-6 rounded-xl border-l-4 border-red-500 shadow-sm"><h3 class="font-bold text-slate-700 mb-2">Zayıf Noktalar</h3><p class="text-sm text-slate-600">${s.weaknessAnalysis}</p></div>
-                        <div class="bg-white p-6 rounded-xl border-l-4 border-green-500 shadow-sm"><h3 class="font-bold text-slate-700 mb-2">Motivasyon</h3><p class="text-sm text-slate-600">${s.motivationMsg}</p></div>
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-blue-500 shadow-sm"><h3 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Durum Tespiti</h3><p class="text-sm text-slate-600 dark:text-slate-400">${s.situationAnalysis}</p></div>
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-yellow-500 shadow-sm"><h3 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Strateji Önerisi</h3><p class="text-sm text-slate-600 dark:text-slate-400">${s.strategyAdvice}</p></div>
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-red-500 shadow-sm"><h3 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Zayıf Noktalar</h3><p class="text-sm text-slate-600 dark:text-slate-400">${s.weaknessAnalysis}</p></div>
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-green-500 shadow-sm"><h3 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Motivasyon</h3><p class="text-sm text-slate-600 dark:text-slate-400">${s.motivationMsg}</p></div>
                     </div>
                 </div>
             `;
@@ -571,30 +616,30 @@
                 let done = 0;
                 CURRICULUM[les].forEach(t => { if((userData.progress || {})[les+"_"+t] === 'completed') done++; });
                 let pct = Math.round((done/total)*100);
-                html += `<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden"><div class="bg-slate-50 p-4 border-b border-slate-200 flex flex-col md:flex-row md:justify-between md:items-center gap-2"><h3 class="font-bold text-lg text-slate-800 border-l-4 border-primary pl-3">${les}</h3><div class="flex items-center gap-3 w-full md:w-1/3"><div class="flex-1 bg-white h-3 rounded-full border border-slate-200 overflow-hidden"><div class="bg-primary h-full transition-all duration-500" style="width: ${pct}%"></div></div><span class="text-xs font-bold text-slate-600 min-w-[3rem] text-right">%${pct}</span></div></div><div class="p-2 md:p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">`;
+                html += `<div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden"><div class="bg-slate-50 dark:bg-slate-700 p-4 border-b border-slate-200 dark:border-slate-600 flex flex-col md:flex-row md:justify-between md:items-center gap-2"><h3 class="font-bold text-lg text-slate-800 dark:text-white border-l-4 border-primary pl-3">${les}</h3><div class="flex items-center gap-3 w-full md:w-1/3"><div class="flex-1 bg-white dark:bg-slate-600 h-3 rounded-full border border-slate-200 dark:border-slate-500 overflow-hidden"><div class="bg-primary h-full transition-all duration-500" style="width: ${pct}%"></div></div><span class="text-xs font-bold text-slate-600 dark:text-slate-300 min-w-[3rem] text-right">%${pct}</span></div></div><div class="p-2 md:p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">`;
                 CURRICULUM[les].forEach(topic => {
                     const key = les + "_" + topic;
                     const status = (userData.progress || {})[key] || 'not_started';
                     const sInfo = STATUS_TYPES[status];
-                    html += `<div class="flex items-center justify-between p-3 rounded-lg border border-slate-100 bg-white hover:shadow-md transition group"><span class="text-sm font-medium text-slate-700 truncate mr-2">${topic}</span><button onclick="window.cycleStatus('${key}')" class="text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1 ${sInfo.color} status-btn min-w-[90px] justify-center"><i class="fa-solid ${sInfo.icon}"></i> ${sInfo.label}</button></div>`;
+                    html += `<div class="flex items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md transition group"><span class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate mr-2">${topic}</span><button onclick="window.cycleStatus('${key}')" class="text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1 ${sInfo.color} status-btn min-w-[90px] justify-center"><i class="fa-solid ${sInfo.icon}"></i> ${sInfo.label}</button></div>`;
                 });
                 html += `</div></div>`;
             }
             return html + `</div>`;
         }
 
-        // --- 4. LEADERBOARD (FIXED: CLIENT-SIDE SORTING) ---
+        // --- 4. LEADERBOARD ---
         function renderLeaderboard() {
             return `
                 <div class="max-w-2xl mx-auto">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center"><i class="fa-solid fa-trophy text-yellow-500 mr-2"></i>Liderlik Tablosu</h2>
-                    <div class="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-6 text-center"><i class="fa-solid fa-trophy text-yellow-500 mr-2"></i>Liderlik Tablosu</h2>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden">
                         <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-4 grid grid-cols-4 text-white font-bold text-sm">
                             <div class="col-span-2">Kullanıcı</div>
                             <div class="text-center">Ünvan</div>
                             <div class="text-right">Tahmini Puan</div>
                         </div>
-                        <div id="leaderboardList" class="divide-y divide-slate-100">
+                        <div id="leaderboardList" class="divide-y divide-slate-100 dark:divide-slate-700">
                             <div class="p-8 text-center text-slate-500"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>
                         </div>
                     </div>
@@ -603,8 +648,6 @@
         }
 
         async function loadLeaderboardData() {
-            // FIX: Removed 'orderBy' from Firestore query to avoid Index/Permission errors.
-            // We fetch users and sort them in JavaScript instead.
             const q = query(collection(db, "users"), limit(50));
             
             try {
@@ -612,7 +655,6 @@
                 let users = [];
                 snap.forEach(doc => { users.push({ id: doc.id, ...doc.data() }); });
                 
-                // Client-side Sorting (Descending Order by TotalScore)
                 users.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
                 
                 let html = '';
@@ -623,12 +665,12 @@
                     const isAdmin = u.title === 'Yönetici' || u.email === ADMIN_EMAIL;
                     
                     html += `
-                        <div class="p-4 grid grid-cols-4 items-center ${isMe ? 'bg-orange-50' : ''}">
+                        <div class="p-4 grid grid-cols-4 items-center ${isMe ? 'bg-orange-50 dark:bg-orange-900/20' : ''}">
                             <div class="col-span-2 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">${rank++}</div>
+                                <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300">${rank++}</div>
                                 <div class="flex items-center gap-2">
                                     <img src="${u.avatar}" class="w-6 h-6 rounded-full">
-                                    <span class="font-medium ${isMe ? 'text-primary font-bold' : 'text-slate-700'}">
+                                    <span class="font-medium ${isMe ? 'text-primary font-bold' : 'text-slate-700 dark:text-slate-300'}">
                                         ${u.name} ${isMe ? '(Sen)' : ''}
                                         ${isAdmin ? '<i class="fa-solid fa-shield-halved text-red-500 ml-1" title="Yönetici"></i>' : ''}
                                     </span>
@@ -637,10 +679,10 @@
                             <div class="text-center flex justify-center">
                                 ${isAdmin 
                                     ? '<span class="bg-red-100 text-red-600 px-2 py-0.5 rounded text-[10px] font-bold border border-red-200">YÖNETİCİ</span>' 
-                                    : `<span class="text-xs text-slate-500 bg-slate-100 rounded py-1 px-2">${u.title || '-'}</span>`
+                                    : `<span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 rounded py-1 px-2">${u.title || '-'}</span>`
                                 }
                             </div>
-                            <div class="text-right font-bold text-slate-800">${u.totalScore || 0}</div>
+                            <div class="text-right font-bold text-slate-800 dark:text-white">${u.totalScore || 0}</div>
                         </div>
                     `;
                 });
@@ -650,7 +692,7 @@
                 document.getElementById('leaderboardList').innerHTML = html;
             } catch (error) {
                 console.error("Leaderboard Error:", error);
-                document.getElementById('leaderboardList').innerHTML = '<div class="p-4 text-center text-red-500">Sıralama yüklenirken hata oluştu. (Veritabanı erişim izni gerekebilir)</div>';
+                document.getElementById('leaderboardList').innerHTML = '<div class="p-4 text-center text-red-500">Sıralama yüklenirken hata oluştu.</div>';
             }
         }
 
@@ -658,30 +700,30 @@
         function renderCards() {
             return `
                 <div class="max-w-4xl mx-auto">
-                    <div class="flex border-b border-slate-200 mb-6">
-                        <button onclick="window.switchCardTab('browse')" id="tabCardBrowse" class="flex-1 py-4 text-center text-slate-500 font-medium hover:text-slate-700 transition">Kartlara Göz At</button>
-                        <button onclick="window.switchCardTab('submit')" id="tabCardSubmit" class="flex-1 py-4 text-center text-slate-500 font-medium hover:text-slate-700 transition">Kart Gönder</button>
+                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6">
+                        <button onclick="window.switchCardTab('browse')" id="tabCardBrowse" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Kartlara Göz At</button>
+                        <button onclick="window.switchCardTab('submit')" id="tabCardSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Kart Gönder</button>
                     </div>
 
                     <div id="contentCardBrowse" class="hidden text-center py-10">
                         ${IS_TEST_UNLOCKED 
                             ? `<div id="liveCardsArea" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>` 
-                            : `<div class="inline-block p-6 bg-slate-100 rounded-full mb-6"><i class="fa-solid fa-lock text-4xl text-slate-400"></i></div>
-                               <h2 class="text-xl font-bold text-slate-800 mb-2">Modül Hazırlanıyor</h2>
-                               <p class="text-slate-500 max-w-md mx-auto">Veritabanımızda şu an yeterli bilgi kartı bulunmadığı için bu özellik şu anlık kilitlidir. Bize destek olmak için bilgi kartı göndermeyi unutma!</p>`
+                            : `<div class="inline-block p-6 bg-slate-100 dark:bg-slate-700 rounded-full mb-6"><i class="fa-solid fa-lock text-4xl text-slate-400 dark:text-slate-500"></i></div>
+                               <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Modül Hazırlanıyor</h2>
+                               <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Veritabanımızda şu an yeterli bilgi kartı bulunmadığı için bu özellik şu anlık kilitlidir.</p>`
                         }
                     </div>
 
                     <div id="contentCardSubmit" class="hidden">
-                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6">
-                            <h3 class="font-bold text-lg mb-4 text-slate-800">Kart Önerisi Gönder</h3>
+                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 mb-6">
+                            <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white">Kart Önerisi Gönder</h3>
                             <div class="space-y-4">
-                                <input id="cardFront" type="text" placeholder="Ön Yüz (Soru/Kavram)" class="w-full p-3 border rounded-lg">
-                                <input id="cardBack" type="text" placeholder="Arka Yüz (Cevap/Açıklama)" class="w-full p-3 border rounded-lg">
-                                <button onclick="window.submitCard()" class="w-full bg-slate-800 text-white font-bold py-3 rounded-lg hover:bg-slate-900 transition">Yönetici Onayına Gönder</button>
+                                <input id="cardFront" type="text" placeholder="Ön Yüz (Soru/Kavram)" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                                <input id="cardBack" type="text" placeholder="Arka Yüz (Cevap/Açıklama)" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                                <button onclick="window.submitCard()" class="w-full bg-slate-800 dark:bg-slate-700 text-white font-bold py-3 rounded-lg hover:bg-slate-900 transition">Yönetici Onayına Gönder</button>
                             </div>
                         </div>
-                        <div class="mt-8"><h3 class="font-bold text-md mb-4 text-slate-800">Gönderimlerin</h3><div id="myCardsList" class="space-y-3"></div></div>
+                        <div class="mt-8"><h3 class="font-bold text-md mb-4 text-slate-800 dark:text-white">Gönderimlerin</h3><div id="myCardsList" class="space-y-3"></div></div>
                     </div>
                 </div>
             `;
@@ -722,7 +764,7 @@
             const list = document.getElementById('myCardsList');
             if(list) {
                 list.innerHTML = snap.docs.map(d => { const data=d.data(); return `
-                    <div class="p-3 bg-white border rounded flex justify-between items-center">
+                    <div class="p-3 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded flex justify-between items-center text-slate-800 dark:text-slate-200">
                         <div><span class="font-bold">${data.front}</span> - ${data.back}</div>
                         <span class="text-xs px-2 py-1 rounded ${data.status==='approved'?'bg-green-100 text-green-700':(data.status==='rejected'?'bg-red-100 text-red-700':'bg-yellow-100 text-yellow-700')}">${data.status}</span>
                     </div>`;
@@ -734,8 +776,8 @@
              const snap = await getDocs(collection(db, "flashcards"));
              document.getElementById('liveCardsArea').innerHTML = snap.docs.map(d => { const c=d.data(); return `
                 <div class="flip-card h-48 w-full perspective cursor-pointer" onclick="this.classList.toggle('flipped')">
-                    <div class="flip-card-inner relative w-full h-full shadow-md rounded-2xl bg-white border border-slate-200">
-                        <div class="flip-card-front flex flex-col items-center justify-center p-4 text-center"><h3 class="font-bold text-slate-800 text-lg">${c.front}</h3></div>
+                    <div class="flip-card-inner relative w-full h-full shadow-md rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <div class="flip-card-front flex flex-col items-center justify-center p-4 text-center"><h3 class="font-bold text-slate-800 dark:text-white text-lg">${c.front}</h3></div>
                         <div class="flip-card-back flex flex-col items-center justify-center p-4 text-center bg-primary text-white rounded-2xl"><p class="font-bold text-xl">${c.back}</p></div>
                     </div>
                 </div>`; 
@@ -746,9 +788,9 @@
         function renderNotes() {
             return `
                 <div class="max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Not Defterim</h2>
-                    <div class="mb-6 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                        <textarea id="newNoteText" class="w-full p-3 border border-slate-200 rounded-lg outline-none focus:border-primary h-24" placeholder="Yeni bir not al..."></textarea>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Not Defterim</h2>
+                    <div class="mb-6 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                        <textarea id="newNoteText" class="w-full p-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg outline-none focus:border-primary h-24" placeholder="Yeni bir not al..."></textarea>
                         <button onclick="window.saveNote()" class="mt-2 bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-primaryDark">Notu Kaydet</button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="notesList">
@@ -765,21 +807,21 @@
             `;
         }
 
-        // --- 7. FORUM MODULE ---
+        // --- 7. FORUM MODULE (FIXED) ---
         function renderForum() {
             return `
                 <div class="max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Öğrenci Forumu</h2>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Öğrenci Forumu</h2>
                     
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8">
-                        <h3 class="font-bold mb-4">Yeni Konu Başlat</h3>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 mb-8">
+                        <h3 class="font-bold mb-4 dark:text-white">Yeni Konu Başlat</h3>
                         <div class="space-y-3">
-                            <input id="forumTitle" type="text" placeholder="Başlık" class="w-full p-3 border rounded-lg">
-                            <textarea id="forumContent" placeholder="Mesajın..." class="w-full p-3 border rounded-lg" rows="3"></textarea>
-                            <select id="forumCategory" class="p-3 border rounded-lg w-full bg-white">
+                            <input id="forumTitle" type="text" placeholder="Başlık" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                            <textarea id="forumContent" placeholder="Mesajın..." class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg" rows="3"></textarea>
+                            <select id="forumCategory" class="p-3 border dark:border-slate-600 rounded-lg w-full bg-white dark:bg-slate-700 dark:text-white">
                                 <option>Genel Sohbet</option><option>Ders: Türkçe</option><option>Ders: Matematik</option><option>Ders: Tarih</option><option>Motivasyon</option>
                             </select>
-                            <button onclick="window.submitForumPost()" class="bg-slate-800 text-white px-6 py-2 rounded-lg font-bold">Gönder (Onay Gerekli)</button>
+                            <button onclick="window.submitForumPost()" class="bg-slate-800 dark:bg-slate-600 text-white px-6 py-2 rounded-lg font-bold">Gönder (Onay Gerekli)</button>
                         </div>
                     </div>
 
@@ -799,7 +841,7 @@
             await addDoc(collection(db, "forumPosts"), {
                 uid: currentUser.uid, 
                 authorName: userData.name, 
-                authorTitle: userData.title, // Save title for badge
+                authorTitle: userData.title, 
                 avatar: userData.avatar,
                 title, content, category, status: 'pending', createdAt: serverTimestamp()
             });
@@ -807,33 +849,61 @@
             document.getElementById('forumTitle').value = ""; document.getElementById('forumContent').value = "";
         }
 
+        // FIXED LOAD FORUM POSTS (Using Client-side sorting to fix Index error)
         async function loadForumPosts() {
-            const q = query(collection(db, "forumPosts"), where("status", "==", "approved"), orderBy("createdAt", "desc"));
-            const snap = await getDocs(q);
-            const isAdminUser = currentUser.email.toLowerCase() === ADMIN_EMAIL;
-            
-            document.getElementById('forumFeed').innerHTML = snap.docs.map(d => {
-                const p = d.data();
-                const isAuthorAdmin = p.authorTitle === 'Yönetici';
+            try {
+                // Sadece status kontrolü yapıyoruz, sıralamayı JS'de yapacağız
+                const q = query(collection(db, "forumPosts"), where("status", "==", "approved"));
+                const snap = await getDocs(q);
                 
-                return `
-                    <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm relative group">
-                        <div class="flex items-center gap-3 mb-3">
-                            <img src="${p.avatar}" class="w-10 h-10 rounded-full">
-                            <div>
-                                <div class="font-bold text-slate-800 flex items-center gap-2">
-                                    ${p.authorName}
-                                    ${isAuthorAdmin ? '<span class="bg-red-100 text-red-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-red-200"><i class="fa-solid fa-shield-halved mr-1"></i>YÖNETİCİ</span>' : ''}
+                let posts = [];
+                snap.forEach(d => {
+                    posts.push({id: d.id, ...d.data()});
+                });
+
+                // Client-side Sort (En yeni en üstte)
+                posts.sort((a, b) => {
+                    const timeA = a.createdAt?.seconds || 0;
+                    const timeB = b.createdAt?.seconds || 0;
+                    return timeB - timeA;
+                });
+
+                const isAdminUser = currentUser.email.toLowerCase() === ADMIN_EMAIL;
+                
+                const container = document.getElementById('forumFeed');
+                if (!container) return;
+
+                if (posts.length === 0) {
+                    container.innerHTML = '<div class="text-center p-8 text-slate-500 dark:text-slate-400">Henüz onaylanmış konu yok.</div>';
+                    return;
+                }
+
+                container.innerHTML = posts.map(p => {
+                    const isAuthorAdmin = p.authorTitle === 'Yönetici';
+                    
+                    return `
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm relative group">
+                            <div class="flex items-center gap-3 mb-3">
+                                <img src="${p.avatar}" class="w-10 h-10 rounded-full">
+                                <div>
+                                    <div class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                        ${p.authorName}
+                                        ${isAuthorAdmin ? '<span class="bg-red-100 text-red-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-red-200">YÖNETİCİ</span>' : ''}
+                                    </div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">${p.category} • ${p.createdAt ? new Date(p.createdAt.seconds*1000).toLocaleDateString() : 'Az önce'}</div>
                                 </div>
-                                <div class="text-xs text-slate-500">${p.category} • ${new Date(p.createdAt?.seconds*1000).toLocaleDateString()}</div>
                             </div>
+                            <h4 class="font-bold text-lg text-slate-900 dark:text-white mb-2">${p.title}</h4>
+                            <p class="text-slate-600 dark:text-slate-300">${p.content}</p>
+                            ${isAdminUser ? `<button onclick="window.deleteForumPost('${p.id}')" class="absolute top-4 right-4 text-red-500 hover:bg-red-50 p-2 rounded"><i class="fa-solid fa-trash"></i></button>` : ''}
                         </div>
-                        <h4 class="font-bold text-lg text-slate-900 mb-2">${p.title}</h4>
-                        <p class="text-slate-600">${p.content}</p>
-                        ${isAdminUser ? `<button onclick="window.deleteForumPost('${d.id}')" class="absolute top-4 right-4 text-red-500 hover:bg-red-50 p-2 rounded"><i class="fa-solid fa-trash"></i></button>` : ''}
-                    </div>
-                `;
-            }).join('') || '<div class="text-center p-8 text-slate-500">Henüz konu yok.</div>';
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error("Forum loading error:", err);
+                document.getElementById('forumFeed').innerHTML = `<div class="text-red-500">Hata oluştu: ${err.message}</div>`;
+            }
         }
         
         window.deleteForumPost = async (id) => {
@@ -847,11 +917,11 @@
         function renderFeedback() {
             return `
                 <div class="max-w-2xl mx-auto">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Öneri & Şikayet Kutusu</h2>
-                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-orange-100">
-                        <div class="text-center mb-6"><i class="fa-solid fa-envelope-open-text text-6xl text-orange-200"></i></div>
-                        <p class="text-center text-slate-600 mb-6">Uygulamayı geliştirmemiz için fikirlerin bizim için çok değerli. Lütfen aklına gelen her şeyi yaz.</p>
-                        <textarea id="feedbackText" class="w-full p-4 border rounded-xl h-40 focus:border-primary outline-none" placeholder="Mesajınız..."></textarea>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Öneri & Şikayet Kutusu</h2>
+                    <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg border border-orange-100 dark:border-slate-700">
+                        <div class="text-center mb-6"><i class="fa-solid fa-envelope-open-text text-6xl text-orange-200 dark:text-orange-900"></i></div>
+                        <p class="text-center text-slate-600 dark:text-slate-300 mb-6">Uygulamayı geliştirmemiz için fikirlerin bizim için çok değerli. Lütfen aklına gelen her şeyi yaz.</p>
+                        <textarea id="feedbackText" class="w-full p-4 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl h-40 focus:border-primary outline-none" placeholder="Mesajınız..."></textarea>
                         <button onclick="window.sendFeedback()" class="w-full mt-4 bg-primary text-white py-3 rounded-xl font-bold hover:bg-primaryDark transition">Gönder</button>
                     </div>
                 </div>
@@ -889,7 +959,7 @@
         function renderNotifications() {
             return `
                 <div class="max-w-3xl mx-auto">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Bildirimler</h2>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Bildirimler</h2>
                     <div id="notifList" class="space-y-3">
                          <div class="text-center text-slate-400 mt-10"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>
                     </div>
@@ -899,37 +969,36 @@
 
         async function fetchNotifications() {
             let q;
-            try {
-                q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid), orderBy("createdAt", "desc"), limit(20));
-                const snap = await getDocs(q);
-                displayNotifications(snap);
-            } catch (e) {
-                console.log("Index missing, falling back to simple query", e);
-                q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid));
-                const snap = await getDocs(q);
-                displayNotifications(snap);
-            }
+            // Fallback strategy just in case index is missing for notifications too
+            q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid));
+            const snap = await getDocs(q);
+            
+            let notifs = [];
+            snap.forEach(d => notifs.push({id: d.id, ...d.data()}));
+            
+            // Client side sort
+            notifs.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+            displayNotifications(notifs);
 
             const unreadQ = query(collection(db, "notifications"), where("uid", "==", currentUser.uid), where("read", "==", false));
             const unreadSnap = await getDocs(unreadQ);
             unreadSnap.forEach(d => updateDoc(doc(db, "notifications", d.id), { read: true }));
         }
 
-        function displayNotifications(snap) {
+        function displayNotifications(data) {
             const list = document.getElementById('notifList');
             if(!list) return;
             
-            if(snap.empty) {
-                list.innerHTML = '<div class="text-center text-slate-500 p-8">Bildirim yok.</div>';
+            if(data.length === 0) {
+                list.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 p-8">Bildirim yok.</div>';
                 return;
             }
 
             let html = '';
-            snap.forEach(d => {
-                const n = d.data();
+            data.forEach(n => {
                 html += `
-                    <div class="p-4 bg-white border-l-4 ${n.type==='success'?'border-green-500':'border-red-500'} rounded shadow-sm">
-                        <div class="font-medium text-slate-800">${n.message}</div>
+                    <div class="p-4 bg-white dark:bg-slate-800 border-l-4 ${n.type==='success'?'border-green-500':'border-red-500'} rounded shadow-sm">
+                        <div class="font-medium text-slate-800 dark:text-white">${n.message}</div>
                         <div class="text-xs text-slate-400 mt-1">${n.createdAt ? new Date(n.createdAt.seconds*1000).toLocaleString() : ''}</div>
                     </div>
                 `;
@@ -941,29 +1010,36 @@
         function renderQuizCenter() {
             return `
                 <div class="max-w-3xl mx-auto">
-                    <div class="flex border-b border-slate-200 mb-6">
-                        <button onclick="window.switchQuizTab('solve')" id="tabSolve" class="flex-1 py-4 text-center text-slate-500 font-medium hover:text-slate-700 transition">Test Çöz</button>
-                        <button onclick="window.switchQuizTab('submit')" id="tabSubmit" class="flex-1 py-4 text-center text-slate-500 font-medium hover:text-slate-700 transition">Soru Gönder</button>
+                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6">
+                        <button onclick="window.switchQuizTab('solve')" id="tabSolve" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Test Çöz</button>
+                        <button onclick="window.switchQuizTab('submit')" id="tabSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Soru Gönder</button>
                     </div>
                     <div id="contentSolve" class="hidden text-center py-10">
                         ${IS_TEST_UNLOCKED 
                             ? `<div id="liveQuestionsArea">Live Test Interface Here (Admin açtı!)</div>`
-                            : `<div class="inline-block p-6 bg-slate-100 rounded-full mb-6"><i class="fa-solid fa-lock text-4xl text-slate-400"></i></div>
-                               <h2 class="text-xl font-bold text-slate-800 mb-2">Modül Hazırlanıyor</h2>
-                               <p class="text-slate-500 max-w-md mx-auto">Veritabanımızda henüz yeterli soru bulunmadığı için bu özellik şu an için kilitlidir. Bize destek olmak için soru göndermeyi unutma!</p>`
+                            : `<div class="inline-block p-6 bg-slate-100 dark:bg-slate-700 rounded-full mb-6"><i class="fa-solid fa-lock text-4xl text-slate-400 dark:text-slate-500"></i></div>
+                               <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Modül Hazırlanıyor</h2>
+                               <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Veritabanımızda henüz yeterli soru bulunmadığı için bu özellik şu an için kilitlidir.</p>`
                         }
                     </div>
                     <div id="contentSubmit" class="hidden">
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                            <h3 class="font-bold text-lg mb-4 text-slate-800">Topluluğa Katkıda Bulun</h3>
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                            <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white">Topluluğa Katkıda Bulun</h3>
                             <div class="space-y-4">
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Ders</label><select id="qLesson" class="w-full p-3 border rounded-lg bg-white"><option>Türkçe</option><option>Matematik</option><option>Tarih</option><option>Coğrafya</option><option>Vatandaşlık</option></select></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Soru Metni</label><textarea id="qText" rows="3" class="w-full p-3 border rounded-lg" placeholder="Soruyu buraya yazın..."></textarea></div>
-                                <div class="grid grid-cols-2 gap-4"><input id="optA" type="text" placeholder="A Şıkkı" class="p-3 border rounded-lg"><input id="optB" type="text" placeholder="B Şıkkı" class="p-3 border rounded-lg"><input id="optC" type="text" placeholder="C Şıkkı" class="p-3 border rounded-lg"><input id="optD" type="text" placeholder="D Şıkkı" class="p-3 border rounded-lg"><input id="optE" type="text" placeholder="E Şıkkı" class="p-3 border rounded-lg"><select id="qCorrect" class="p-3 border rounded-lg bg-green-50 border-green-200"><option value="0">Doğru Cevap: A</option><option value="1">Doğru Cevap: B</option><option value="2">Doğru Cevap: C</option><option value="3">Doğru Cevap: D</option><option value="4">Doğru Cevap: E</option></select></div>
-                                <button onclick="window.submitQuestion()" class="w-full bg-slate-800 text-white font-bold py-3 rounded-lg hover:bg-slate-900 transition">Yönetici Onayına Gönder</button>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Ders</label><select id="qLesson" class="w-full p-3 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white"><option>Türkçe</option><option>Matematik</option><option>Tarih</option><option>Coğrafya</option><option>Vatandaşlık</option></select></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Soru Metni</label><textarea id="qText" rows="3" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg" placeholder="Soruyu buraya yazın..."></textarea></div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input id="optA" type="text" placeholder="A Şıkkı" class="p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                                    <input id="optB" type="text" placeholder="B Şıkkı" class="p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                                    <input id="optC" type="text" placeholder="C Şıkkı" class="p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                                    <input id="optD" type="text" placeholder="D Şıkkı" class="p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                                    <input id="optE" type="text" placeholder="E Şıkkı" class="p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                                    <select id="qCorrect" class="p-3 border rounded-lg bg-green-50 border-green-200 dark:bg-green-900 dark:border-green-700 dark:text-white"><option value="0">Doğru Cevap: A</option><option value="1">Doğru Cevap: B</option><option value="2">Doğru Cevap: C</option><option value="3">Doğru Cevap: D</option><option value="4">Doğru Cevap: E</option></select>
+                                </div>
+                                <button onclick="window.submitQuestion()" class="w-full bg-slate-800 dark:bg-slate-600 text-white font-bold py-3 rounded-lg hover:bg-slate-900 transition">Yönetici Onayına Gönder</button>
                             </div>
                         </div>
-                        <div class="mt-8"><h3 class="font-bold text-md mb-4 text-slate-800">Gönderdiğin Sorular</h3><div id="myQuestionsList" class="space-y-3"></div></div>
+                        <div class="mt-8"><h3 class="font-bold text-md mb-4 text-slate-800 dark:text-white">Gönderdiğin Sorular</h3><div id="myQuestionsList" class="space-y-3"></div></div>
                     </div>
                 </div>
             `;
@@ -977,10 +1053,10 @@
 
             return `
                 <div class="max-w-2xl mx-auto">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Profil Ayarları</h2>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Profil Ayarları</h2>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 mb-6">
                         <div class="mb-6">
-                            <label class="block text-sm font-bold text-slate-700 mb-3">Avatar Seç</label>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Avatar Seç</label>
                             <div class="grid grid-cols-4 md:grid-cols-8 gap-2">
                                 ${AVATAR_OPTIONS.map(url => `
                                     <img src="${url}" 
@@ -990,12 +1066,12 @@
                             </div>
                         </div>
                         <div class="space-y-4">
-                            <div><label class="block text-sm font-medium text-slate-700 mb-1">Ad Soyad</label><input type="text" onchange="window.updateProfileField('name', this.value)" value="${uName}" class="w-full p-3 border border-slate-200 rounded-lg focus:border-primary outline-none"></div>
-                            <div><label class="block text-sm font-medium text-slate-700 mb-1">Hedef Puanın</label><input type="number" onchange="window.updateProfileField('targetScore', this.value)" value="${uTarget}" class="w-full p-3 border border-slate-200 rounded-lg focus:border-primary outline-none"></div>
+                            <div><label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Ad Soyad</label><input type="text" onchange="window.updateProfileField('name', this.value)" value="${uName}" class="w-full p-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:border-primary outline-none"></div>
+                            <div><label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Hedef Puanın</label><input type="number" onchange="window.updateProfileField('targetScore', this.value)" value="${uTarget}" class="w-full p-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:border-primary outline-none"></div>
                             <div class="text-sm text-slate-500 mt-4 flex items-center gap-2"><i class="fa-solid fa-file-contract"></i><span onclick="window.showPrivacyModal()" class="cursor-pointer hover:underline text-primary">Gizlilik Politikası</span></div>
-                            <hr class="border-slate-100 my-4">
-                            <button onclick="alert('Şifre sıfırlama bağlantısı gönderildi.')" class="w-full border border-slate-300 text-slate-600 font-medium py-3 rounded-lg hover:bg-slate-50 transition">Şifre Değiştir</button>
-                            <button onclick="window.deleteAccountRequest()" class="w-full border border-red-200 text-red-500 font-medium py-3 rounded-lg hover:bg-red-50 transition">Hesabımı Sil</button>
+                            <hr class="border-slate-100 dark:border-slate-700 my-4">
+                            <button onclick="alert('Şifre sıfırlama bağlantısı gönderildi.')" class="w-full border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 font-medium py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition">Şifre Değiştir</button>
+                            <button onclick="window.deleteAccountRequest()" class="w-full border border-red-200 text-red-500 font-medium py-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition">Hesabımı Sil</button>
                         </div>
                     </div>
                 </div>
@@ -1006,21 +1082,21 @@
         function renderAdminPanel() {
             return `
                 <div class="max-w-6xl mx-auto">
-                    <h1 class="text-2xl font-bold mb-6 text-slate-800">Yönetim Paneli</h1>
+                    <h1 class="text-2xl font-bold mb-6 text-slate-800 dark:text-white">Yönetim Paneli</h1>
                     
                     <div class="flex gap-4 mb-6 overflow-x-auto pb-2">
-                        <button onclick="window.loadAdminData('questions')" class="px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50">Bekleyen Sorular</button>
-                        <button onclick="window.loadAdminData('cards')" class="px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50">Bekleyen Kartlar</button>
-                        <button onclick="window.loadAdminData('forum')" class="px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50">Bekleyen Forum</button>
-                        <button onclick="window.loadAdminData('inbox')" class="px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50">Gelen Kutusu</button>
+                        <button onclick="window.loadAdminData('questions')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white">Bekleyen Sorular</button>
+                        <button onclick="window.loadAdminData('cards')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white">Bekleyen Kartlar</button>
+                        <button onclick="window.loadAdminData('forum')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white">Bekleyen Forum</button>
+                        <button onclick="window.loadAdminData('inbox')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white">Gelen Kutusu</button>
                         <div class="w-px bg-slate-300 mx-2"></div>
                         <button onclick="window.loadAdminData('live_questions')" class="px-4 py-2 bg-red-50 border border-red-200 text-red-700 rounded shadow-sm">Canlı Sorular</button>
                         <button onclick="window.loadAdminData('live_cards')" class="px-4 py-2 bg-red-50 border border-red-200 text-red-700 rounded shadow-sm">Canlı Kartlar</button>
                     </div>
 
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="bg-slate-50 p-4 border-b border-slate-200 font-bold text-slate-600" id="adminPanelTitle">Veriler</div>
-                        <div id="adminContentArea" class="divide-y divide-slate-100 min-h-[300px]">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                        <div class="bg-slate-50 dark:bg-slate-700 p-4 border-b border-slate-200 dark:border-slate-600 font-bold text-slate-600 dark:text-slate-300" id="adminPanelTitle">Veriler</div>
+                        <div id="adminContentArea" class="divide-y divide-slate-100 dark:divide-slate-700 min-h-[300px] text-slate-800 dark:text-slate-200">
                             <div class="p-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>
                         </div>
                     </div>
@@ -1055,7 +1131,7 @@
                 else {
                     snap.forEach(doc => { const d=doc.data(); html += `
                         <div class="p-6 flex justify-between items-center">
-                            <div><div class="font-bold text-lg">${d.front}</div><div class="text-slate-600">${d.back}</div><div class="text-xs text-slate-400 mt-1">${d.authorName}</div></div>
+                            <div><div class="font-bold text-lg">${d.front}</div><div class="text-slate-600 dark:text-slate-400">${d.back}</div><div class="text-xs text-slate-400 mt-1">${d.authorName}</div></div>
                             <div class="flex gap-2"><button onclick="window.adminAction('card', '${doc.id}', 'approve')" class="bg-green-500 text-white px-3 py-1 rounded">Onayla</button><button onclick="window.adminAction('card', '${doc.id}', 'reject')" class="bg-red-500 text-white px-3 py-1 rounded">Reddet</button></div>
                         </div>`;
                     });
@@ -1067,7 +1143,7 @@
                 else {
                     snap.forEach(doc => { const d=doc.data(); html += `
                         <div class="p-6">
-                            <h4 class="font-bold text-lg">${d.title}</h4><p class="text-slate-600 mb-2">${d.content}</p><div class="text-xs text-slate-400 mb-2">${d.category} - ${d.authorName}</div>
+                            <h4 class="font-bold text-lg">${d.title}</h4><p class="text-slate-600 dark:text-slate-400 mb-2">${d.content}</p><div class="text-xs text-slate-400 mb-2">${d.category} - ${d.authorName}</div>
                             <div class="flex gap-2"><button onclick="window.adminAction('forum', '${doc.id}', 'approve')" class="bg-green-500 text-white px-3 py-1 rounded">Onayla</button><button onclick="window.adminAction('forum', '${doc.id}', 'reject')" class="bg-red-500 text-white px-3 py-1 rounded">Reddet</button></div>
                         </div>`;
                     });
@@ -1075,7 +1151,7 @@
             } else if (type === 'inbox') {
                 const q = query(collection(db, "feedback"), orderBy("createdAt", "desc"));
                 const snap = await getDocs(q);
-                snap.forEach(doc => { const d=doc.data(); html += `<div class="p-6"><div class="font-bold text-slate-800">${d.name}</div><p class="text-slate-600 mt-1">${d.message}</p><div class="text-xs text-slate-400 mt-2">${d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleString() : ''}</div></div>`; });
+                snap.forEach(doc => { const d=doc.data(); html += `<div class="p-6"><div class="font-bold text-slate-800 dark:text-white">${d.name}</div><p class="text-slate-600 dark:text-slate-400 mt-1">${d.message}</p><div class="text-xs text-slate-400 mt-2">${d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleString() : ''}</div></div>`; });
             } else if (type === 'live_questions') {
                 const snap = await getDocs(collection(db, "questions"));
                 snap.forEach(doc => { const d=doc.data(); html += `<div class="p-4 flex justify-between border-b items-center"><div><span class="font-bold">[${d.lesson}]</span> ${d.text}</div><button onclick="window.deleteLiveItem('questions', '${doc.id}')" class="text-red-500 hover:underline">Sil</button></div>`; });
@@ -1116,32 +1192,32 @@
             }
         };
 
-        // --- 13. MOCKS MODULE (RESTORED) ---
+        // --- 13. MOCKS MODULE ---
         function renderMocks() {
             return `
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div>
-                        <h2 class="text-2xl font-bold mb-4">Yeni Deneme Ekle</h2>
-                        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                        <h2 class="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Yeni Deneme Ekle</h2>
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-4">
                             <div class="grid grid-cols-2 gap-4">
-                                <div><label class="text-xs font-bold text-slate-500">Türkçe Net</label><input type="number" id="netTr" class="w-full p-2 border rounded outline-none focus:border-primary" placeholder="0"></div>
-                                <div><label class="text-xs font-bold text-slate-500">Matematik Net</label><input type="number" id="netMat" class="w-full p-2 border rounded outline-none focus:border-primary" placeholder="0"></div>
-                                <div><label class="text-xs font-bold text-slate-500">Tarih Net</label><input type="number" id="netHist" class="w-full p-2 border rounded outline-none focus:border-primary" placeholder="0"></div>
-                                <div><label class="text-xs font-bold text-slate-500">Coğrafya Net</label><input type="number" id="netGeo" class="w-full p-2 border rounded outline-none focus:border-primary" placeholder="0"></div>
-                                <div><label class="text-xs font-bold text-slate-500">Vatandaşlık Net</label><input type="number" id="netCit" class="w-full p-2 border rounded outline-none focus:border-primary" placeholder="0"></div>
+                                <div><label class="text-xs font-bold text-slate-500">Türkçe Net</label><input type="number" id="netTr" class="w-full p-2 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded outline-none focus:border-primary" placeholder="0"></div>
+                                <div><label class="text-xs font-bold text-slate-500">Matematik Net</label><input type="number" id="netMat" class="w-full p-2 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded outline-none focus:border-primary" placeholder="0"></div>
+                                <div><label class="text-xs font-bold text-slate-500">Tarih Net</label><input type="number" id="netHist" class="w-full p-2 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded outline-none focus:border-primary" placeholder="0"></div>
+                                <div><label class="text-xs font-bold text-slate-500">Coğrafya Net</label><input type="number" id="netGeo" class="w-full p-2 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded outline-none focus:border-primary" placeholder="0"></div>
+                                <div><label class="text-xs font-bold text-slate-500">Vatandaşlık Net</label><input type="number" id="netCit" class="w-full p-2 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded outline-none focus:border-primary" placeholder="0"></div>
                             </div>
                             <button onclick="window.saveMockResult()" class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primaryDark mt-4">Hesapla ve Kaydet</button>
                         </div>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-bold mb-4">Sonuç Geçmişi</h2>
-                        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden max-h-96 overflow-y-auto">
+                        <h2 class="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Sonuç Geçmişi</h2>
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden max-h-96 overflow-y-auto">
                             ${mockExamsHistory.length === 0 ? '<p class="p-4 text-slate-500">Kayıt yok.</p>' : ''}
                             ${mockExamsHistory.map(m => `
-                                <div class="p-4 border-b border-slate-100 flex justify-between items-center hover:bg-slate-50">
+                                <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-700">
                                     <div>
-                                        <div class="font-bold text-slate-800">${m.date}</div>
-                                        <div class="text-xs text-slate-500">TR: ${m.trNet} | MAT: ${m.mathNet} | TAR: ${m.histNet}</div>
+                                        <div class="font-bold text-slate-800 dark:text-white">${m.date}</div>
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">TR: ${m.trNet} | MAT: ${m.mathNet} | TAR: ${m.histNet}</div>
                                     </div>
                                     <div class="text-xl font-bold text-primary">${m.totalScore} Puan</div>
                                 </div>
@@ -1149,8 +1225,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-8 bg-white p-6 rounded-2xl h-80 border border-slate-100 shadow-sm">
-                    <h3 class="font-bold mb-4">İlerleme Analizi</h3>
+                <div class="mt-8 bg-white dark:bg-slate-800 p-6 rounded-2xl h-80 border border-slate-100 dark:border-slate-700 shadow-sm">
+                    <h3 class="font-bold mb-4 dark:text-white">İlerleme Analizi</h3>
                     <canvas id="historyChart"></canvas>
                 </div>
             `;
@@ -1208,6 +1284,8 @@
 
             const labels = mockExamsHistory.slice().reverse().map(m => m.date);
             const data = mockExamsHistory.slice().reverse().map(m => m.totalScore);
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#e2e8f0' : '#64748b';
 
             new Chart(ctx, { 
                 type: 'line', 
@@ -1225,7 +1303,20 @@
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
-                    scales: { y: { beginAtZero: false, min: 50, max: 100 } } 
+                    scales: { 
+                        y: { 
+                            beginAtZero: false, 
+                            min: 50, 
+                            max: 100,
+                            ticks: { color: textColor }
+                        },
+                        x: {
+                            ticks: { color: textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: textColor } }
+                    }
                 } 
             });
         }
@@ -1240,12 +1331,11 @@
         window.cycleStatus = async (key) => { if(!userData.progress) userData.progress = {}; const current = userData.progress[key] || 'not_started'; const order = ['not_started', 'started', 'completed', 'needs_review']; const next = order[(order.indexOf(current) + 1) % 4]; userData.progress[key] = next; window.loadPage('subjects'); await updateDoc(doc(db, "users", currentUser.uid), { progress: userData.progress }); };
         window.switchQuizTab = (tab) => { document.getElementById('contentSolve').classList.add('hidden'); document.getElementById('contentSubmit').classList.add('hidden'); document.getElementById('tabSolve').classList.remove('tab-active'); document.getElementById('tabSubmit').classList.remove('tab-active'); if(tab === 'solve') { document.getElementById('contentSolve').classList.remove('hidden'); document.getElementById('tabSolve').classList.add('tab-active'); if(IS_TEST_UNLOCKED) document.getElementById('liveQuestionsArea').innerText = "Testler burada listelenecek (Veritabanı bağlantısı hazır)."; } else { document.getElementById('contentSubmit').classList.remove('hidden'); document.getElementById('tabSubmit').classList.add('tab-active'); loadMyQuestions(); } };
         window.submitQuestion = async () => { const text = document.getElementById('qText').value; const optA = document.getElementById('optA').value; if(!text || !optA) return alert("Soru ve en az bir şık girin."); const qData = { uid: currentUser.uid, authorName: userData.name, lesson: document.getElementById('qLesson').value, text: text, options: [ document.getElementById('optA').value, document.getElementById('optB').value, document.getElementById('optC').value, document.getElementById('optD').value, document.getElementById('optE').value ], correct: parseInt(document.getElementById('qCorrect').value), status: 'pending', adminNote: '', createdAt: serverTimestamp() }; await addDoc(collection(db, "questionSubmissions"), qData); alert("Sorun gönderildi!"); document.getElementById('qText').value = ""; loadMyQuestions(); };
-        async function loadMyQuestions() { if(!currentUser) return; const q = query(collection(db, "questionSubmissions"), where("uid", "==", currentUser.uid), orderBy("createdAt", "desc")); const snapshot = await getDocs(q); myQuestions = []; snapshot.forEach(doc => myQuestions.push({id: doc.id, ...doc.data()})); const list = document.getElementById('myQuestionsList'); if(list) list.innerHTML = myQuestions.map(mq => `<div class="p-4 bg-white rounded-lg border border-slate-100 flex justify-between items-start"><div><div class="text-xs font-bold text-slate-500 mb-1">${mq.lesson}</div><div class="text-sm font-medium text-slate-800 line-clamp-1">${mq.text}</div>${mq.status === 'rejected' ? `<div class="text-xs text-red-600 mt-2 bg-red-50 p-2 rounded"><strong>Red Sebebi:</strong> ${mq.adminNote}</div>` : ''}</div><div class="ml-4">${mq.status === 'pending' ? '<span class="text-xs font-bold bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Bekliyor</span>' : ''}${mq.status === 'approved' ? '<span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded">Yayında</span>' : ''}${mq.status === 'rejected' ? '<span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded">Red</span>' : ''}</div></div>`).join('') || '<p class="text-sm text-slate-400">Henüz soru göndermediniz.</p>'; }
+        async function loadMyQuestions() { if(!currentUser) return; const q = query(collection(db, "questionSubmissions"), where("uid", "==", currentUser.uid), orderBy("createdAt", "desc")); const snapshot = await getDocs(q); myQuestions = []; snapshot.forEach(doc => myQuestions.push({id: doc.id, ...doc.data()})); const list = document.getElementById('myQuestionsList'); if(list) list.innerHTML = myQuestions.map(mq => `<div class="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 flex justify-between items-start"><div><div class="text-xs font-bold text-slate-500 mb-1">${mq.lesson}</div><div class="text-sm font-medium text-slate-800 dark:text-white line-clamp-1">${mq.text}</div>${mq.status === 'rejected' ? `<div class="text-xs text-red-600 mt-2 bg-red-50 p-2 rounded"><strong>Red Sebebi:</strong> ${mq.adminNote}</div>` : ''}</div><div class="ml-4">${mq.status === 'pending' ? '<span class="text-xs font-bold bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Bekliyor</span>' : ''}${mq.status === 'approved' ? '<span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded">Yayında</span>' : ''}${mq.status === 'rejected' ? '<span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded">Red</span>' : ''}</div></div>`).join('') || '<p class="text-sm text-slate-400">Henüz soru göndermediniz.</p>'; }
         window.deleteAccountRequest = async () => { if(confirm("Hesabını silmek istediğine emin misin?")) { try { await deleteDoc(doc(db, "users", currentUser.uid)); await deleteUser(currentUser); alert("Hesabınız silindi."); window.location.reload(); } catch(e) { alert("Hata: " + e.message); } } };
         window.handleLogin = async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch(e){alert(e.message)} };
         window.handleRegister = async () => { try { if(!document.getElementById('privacyCheck').checked) throw new Error("Onay gerekli"); const cred = await createUserWithEmailAndPassword(auth, document.getElementById('regEmail').value, document.getElementById('regPassword').value); await setDoc(doc(db, "users", cred.user.uid), {name: document.getElementById('regName').value, email: cred.user.email, progress: {}, targetScore: 85, createdAt: serverTimestamp(), avatar: AVATAR_OPTIONS[0], pomodoroSessions: 0, totalScore: 0 }); } catch(e){alert(e.message)} };
         
-        // --- FIXED LOGOUT ---
         window.logout = async () => { 
             await signOut(auth);
             window.location.reload(); 
@@ -1260,4 +1350,3 @@
     </script>
 </body>
 </html>
-
