@@ -6,6 +6,7 @@
     <title>Al&Ni KPSS Studio | Al&Ni Studios</title>
     
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1105930817107200" crossorigin="anonymous"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -13,7 +14,7 @@
     
     <script>
         tailwind.config = {
-            darkMode: 'class', // Dark mode sınıf tabanlı çalışacak
+            darkMode: 'class', 
             theme: {
                 extend: {
                     colors: {
@@ -24,9 +25,9 @@
                         warning: '#eab308',
                         danger: '#ef4444',
                         studio: '#1e293b',
-                        darkBg: '#0f172a', // Dark mode ana arka plan
-                        darkCard: '#1e293b', // Dark mode kart arka planı
-                        darkText: '#f1f5f9'  // Dark mode yazı rengi
+                        darkBg: '#0f172a', 
+                        darkCard: '#1e293b', 
+                        darkText: '#f1f5f9'  
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -54,7 +55,6 @@
             font-weight: 600;
         }
         
-        /* Dark Mode Active Nav */
         .dark .nav-item.active-nav {
             background-color: #334155;
             color: #fb923c;
@@ -96,7 +96,6 @@
             box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
             border-bottom-right-radius: 20px;
         }
-        /* Dark mode sticky note adjustment */
         .dark .sticky-note {
             background: #f59e0b; 
             color: #000;
@@ -111,6 +110,11 @@
 
         .carousel-track { transition: transform 0.5s ease-in-out; }
         .glass-panel { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        
+        /* Şafak Sayar Animasyonu */
+        .countdown-item span {
+            display: block;
+        }
     </style>
 </head>
 <body class="text-slate-800 bg-slate-50 dark:bg-darkBg dark:text-darkText h-screen overflow-hidden flex flex-col transition-colors duration-300">
@@ -149,6 +153,7 @@
                                     <li>Konu eksiklerini tamamla.</li>
                                     <li>Düzenli deneme çöz.</li>
                                     <li>Pomodoro ile odaklan.</li>
+                                    <li>Streak zincirini kırma!</li>
                                 </ul>
                             </div>
                         </div>
@@ -157,9 +162,9 @@
                             <i class="fa-solid fa-layer-group text-5xl md:text-6xl text-warning mb-4 md:mb-6"></i>
                             <h2 class="text-2xl md:text-3xl font-bold mb-2 md:mb-4">Al&Ni Ekosistemi</h2>
                             <p class="text-slate-300 text-sm md:text-base leading-relaxed max-w-md">
-                                <span class="block mb-1"><strong>LifeCalc Pro:</strong> Finans yönetimi.</span>
-                                <span class="block mb-1"><strong>Menu Architect:</strong> Dijital menü.</span>
-                                <span class="block"><strong>Mini Games:</strong> Eğlence dünyası.</span>
+                                <span class="block mb-1"><strong>Sanal Etüt:</strong> Soru sor, XP kazan.</span>
+                                <span class="block mb-1"><strong>Hata Kutusu:</strong> Yanlışlarını tekrarla.</span>
+                                <span class="block"><strong>LifeCalc & Menu Architect:</strong> Diğer projelerimiz.</span>
                             </p>
                         </div>
 
@@ -252,7 +257,12 @@
                 <div class="p-4 bg-secondary dark:bg-slate-800 m-4 rounded-xl border border-orange-100 dark:border-slate-600 text-center shrink-0">
                     <img id="sidebarAvatar" src="" class="w-12 h-12 rounded-full mx-auto border-2 border-white dark:border-slate-700 shadow-sm mb-2 bg-white dark:bg-slate-600">
                     <div id="sidebarName" class="text-sm font-bold text-slate-800 dark:text-white">...</div>
-                    <div id="sidebarTitle" class="text-xs text-primary font-semibold">...</div>
+                    <div class="flex justify-center items-center gap-2 mt-1">
+                        <div id="sidebarTitle" class="text-xs text-primary font-semibold">...</div>
+                        <div class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 px-1.5 py-0.5 rounded font-bold" title="XP Puanı">
+                            <i class="fa-solid fa-star text-[10px] mr-1"></i><span id="sidebarXP">0</span>
+                        </div>
+                    </div>
                 </div>
 
                 <nav class="px-4 space-y-1 text-sm mt-2 flex-1 overflow-y-auto pb-4">
@@ -260,6 +270,8 @@
                     <button id="nav-smartcoach" onclick="window.loadPage('smartcoach')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-brain w-5 text-purple-600"></i><span class="font-bold text-purple-700 dark:text-purple-400">SmartCoach AI</span></button>
                     
                     <div class="pt-2 pb-1 text-xs font-bold text-slate-400 px-4">ÇALIŞMA</div>
+                    <button id="nav-etut" onclick="window.loadPage('etut')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-users-viewfinder w-5 text-blue-500"></i><span class="font-bold">Sanal Etüt</span></button>
+                    <button id="nav-mistakes" onclick="window.loadPage('mistakes')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-triangle-exclamation w-5 text-red-500"></i><span>Hata Kutusu</span></button>
                     <button id="nav-subjects" onclick="window.loadPage('subjects')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-list-check w-5"></i><span>Konu Takip</span></button>
                     <button id="nav-quiz" onclick="window.loadPage('quiz')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-pen-nib w-5"></i><span>Soru Merkezi</span></button>
                     <button id="nav-cards" onclick="window.loadPage('cards')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-layer-group w-5"></i><span>Flashcards</span></button>
@@ -443,6 +455,7 @@
         let pomodoroTimeLeft = 25 * 60;
         let isTimerRunning = false;
         let unsubscribeNotifications = null;
+        let countdownInterval;
 
         // --- AUTH & INIT ---
         onAuthStateChanged(auth, async (user) => {
@@ -456,6 +469,7 @@
                     
                     if (snap.exists()) {
                         userData = snap.data();
+                        await checkStreak(docRef, userData); // STREAK KONTROLÜ
                     } else {
                         userData = { 
                             name: user.displayName || (user.email.split('@')[0]), 
@@ -465,7 +479,10 @@
                             title: (user.email.toLowerCase() === ADMIN_EMAIL ? "Yönetici" : "Yeni Üye"), 
                             avatar: AVATAR_OPTIONS[0], 
                             pomodoroSessions: 0, 
-                            totalScore: 0 
+                            totalScore: 0,
+                            xp: 0, // YENİ: XP Sistemi
+                            streak: 1, // YENİ: Streak
+                            lastLoginDate: serverTimestamp()
                         };
                         await setDoc(docRef, userData);
                     }
@@ -489,6 +506,52 @@
                 document.getElementById('authScreen').classList.remove('hidden');
             }
         });
+
+// --- STREAK LOGIC (DÜZELTİLMİŞ) ---
+        async function checkStreak(docRef, data) {
+            const now = new Date();
+            let lastLogin;
+
+            // Tarih verisinin tipini kontrol ederek dönüştür
+            if (data.lastLoginDate && typeof data.lastLoginDate.toDate === 'function') {
+                // Eğer Firestore Timestamp ise
+                lastLogin = data.lastLoginDate.toDate();
+            } else if (data.lastLoginDate instanceof Date) {
+                // Eğer zaten JavaScript Date objesi ise
+                lastLogin = data.lastLoginDate;
+            } else {
+                // Hiçbiri değilse veya yoksa şu anı kabul et
+                lastLogin = new Date();
+            }
+            
+            // Tarihleri normalleştir (Saat farkını yoksay)
+            const todayStr = now.toDateString();
+            const lastLoginStr = lastLogin.toDateString();
+            
+            // Eğer bugün giriş yapılmadıysa kontrol et
+            if (todayStr !== lastLoginStr) {
+                const diffTime = Math.abs(now - lastLogin);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                
+                let newStreak = data.streak || 0;
+                
+                // 1 günden az fark varsa (yani dün girmişse) veya yeni başlıyorsa
+                // Not: diffDays 1 ise "dün", diffDays 0 ise "bugün" (yukarıdaki if bunu eledi ama yine de)
+                if (diffDays <= 2) { 
+                    newStreak += 1;
+                } else {
+                    newStreak = 1; // Zincir kırıldı, baştan başla
+                }
+                
+                // Veriyi güncelle (userData global değişkenini de güncelle ki ekranda hemen görünsün)
+                userData.streak = newStreak; 
+                
+                await updateDoc(docRef, { 
+                    lastLoginDate: serverTimestamp(),
+                    streak: newStreak
+                });
+            }
+        }
 
         // --- MOBILE MENU LOGIC ---
         window.toggleSidebar = () => {
@@ -523,8 +586,11 @@
                 return;
             }
 
+            // Temizle ve Yükle
+            if(countdownInterval) clearInterval(countdownInterval);
+
             switch(page) {
-                case 'dashboard': content.innerHTML = renderDashboard(); renderChart('dashboardChart'); break;
+                case 'dashboard': content.innerHTML = renderDashboard(); renderChart('dashboardChart'); startCountdown(); break;
                 case 'smartcoach': content.innerHTML = renderSmartCoachPage(); break;
                 case 'subjects': content.innerHTML = renderSubjects(); break;
                 case 'quiz': content.innerHTML = renderQuizCenter(); window.switchQuizTab('submit'); break;
@@ -536,6 +602,8 @@
                 case 'cards': content.innerHTML = renderCards(); window.switchCardTab('submit'); break;
                 case 'forum': content.innerHTML = renderForum(); loadForumPosts(); break;
                 case 'feedback': content.innerHTML = renderFeedback(); break;
+                case 'etut': content.innerHTML = renderEtut(); loadEtutQuestions(); break; // YENİ
+                case 'mistakes': content.innerHTML = renderMistakes(); loadMistakes(); break; // YENİ
                 case 'notifications': 
                     content.innerHTML = renderNotifications(); 
                     fetchNotifications(); 
@@ -543,17 +611,58 @@
             }
         };
 
-        // --- 1. DASHBOARD ---
+        // --- 1. DASHBOARD (UPDATED) ---
         function renderDashboard() {
             const stats = calculateStats();
+            const xp = userData.xp || 0;
+            const streak = userData.streak || 1;
+            
+            // Level Hesaplama (Her 100 XP 1 Level)
+            const level = Math.floor(xp / 100) + 1;
+            const nextLevelXp = level * 100;
+            const xpProgress = ((xp % 100) / 100) * 100;
+
             return `
-                <div class="mb-6 flex justify-between items-end">
+                <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                     <div>
                         <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Merhaba, ${userData.name} 👋</h1>
                         <p class="text-slate-500 dark:text-slate-400">Bugün kazanmak için harika bir gün!</p>
                     </div>
+                    <div class="flex items-center gap-3">
+                         <div class="bg-white dark:bg-slate-800 px-4 py-2 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-fire text-orange-500 animate-pulse"></i>
+                            <div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase">Zincir</div>
+                                <div class="font-bold text-slate-800 dark:text-white leading-none">${streak} Gün</div>
+                            </div>
+                         </div>
+                         <div class="bg-white dark:bg-slate-800 px-4 py-2 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-star text-yellow-500"></i>
+                            <div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase">Seviye ${level}</div>
+                                <div class="font-bold text-slate-800 dark:text-white leading-none">${xp} XP</div>
+                            </div>
+                         </div>
+                    </div>
                 </div>
                 
+                <div class="bg-slate-900 text-white rounded-2xl p-6 mb-8 relative shadow-xl overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-20 group-hover:opacity-30 transition"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="text-center md:text-left">
+                            <h3 class="text-lg font-bold text-blue-200 uppercase tracking-widest mb-1">Büyük Sınav</h3>
+                            <div class="text-3xl md:text-4xl font-bold">04 Ekim 2026</div>
+                            <p class="text-blue-200/60 text-sm">Hayallerine giden yol.</p>
+                        </div>
+                        <div class="flex gap-3 md:gap-6 text-center" id="countdownTimer">
+                            <div class="countdown-item bg-white/10 p-3 rounded-lg min-w-[70px] backdrop-blur-sm"><span class="text-2xl font-bold" id="cdDays">00</span><span class="text-[10px] uppercase opacity-70">Gün</span></div>
+                            <div class="countdown-item bg-white/10 p-3 rounded-lg min-w-[70px] backdrop-blur-sm"><span class="text-2xl font-bold" id="cdHours">00</span><span class="text-[10px] uppercase opacity-70">Saat</span></div>
+                            <div class="countdown-item bg-white/10 p-3 rounded-lg min-w-[70px] backdrop-blur-sm"><span class="text-2xl font-bold" id="cdMins">00</span><span class="text-[10px] uppercase opacity-70">Dk</span></div>
+                            <div class="countdown-item bg-white/10 p-3 rounded-lg min-w-[70px] backdrop-blur-sm"><span class="text-2xl font-bold" id="cdSecs">00</span><span class="text-[10px] uppercase opacity-70">Sn</span></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div onclick="window.loadPage('smartcoach')" class="cursor-pointer bg-gradient-to-r from-purple-800 to-indigo-900 rounded-2xl p-6 text-white mb-8 relative shadow-xl transform transition hover:scale-[1.01]">
                     <div class="absolute right-4 top-4 bg-white/20 px-3 py-1 rounded-full text-xs font-bold">AI Raporu</div>
                     <div class="flex items-start gap-4">
@@ -588,7 +697,37 @@
             `;
         }
 
-        // --- 2. SMARTCOACH ---
+        // --- COUNTDOWN LOGIC ---
+        function startCountdown() {
+            const targetDate = new Date("2026-10-04T00:00:00").getTime();
+            
+            const update = () => {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+                
+                if (distance < 0) {
+                    if(document.getElementById("countdownTimer")) document.getElementById("countdownTimer").innerHTML = "SINAV GÜNÜ!";
+                    clearInterval(countdownInterval);
+                    return;
+                }
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                if(document.getElementById("cdDays")) {
+                    document.getElementById("cdDays").innerText = days;
+                    document.getElementById("cdHours").innerText = hours.toString().padStart(2, '0');
+                    document.getElementById("cdMins").innerText = minutes.toString().padStart(2, '0');
+                    document.getElementById("cdSecs").innerText = seconds.toString().padStart(2, '0');
+                }
+            };
+            
+            update();
+            countdownInterval = setInterval(update, 1000);
+        }
+        // --- 2. SMARTCOACH (MEVCUT - KORUNDU) ---
         function renderSmartCoachPage() {
             const s = calculateStats();
             return `
@@ -608,7 +747,7 @@
             `;
         }
 
-        // --- 3. SUBJECTS ---
+        // --- 3. SUBJECTS (MEVCUT - KORUNDU) ---
         function renderSubjects() {
             let html = `<div class="grid grid-cols-1 gap-8 max-w-5xl mx-auto">`;
             for(let les in CURRICULUM) {
@@ -628,15 +767,16 @@
             return html + `</div>`;
         }
 
-        // --- 4. LEADERBOARD ---
+        // --- 4. LEADERBOARD (MEVCUT - XP DESTEĞİ EKLENDİ) ---
         function renderLeaderboard() {
             return `
                 <div class="max-w-2xl mx-auto">
                     <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-6 text-center"><i class="fa-solid fa-trophy text-yellow-500 mr-2"></i>Liderlik Tablosu</h2>
                     <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden">
-                        <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-4 grid grid-cols-4 text-white font-bold text-sm">
+                        <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-4 grid grid-cols-5 text-white font-bold text-sm">
                             <div class="col-span-2">Kullanıcı</div>
                             <div class="text-center">Ünvan</div>
+                            <div class="text-center">XP</div>
                             <div class="text-right">Tahmini Puan</div>
                         </div>
                         <div id="leaderboardList" class="divide-y divide-slate-100 dark:divide-slate-700">
@@ -655,7 +795,12 @@
                 let users = [];
                 snap.forEach(doc => { users.push({ id: doc.id, ...doc.data() }); });
                 
-                users.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+                // Sıralama: Önce Total Score, Eşitse XP
+                users.sort((a, b) => {
+                    const scoreDiff = (b.totalScore || 0) - (a.totalScore || 0);
+                    if(scoreDiff !== 0) return scoreDiff;
+                    return (b.xp || 0) - (a.xp || 0);
+                });
                 
                 let html = '';
                 let rank = 1;
@@ -665,7 +810,7 @@
                     const isAdmin = u.title === 'Yönetici' || u.email === ADMIN_EMAIL;
                     
                     html += `
-                        <div class="p-4 grid grid-cols-4 items-center ${isMe ? 'bg-orange-50 dark:bg-orange-900/20' : ''}">
+                        <div class="p-4 grid grid-cols-5 items-center ${isMe ? 'bg-orange-50 dark:bg-orange-900/20' : ''}">
                             <div class="col-span-2 flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300">${rank++}</div>
                                 <div class="flex items-center gap-2">
@@ -682,13 +827,13 @@
                                     : `<span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 rounded py-1 px-2">${u.title || '-'}</span>`
                                 }
                             </div>
+                            <div class="text-center font-bold text-purple-600 dark:text-purple-400 text-xs">${u.xp || 0} XP</div>
                             <div class="text-right font-bold text-slate-800 dark:text-white">${u.totalScore || 0}</div>
                         </div>
                     `;
                 });
                 
                 if(users.length === 0) html = '<div class="p-4 text-center text-slate-500">Henüz kayıtlı kullanıcı yok.</div>';
-                
                 document.getElementById('leaderboardList').innerHTML = html;
             } catch (error) {
                 console.error("Leaderboard Error:", error);
@@ -696,7 +841,310 @@
             }
         }
 
-        // --- 5. FLASHCARDS ---
+        // --- 5. SANAL ETÜT ODASI (YENİ - XP SİSTEMLİ) ---
+        let tempUploadedImageUrl = ""; // Resim URL'ini tutmak için
+
+        function renderEtut() {
+            return `
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-users-viewfinder text-blue-500 mr-2"></i>Sanal Etüt Odası</h2>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">Yapamadığın soruları sor, bilenlere yardım et, XP kazan!</p>
+                        </div>
+                        <div class="flex gap-2 text-[10px] font-bold">
+                            <div class="bg-blue-100 text-blue-700 px-2 py-1 rounded border border-blue-200">Soru Sor: +5 XP</div>
+                            <div class="bg-purple-100 text-purple-700 px-2 py-1 rounded border border-purple-200">Cevap Yaz: +10 XP</div>
+                            <div class="bg-green-100 text-green-700 px-2 py-1 rounded border border-green-200">En İyi Cevap: +50 XP</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 mb-8">
+                        <div onclick="document.getElementById('askForm').classList.toggle('hidden')" class="flex justify-between items-center cursor-pointer">
+                            <h3 class="font-bold text-slate-700 dark:text-slate-200">Yeni Soru Oluştur</h3>
+                            <i class="fa-solid fa-chevron-down text-slate-400"></i>
+                        </div>
+                        
+                        <div id="askForm" class="hidden mt-4 space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <select id="etutLesson" class="p-3 border dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 dark:text-white outline-none">
+                                    <option value="Genel">Ders Seçiniz...</option>
+                                    <option value="Matematik">Matematik</option>
+                                    <option value="Türkçe">Türkçe</option>
+                                    <option value="Tarih">Tarih</option>
+                                    <option value="Coğrafya">Coğrafya</option>
+                                    <option value="Vatandaşlık">Vatandaşlık</option>
+                                </select>
+                                <button onclick="window.openCloudinaryWidget()" id="uploadBtn" class="p-3 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-camera"></i> Fotoğraf Ekle
+                                </button>
+                            </div>
+                            <div id="imagePreview" class="hidden relative w-full h-32 bg-slate-100 dark:bg-slate-900 rounded-lg overflow-hidden">
+                                <img id="previewImg" src="" class="h-full w-auto mx-auto object-contain">
+                                <button onclick="window.clearImage()" class="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+
+                            <textarea id="etutText" rows="3" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg outline-none" placeholder="Sorunu buraya yaz..."></textarea>
+                            
+                            <button onclick="window.submitEtutQuestion()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-blue-200 dark:shadow-none">
+                                Paylaş (+5 XP)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="etutFeed" class="space-y-6">
+                        <div class="text-center text-slate-400 mt-8"><i class="fa-solid fa-spinner fa-spin"></i> Sorular yükleniyor...</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- CLOUDINARY ENTEGRASYONU ---
+        window.openCloudinaryWidget = () => {
+            const myWidget = cloudinary.createUploadWidget({
+                cloudName: 'dbwqidxpy', 
+                uploadPreset: 'alnikpss',
+                sources: ['local', 'camera'],
+                multiple: false,
+                folder: 'etut_questions'
+            }, (error, result) => { 
+                if (!error && result && result.event === "success") { 
+                    console.log('Done! Here is the image info: ', result.info); 
+                    tempUploadedImageUrl = result.info.secure_url;
+                    
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('previewImg').src = tempUploadedImageUrl;
+                    document.getElementById('uploadBtn').classList.add('bg-green-50', 'text-green-600', 'border-green-200');
+                    document.getElementById('uploadBtn').innerHTML = '<i class="fa-solid fa-check"></i> Fotoğraf Yüklendi';
+                }
+            });
+            myWidget.open();
+        }
+
+        window.clearImage = () => {
+            tempUploadedImageUrl = "";
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('previewImg').src = "";
+            document.getElementById('uploadBtn').classList.remove('bg-green-50', 'text-green-600', 'border-green-200');
+            document.getElementById('uploadBtn').innerHTML = '<i class="fa-solid fa-camera"></i> Fotoğraf Ekle';
+        }
+
+        // --- ETÜT İŞLEMLERİ ---
+        window.submitEtutQuestion = async () => {
+            const lesson = document.getElementById('etutLesson').value;
+            const text = document.getElementById('etutText').value;
+
+            if(lesson === 'Genel' || !text) return alert("Lütfen ders seçin ve soru metni girin.");
+
+            const btn = document.querySelector('#askForm button');
+            btn.disabled = true;
+            btn.innerText = "Paylaşılıyor...";
+
+            try {
+                // Soru Ekle
+                const qRef = await addDoc(collection(db, "etutQuestions"), {
+                    uid: currentUser.uid,
+                    authorName: userData.name,
+                    authorAvatar: userData.avatar,
+                    lesson: lesson,
+                    text: text,
+                    image: tempUploadedImageUrl,
+                    createdAt: serverTimestamp(),
+                    isSolved: false,
+                    commentCount: 0
+                });
+
+                // XP Ver (+5)
+                const newXp = (userData.xp || 0) + 5;
+                userData.xp = newXp;
+                await updateDoc(doc(db, "users", currentUser.uid), { xp: newXp });
+
+                // Bildirim
+                alert("Soru paylaşıldı! +5 XP Kazandın!");
+                
+                // Formu Temizle
+                document.getElementById('etutText').value = "";
+                window.clearImage();
+                document.getElementById('askForm').classList.add('hidden');
+                
+                // Yenile
+                loadEtutQuestions();
+                updateSidebar(); // XP güncellemesi için
+
+            } catch (err) {
+                console.error(err);
+                alert("Hata oluştu.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Paylaş (+5 XP)";
+            }
+        };
+
+        async function loadEtutQuestions() {
+            const container = document.getElementById('etutFeed');
+            const q = query(collection(db, "etutQuestions"), orderBy("createdAt", "desc"), limit(20));
+            
+            const snap = await getDocs(q);
+            if(snap.empty) {
+                container.innerHTML = '<div class="text-center text-slate-400 py-10">Henüz soru sorulmamış. İlk soran sen ol!</div>';
+                return;
+            }
+
+            let html = '';
+            for (const d of snap.docs) {
+                const qData = d.data();
+                const qId = d.id;
+                const isMyQuestion = qData.uid === currentUser.uid;
+
+                // Yorumları Çek (Client side'da basitçe çekiyoruz, pagination yok)
+                const commentsQ = query(collection(db, `etutQuestions/${qId}/comments`), orderBy("createdAt", "asc"));
+                const commentsSnap = await getDocs(commentsQ);
+                
+                let commentsHtml = '';
+                commentsSnap.forEach(cDoc => {
+                    const c = cDoc.data();
+                    const isBest = c.isBestAnswer;
+                    
+                    commentsHtml += `
+                        <div class="flex gap-3 text-sm ${isBest ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3' : 'border-l-2 border-slate-200 dark:border-slate-700 pl-3'}">
+                            <img src="${c.authorAvatar}" class="w-8 h-8 rounded-full">
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div class="font-bold text-slate-700 dark:text-slate-300">
+                                        ${c.authorName} 
+                                        ${isBest ? '<span class="text-xs text-green-600 ml-2"><i class="fa-solid fa-check-circle"></i> En İyi Cevap</span>' : ''}
+                                    </div>
+                                    <div class="text-xs text-slate-400">${c.createdAt ? new Date(c.createdAt.seconds*1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</div>
+                                </div>
+                                <p class="text-slate-600 dark:text-slate-300 mt-1">${c.text}</p>
+                                
+                                ${isMyQuestion && !qData.isSolved && !isBest && c.uid !== currentUser.uid ? `
+                                    <button onclick="window.markBestAnswer('${qId}', '${cDoc.id}', '${c.uid}')" class="mt-2 text-xs text-slate-400 hover:text-green-500 transition flex items-center gap-1">
+                                        <i class="fa-regular fa-star"></i> En iyi cevap seç (+50 XP Ver)
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border ${qData.isSolved ? 'border-green-200 dark:border-green-900' : 'border-slate-100 dark:border-slate-700'} overflow-hidden">
+                        <div class="p-4 md:p-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="${qData.authorAvatar}" class="w-10 h-10 rounded-full border border-slate-200">
+                                    <div>
+                                        <div class="font-bold text-slate-800 dark:text-white">${qData.authorName}</div>
+                                        <div class="text-xs text-slate-500">${qData.lesson} • ${qData.createdAt ? new Date(qData.createdAt.seconds*1000).toLocaleString() : ''}</div>
+                                    </div>
+                                </div>
+                                ${qData.isSolved ? '<div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-check"></i> Çözüldü</div>' : ''}
+                            </div>
+                            
+                            <p class="text-slate-800 dark:text-slate-200 mb-4 whitespace-pre-wrap">${qData.text}</p>
+                            
+                            ${qData.image ? `
+                                <div class="mb-4 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                    <img src="${qData.image}" class="max-h-96 w-auto mx-auto" onclick="window.open(this.src)" style="cursor:zoom-in">
+                                </div>
+                            ` : ''}
+
+                            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700">
+                                <div class="space-y-4 mb-4" id="comments-${qId}">
+                                    ${commentsHtml}
+                                </div>
+                                
+                                <div class="flex gap-2 items-center">
+                                    <img src="${userData.avatar}" class="w-8 h-8 rounded-full hidden md:block">
+                                    <div class="relative flex-1">
+                                        <input type="text" id="commentInput-${qId}" placeholder="Cevabını yaz (+10 XP)..." 
+                                            class="w-full pl-4 pr-12 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-full text-sm outline-none focus:border-blue-500 transition dark:text-white"
+                                            onkeydown="if(event.key === 'Enter') window.submitComment('${qId}')">
+                                        <button onclick="window.submitComment('${qId}')" class="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition">
+                                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        window.submitComment = async (qId) => {
+            const input = document.getElementById(`commentInput-${qId}`);
+            const text = input.value.trim();
+            if(!text) return;
+
+            try {
+                // Yorum Ekle
+                await addDoc(collection(db, `etutQuestions/${qId}/comments`), {
+                    uid: currentUser.uid,
+                    authorName: userData.name,
+                    authorAvatar: userData.avatar,
+                    text: text,
+                    createdAt: serverTimestamp(),
+                    isBestAnswer: false
+                });
+
+                // Soruya Yorum Sayısını Artır (Opsiyonel ama iyi olur)
+                // await updateDoc(doc(db, "etutQuestions", qId), { commentCount: increment(1) });
+
+                // XP Ver (+10)
+                const newXp = (userData.xp || 0) + 10;
+                userData.xp = newXp;
+                await updateDoc(doc(db, "users", currentUser.uid), { xp: newXp });
+
+                // Bildirim ve UI güncelleme
+                input.value = "";
+                loadEtutQuestions(); // Sayfayı yenilemeden sadece içeriği güncellemek daha iyi ama şimdilik load çağırıyoruz.
+                updateSidebar();
+
+            } catch (err) {
+                console.error(err);
+                alert("Yorum gönderilemedi.");
+            }
+        };
+
+        window.markBestAnswer = async (qId, cId, authorId) => {
+            if(!confirm("Bu cevabı en iyi cevap olarak seçmek istiyor musun? İşlem geri alınamaz.")) return;
+
+            try {
+                // 1. Cevabı güncelle
+                await updateDoc(doc(db, `etutQuestions/${qId}/comments/${cId}`), { isBestAnswer: true });
+
+                // 2. Soruyu 'Çözüldü' yap
+                await updateDoc(doc(db, "etutQuestions", qId), { isSolved: true });
+
+                // 3. Cevap sahibine XP ver (+50)
+                // Dikkat: Cevap sahibi biz değilsek, onun dokümanını güncellemeliyiz.
+                const authorRef = doc(db, "users", authorId);
+                const authorSnap = await getDoc(authorRef);
+                if(authorSnap.exists()) {
+                    const currentXp = authorSnap.data().xp || 0;
+                    await updateDoc(authorRef, { xp: currentXp + 50 });
+                }
+
+                // 4. Bildirim gönder
+                await addDoc(collection(db, "notifications"), {
+                    uid: authorId,
+                    message: "Tebrikler! Verdiğin cevap 'En İyi Cevap' seçildi. +50 XP kazandın!",
+                    type: "success",
+                    read: false,
+                    createdAt: serverTimestamp()
+                });
+
+                loadEtutQuestions();
+
+            } catch (err) {
+                console.error(err);
+                alert("İşlem sırasında hata oluştu.");
+            }
+        };
+        // --- 6. FLASHCARDS (MEVCUT - KORUNDU) ---
         function renderCards() {
             return `
                 <div class="max-w-4xl mx-auto">
@@ -784,7 +1232,7 @@
              }).join('');
         }
 
-        // --- 6. NOTES ---
+        // --- 7. NOTES (MEVCUT - KORUNDU) ---
         function renderNotes() {
             return `
                 <div class="max-w-4xl mx-auto">
@@ -807,7 +1255,7 @@
             `;
         }
 
-        // --- 7. FORUM MODULE (FIXED) ---
+        // --- 8. FORUM MODULE (MEVCUT - KORUNDU) ---
         function renderForum() {
             return `
                 <div class="max-w-4xl mx-auto">
@@ -849,19 +1297,14 @@
             document.getElementById('forumTitle').value = ""; document.getElementById('forumContent').value = "";
         }
 
-        // FIXED LOAD FORUM POSTS (Using Client-side sorting to fix Index error)
         async function loadForumPosts() {
             try {
-                // Sadece status kontrolü yapıyoruz, sıralamayı JS'de yapacağız
                 const q = query(collection(db, "forumPosts"), where("status", "==", "approved"));
                 const snap = await getDocs(q);
                 
                 let posts = [];
-                snap.forEach(d => {
-                    posts.push({id: d.id, ...d.data()});
-                });
+                snap.forEach(d => { posts.push({id: d.id, ...d.data()}); });
 
-                // Client-side Sort (En yeni en üstte)
                 posts.sort((a, b) => {
                     const timeA = a.createdAt?.seconds || 0;
                     const timeB = b.createdAt?.seconds || 0;
@@ -869,7 +1312,6 @@
                 });
 
                 const isAdminUser = currentUser.email.toLowerCase() === ADMIN_EMAIL;
-                
                 const container = document.getElementById('forumFeed');
                 if (!container) return;
 
@@ -880,7 +1322,6 @@
 
                 container.innerHTML = posts.map(p => {
                     const isAuthorAdmin = p.authorTitle === 'Yönetici';
-                    
                     return `
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm relative group">
                             <div class="flex items-center gap-3 mb-3">
@@ -902,7 +1343,6 @@
 
             } catch (err) {
                 console.error("Forum loading error:", err);
-                document.getElementById('forumFeed').innerHTML = `<div class="text-red-500">Hata oluştu: ${err.message}</div>`;
             }
         }
         
@@ -913,7 +1353,7 @@
             }
         };
 
-        // --- 8. FEEDBACK MODULE ---
+        // --- 9. FEEDBACK MODULE (MEVCUT - KORUNDU) ---
         function renderFeedback() {
             return `
                 <div class="max-w-2xl mx-auto">
@@ -938,7 +1378,7 @@
             document.getElementById('feedbackText').value = "";
         };
 
-        // --- 9. NOTIFICATIONS MODULE ---
+        // --- 10. NOTIFICATIONS MODULE (MEVCUT - KORUNDU) ---
         function listenForNotificationBadge() {
             if(unsubscribeNotifications) unsubscribeNotifications();
             const q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid), where("read", "==", false));
@@ -969,14 +1409,12 @@
 
         async function fetchNotifications() {
             let q;
-            // Fallback strategy just in case index is missing for notifications too
             q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid));
             const snap = await getDocs(q);
             
             let notifs = [];
             snap.forEach(d => notifs.push({id: d.id, ...d.data()}));
             
-            // Client side sort
             notifs.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
             displayNotifications(notifs);
 
@@ -1006,7 +1444,7 @@
             list.innerHTML = html;
         }
 
-        // --- 10. QUIZ CENTER ---
+        // --- 11. QUIZ CENTER (MEVCUT - KORUNDU) ---
         function renderQuizCenter() {
             return `
                 <div class="max-w-3xl mx-auto">
@@ -1045,7 +1483,63 @@
             `;
         }
 
-        // --- 11. PROFILE ---
+        // --- 12. HATA KUTUSU (YENİ - MISTAKES BOX) ---
+        function renderMistakes() {
+            return `
+                <div class="max-w-3xl mx-auto">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-recycle text-red-500 mr-2"></i>Hata Kutusu</h2>
+                        <p class="text-slate-500 dark:text-slate-400">Yanlış yaptığın sorular burada birikir. Tekrar çözüp doğrusunu öğrenince silinir.</p>
+                    </div>
+                    <div id="mistakesList" class="space-y-6">
+                        <div class="text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadMistakes() {
+            const container = document.getElementById('mistakesList');
+            const q = query(collection(db, `users/${currentUser.uid}/mistakes`));
+            const snap = await getDocs(q);
+
+            if(snap.empty) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center p-10 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <i class="fa-solid fa-check-circle text-6xl text-green-500 mb-4"></i>
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-white">Harika Gidiyorsun!</h3>
+                        <p class="text-slate-500 dark:text-slate-400">Hata kutun boş. Tüm yanlışlarını temizledin.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            snap.forEach((doc) => {
+                const data = doc.data();
+                html += `
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-red-500 shadow-sm" id="mistake-${doc.id}">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold px-2 py-1 rounded uppercase">${data.lesson || 'Genel'}</span>
+                            <button onclick="window.deleteMistake('${doc.id}')" class="text-slate-400 hover:text-red-500" title="Kutudan Sil"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <p class="text-lg font-bold text-slate-800 dark:text-white mb-6">${data.text}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            ${data.options.map((opt, idx) => `
+                                <button onclick="window.checkMistakeAnswer('${doc.id}', ${idx}, ${data.correct})" 
+                                    class="text-left p-3 rounded-lg border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition mistake-opt-${doc.id}" data-idx="${idx}">
+                                    <span class="font-bold mr-2">${String.fromCharCode(65+idx)})</span> ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="feedback-${doc.id}" class="mt-4 hidden font-bold text-center"></div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // --- 13. PROFILE (MEVCUT - KORUNDU) ---
         function renderProfile() {
             const uName = userData?.name || '';
             const uTarget = userData?.targetScore || 85;
@@ -1077,8 +1571,7 @@
                 </div>
             `;
         }
-
-        // --- 12. ADMIN PANEL V2 ---
+        // --- 14. ADMIN PANEL (MEVCUT - KORUNDU) ---
         function renderAdminPanel() {
             return `
                 <div class="max-w-6xl mx-auto">
@@ -1192,7 +1685,7 @@
             }
         };
 
-        // --- 13. MOCKS MODULE ---
+        // --- 15. MOCKS MODULE (MEVCUT - KORUNDU) ---
         function renderMocks() {
             return `
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1242,8 +1735,6 @@
             const gy = tr + mat;
             const gk = hist + geo + cit;
             let score = Math.round(55 + (gy * 0.4) + (gk * 0.4)); 
-            
-            // NEW RULE: Cap score at 100
             if(score > 100) score = 100;
 
             const data = {
@@ -1265,10 +1756,8 @@
             onSnapshot(q, (s) => { 
                 mockExamsHistory=[]; 
                 s.forEach(d=>mockExamsHistory.push(d.data())); 
-                // Auto refresh if looking at mocks or dashboard
                 const content = document.getElementById('contentArea');
                 if(content.innerHTML.includes('Yeni Deneme Ekle') || content.innerHTML.includes('Puan Grafiği')) {
-                    // Slight hack to refresh charts without full page reload
                     const active = document.querySelector('.active-nav');
                     if(active) window.loadPage(active.id.replace('nav-', ''));
                 }
@@ -1321,7 +1810,60 @@
             });
         }
 
-        // --- GLOBAL WRAPPERS ---
+        // --- GLOBAL WRAPPERS & HELPERS ---
+        
+        // Hata Kutusu Mantığı
+        window.checkMistakeAnswer = async (docId, selectedIdx, correctIdx) => {
+            const feedback = document.getElementById(`feedback-${docId}`);
+            const buttons = document.querySelectorAll(`.mistake-opt-${docId}`);
+            
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedIdx === correctIdx) {
+                // DOĞRU
+                feedback.innerHTML = '<span class="text-green-500"><i class="fa-solid fa-check"></i> Doğru! Kutu temizleniyor...</span>';
+                feedback.classList.remove('hidden');
+                buttons[selectedIdx].classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+                
+                // Sil ve Arayüzü Güncelle
+                setTimeout(async () => {
+                    await deleteDoc(doc(db, `users/${currentUser.uid}/mistakes/${docId}`));
+                    const el = document.getElementById(`mistake-${docId}`);
+                    if(el) {
+                        el.style.transition = 'all 0.5s';
+                        el.style.opacity = '0';
+                        el.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            el.remove();
+                            // Eğer liste boşaldıysa UI'ı güncelle
+                            if(document.getElementById('mistakesList').children.length === 0) loadMistakes();
+                        }, 500);
+                    }
+                }, 1500);
+            } else {
+                // YANLIŞ
+                feedback.innerHTML = '<span class="text-red-500"><i class="fa-solid fa-xmark"></i> Yanlış. Tekrar dene!</span>';
+                feedback.classList.remove('hidden');
+                buttons[selectedIdx].classList.add('bg-red-100', 'border-red-500', 'text-red-700');
+                
+                // Butonları tekrar aktif et
+                setTimeout(() => {
+                     buttons.forEach(btn => {
+                         btn.disabled = false;
+                         btn.classList.remove('bg-red-100', 'border-red-500', 'text-red-700');
+                     });
+                     feedback.classList.add('hidden');
+                }, 1500);
+            }
+        };
+
+        window.deleteMistake = async (id) => {
+            if(confirm("Bu soruyu kutudan silmek istiyor musun?")) {
+                await deleteDoc(doc(db, `users/${currentUser.uid}/mistakes/${id}`));
+                loadMistakes();
+            }
+        };
+
         window.saveNote = async () => { const txt = document.getElementById('newNoteText').value; if(!txt) return; const noteData = { text: txt, createdAt: serverTimestamp() }; await addDoc(collection(db, `users/${currentUser.uid}/notes`), noteData); document.getElementById('newNoteText').value = ""; loadMyNotes(); };
         window.deleteNote = async (id) => { if(confirm("Sileyim mi?")) { await deleteDoc(doc(db, `users/${currentUser.uid}/notes/${id}`)); loadMyNotes(); } };
         window.toggleTimer = () => { if(isTimerRunning) { clearInterval(pomodoroInterval); isTimerRunning = false; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>'; } else { isTimerRunning = true; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-pause text-[10px]"></i>'; pomodoroInterval = setInterval(() => { pomodoroTimeLeft--; const m = Math.floor(pomodoroTimeLeft / 60).toString().padStart(2, '0'); const s = (pomodoroTimeLeft % 60).toString().padStart(2, '0'); document.getElementById('timerDisplay').innerText = `${m}:${s}`; if(pomodoroTimeLeft <= 0) { clearInterval(pomodoroInterval); isTimerRunning = false; alert("Pomodoro Bitti! +1 Puan"); savePomodoroSession(); pomodoroTimeLeft = 25 * 60; document.getElementById('timerDisplay').innerText = "25:00"; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>'; } }, 1000); } };
@@ -1346,7 +1888,16 @@
         window.closePrivacyModal = () => document.getElementById('privacyModal').classList.add('hidden');
         async function loadMyNotes() { const q = query(collection(db, `users/${currentUser.uid}/notes`), orderBy("createdAt", "desc")); const snap = await getDocs(q); myNotes = []; snap.forEach(d => myNotes.push({ id: d.id, text: d.data().text, date: new Date(d.data().createdAt?.seconds * 1000).toLocaleDateString() })); if(document.getElementById('nav-notes').classList.contains('active-nav')) window.loadPage('notes'); }
         function calculateStats() { let totalTopics = 0, completed = 0, started = 0; for(let les in CURRICULUM) { totalTopics += CURRICULUM[les].length; CURRICULUM[les].forEach(t => { const s = (userData.progress || {})[les+"_"+t]; if(s === 'completed') completed++; if(s === 'started') started++; }); } const totalProgress = Math.round((completed/totalTopics)*100) || 0; const avgScore = mockExamsHistory.length > 0 ? Math.round(mockExamsHistory.reduce((a,b)=>a+b.totalScore,0)/mockExamsHistory.length) : 0; let situation = "Veri girişi bekleniyor.", strategy = "Önce konulara başla.", shortAdvice = "Başlamak bitirmenin yarısıdır.", weakness = "Veri yok.", motivation = "Yolun başındasın."; if(totalProgress < 10) { situation = "Henüz yolun başındasın."; strategy = "Konulara yüklen."; shortAdvice = "Konu eksiğin çok."; } else if(totalProgress < 50) { situation = "Orta seviye."; strategy = "Tekrarlara başla."; shortAdvice = "Yarılamak üzeresin."; } else { situation = "Konular bitiyor."; strategy = "Deneme çöz."; shortAdvice = "Deneme vakti!"; } if(mockExamsHistory.length > 0 && avgScore < 70) weakness = "Netlerin düşük."; else if(avgScore > 85) motivation = "Derece yapabilirsin!"; return { totalProgress, avgScore, completedCount: completed, startedCount: started, situationAnalysis: situation, strategyAdvice: strategy, weaknessAnalysis: weakness, motivationMsg: motivation, shortAdvice }; }
-        function updateSidebar() { if(!userData) return; document.getElementById('sidebarName').innerText = userData.name; document.getElementById('sidebarAvatar').src = userData.avatar; document.getElementById('sidebarTitle').innerText = userData.title || 'Öğrenci'; document.getElementById('pomodoroCount').innerText = (userData.pomodoroSessions || 0) + " Seans"; document.getElementById('mobileAvatar').src = userData.avatar; }
+        function updateSidebar() { 
+            if(!userData) return; 
+            document.getElementById('sidebarName').innerText = userData.name; 
+            document.getElementById('sidebarAvatar').src = userData.avatar; 
+            document.getElementById('sidebarTitle').innerText = userData.title || 'Öğrenci'; 
+            document.getElementById('pomodoroCount').innerText = (userData.pomodoroSessions || 0) + " Seans"; 
+            document.getElementById('mobileAvatar').src = userData.avatar;
+            // XP Güncelleme
+            if(document.getElementById('sidebarXP')) document.getElementById('sidebarXP').innerText = userData.xp || 0;
+        }
     </script>
 </body>
 </html>
