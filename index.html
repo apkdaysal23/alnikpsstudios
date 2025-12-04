@@ -2331,17 +2331,22 @@
                 const batch = writeBatch(db);
                 let count = 0;
                 cards.forEach(c => {
+                    // GÜNCELLEME: lesson alanı eklendi
                     if(c.front && c.back) {
                         const newRef = doc(collection(db, "flashcards")); 
                         batch.set(newRef, {
-                            front: c.front, back: c.back,
-                            authorName: "Sistem", uid: currentUser.uid, createdAt: serverTimestamp()
+                            front: c.front, 
+                            back: c.back,
+                            lesson: c.lesson || "General", // JSON'da lesson varsa al, yoksa General yap
+                            authorName: "Sistem", 
+                            uid: currentUser.uid, 
+                            createdAt: serverTimestamp()
                         });
                         count++;
                     }
                 });
                 await batch.commit();
-                alert(`✅ İşlem Başarılı! ${count} kart canlıya alındı.`);
+                alert(`✅ İşlem Başarılı! ${count} kart, kategorileriyle birlikte canlıya alındı.`);
                 document.getElementById('bulkJsonFlashcards').value = ""; 
             } catch (e) { console.error(e); alert("❌ HATA: " + e.message); } 
         };
@@ -2621,3 +2626,4 @@
     </script>
 </body>
 </html>
+
