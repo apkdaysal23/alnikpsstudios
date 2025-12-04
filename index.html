@@ -2325,6 +2325,54 @@ window.drop = (ev) => {
             document.getElementById('mobileAvatar').src = userData.avatar;
             if(document.getElementById('sidebarXP')) document.getElementById('sidebarXP').innerText = userData.xp || 0;
         }
+        // Akıllı Program Kaydetme Fonksiyonu
+        window.saveSchedule = async () => {
+            // Kullanıcı kontrolü
+            if (!currentUser) {
+                alert("Lütfen önce giriş yapın.");
+                return;
+            }
+
+            const btn = document.querySelector('button[onclick="window.saveSchedule()"]');
+            if(btn) { btn.innerText = "Kaydediliyor..."; btn.disabled = true; }
+
+            // 1. Günlerin HTML ID'lerindeki karşılıkları
+            const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+            let scheduleData = {}; 
+
+            // 2. Her günün sütununu gez ve içindeki dersleri topla
+            days.forEach(day => {
+                const col = document.getElementById(`col-${day}`);
+                if(col) {
+                    // Sütun içindeki sürüklenmiş öğeleri (drag-item) bul
+                    const items = col.querySelectorAll('.drag-item');
+                    let itemIds = [];
+                    
+                    // Öğelerin ID'lerini listeye ekle
+                    items.forEach(item => {
+                        itemIds.push(item.id);
+                    });
+                    
+                    // O günün verisini objeye yaz (Örn: { "Pazartesi": ["drag-Mat-1", "drag-Tr-2"] })
+                    scheduleData[day] = itemIds;
+                }
+            });
+
+            // 3. Firebase'e Kaydet
+            try {
+                // Kullanıcının "scheduler" koleksiyonuna "weekly" dökümanı olarak kaydet
+                await setDoc(doc(db, `users/${currentUser.uid}/scheduler/weekly`), scheduleData);
+                
+                alert("✅ Ders programın başarıyla kaydedildi!");
+                
+            } catch (e) {
+                console.error("Kaydetme Hatası:", e);
+                alert("Hata oluştu: " + e.message);
+            } finally {
+                if(btn) { btn.innerHTML = '<i class="fa-solid fa-save mr-2"></i>Kaydet'; btn.disabled = false; }
+            }
+        };
     </script>
 </body>
 </html>
+
