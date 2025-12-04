@@ -2319,36 +2319,105 @@
             } catch (e) { console.error(e); alert("❌ HATA: " + e.message); } 
         };
 
-        window.bulkUploadFlashcards = async () => {
-            const input = document.getElementById('bulkJsonFlashcards').value.trim();
-            if(!input) return alert("Lütfen JSON verisi yapıştırın.");
+        window.startFlashcardGame = async () => {
+            const category = document.getElementById('flashcardCategorySelect').value;
+            const btn = document.querySelector('#flashcardStartScreen button');
+            
+            // Butonu kilitle ve yükleniyor yap
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...';
+            btn.disabled = true;
+            
             try {
-                const cards = JSON.parse(input);
-                if(!Array.isArray(cards)) throw new Error("Veri köşeli parantez [] ile başlamalı.");
-                if(cards.length === 0) throw new Error("Liste boş.");
-                if(!confirm(`${cards.length} adet Flashcard YAYINA alınacak. Emin misin?`)) return;
-
-                const batch = writeBatch(db);
-                let count = 0;
-                cards.forEach(c => {
-                    // GÜNCELLEME: lesson alanı eklendi
-                    if(c.front && c.back) {
-                        const newRef = doc(collection(db, "flashcards")); 
-                        batch.set(newRef, {
-                            front: c.front, 
-                            back: c.back,
-                            lesson: c.lesson || "General", // JSON'da lesson varsa al, yoksa General yap
-                            authorName: "Sistem", 
-                            uid: currentUser.uid, 
-                            createdAt: serverTimestamp()
-                        });
-                        count++;
+                // Veritabanından tüm kartları çek
+                const q = query(collection(db, "flashcards"));
+                const snap = await getDocs(q);
+                
+                flashcardsPool = [];
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    // Kategori filtreleme: "All" ise hepsi, değilse sadece o ders
+                    // Eğer veritabanında 'lesson' alanı yoksa ve kategori 'General' ise onu da al
+                    if(category === 'All' || d.lesson === category || (!d.lesson && category === 'General')) {
+                        flashcardsPool.push({ id: doc.id, ...d });
                     }
                 });
-                await batch.commit();
-                alert(`✅ İşlem Başarılı! ${count} kart, kategorileriyle birlikte canlıya alındı.`);
-                document.getElementById('bulkJsonFlashcards').value = ""; 
-            } catch (e) { console.error(e); alert("❌ HATA: " + e.message); } 
+
+                // Eğer hiç kart yoksa uyar
+                if(flashcardsPool.length === 0) {
+                    alert("Bu kategoride henüz kart bulunamadı.");
+                    btn.innerHTML = 'Başla';
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Kartları karıştır (Shuffle)
+                flashcardsPool.sort(() => Math.random() - 0.5);
+
+                // Ekranları değiştir (Giriş ekranını gizle, Oyunu aç)
+                document.getElementById('flashcardStartScreen').classList.add('hidden');
+                document.getElementById('flashcardGameArea').classList.remove('hidden');
+                
+                // Rozeti güncelle
+                const badge = document.getElementById('fcCategoryBadge');
+                if(badge) badge.innerText = category === 'All' ? 'Karışık' : category;
+                
+                // İLK KARTI GETİR
+                window.nextCard();
+                
+                // Butonu resetle (geri dönülürse hazır olsun)
+                btn.innerHTML = 'Başla';
+                btn.disabled = false;
+
+            } catch (e) {
+                console.error("Kart yükleme hatası:", e);
+                alert("Kartlar yüklenirken hata oluştu: " + e.message);
+                btn.innerHTML = 'Başla';
+                btn.disabled = false;
+            }
+        };
+
+        window.nextCard = () => {
+            // 1. Havuz kontrolü
+            if(!flashcardsPool || flashcardsPool.length === 0) {
+                alert("Gösterilecek kart kalmadı! Kategori seçimine dönülüyor.");
+                window.switchCardTab('browse'); 
+                return;
+            }
+
+            // 2. Rastgele bir kart seç
+            const randomIndex = Math.floor(Math.random() * flashcardsPool.length);
+            currentCard = flashcardsPool[randomIndex];
+            
+            // 3. Kart elementini bul
+            const cardEl = document.querySelector('.flip-card');
+            
+            if(cardEl) {
+                // Eğer kartın arkası dönükse (cevap açıksa), önce ön yüzünü çevir
+                if(cardEl.classList.contains('flipped')) {
+                    cardEl.classList.remove('flipped');
+                    
+                    // Animasyonun bitmesini bekle (300ms), sonra yazıları değiştir
+                    // Bu sayede kullanıcı yazının değiştiğini çevrilirken görmez
+                    setTimeout(() => {
+                        updateCardText();
+                    }, 300);
+                } else {
+                    // Zaten ön yüzdeyse direkt değiştir
+                    updateCardText();
+                }
+            } else {
+                // Element bulunamazsa (nadiren olur) direkt güncelle
+                updateCardText();
+            }
+            
+            // İç yardımcı fonksiyon: Metinleri güncelle
+            function updateCardText() {
+                const frontEl = document.getElementById('fcFront');
+                const backEl = document.getElementById('fcBack');
+                
+                if(frontEl) frontEl.innerText = currentCard.front;
+                if(backEl) backEl.innerText = currentCard.back;
+            }
         };
 
         window.adminSendNotification = async () => {
@@ -2626,4 +2695,3 @@
     </script>
 </body>
 </html>
-
