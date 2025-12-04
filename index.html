@@ -112,9 +112,127 @@
         .glass-panel { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
         
         /* Şafak Sayar Animasyonu */
-        .countdown-item span {
-            display: block;
+        .countdown-item span { display: block; }
+
+        /* --- ODAK BAHÇESİ STİLLERİ --- */
+        .garden-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 1rem;
         }
+        .plant-slot {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .dark .plant-slot { background: rgba(30, 41, 59, 0.5); }
+        .plant-slot:hover { transform: scale(1.1); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        .plant-icon {
+            font-size: 2rem;
+            animation: growPlant 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes growPlant { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* --- AKILLI DERS PROGRAMI STİLLERİ --- */
+        .scheduler-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            min-height: 500px;
+        }
+        .scheduler-col {
+            min-width: 200px;
+            flex: 1;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column; 
+        }
+        .dark .scheduler-col {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .col-header {
+            padding: 0.75rem;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f1f5f9;
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+        }
+        .dark .col-header {
+            background: #0f172a;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+        .col-body {
+            padding: 0.5rem;
+            flex: 1;
+            min-height: 100px;
+        }
+        .col-body.drag-over {
+            background-color: rgba(249, 115, 22, 0.1);
+            border: 2px dashed #f97316;
+        }
+        /* Kaynak Liste için Drag Over stili */
+        #subjectSourceList.drag-over {
+            background-color: rgba(239, 68, 68, 0.1); /* Kırmızı tonu */
+            border: 2px dashed #ef4444;
+        }
+
+        .drag-item {
+            background: white;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            font-size: 0.8rem;
+            cursor: grab;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .dark .drag-item {
+            background: #334155;
+            color: #f1f5f9;
+        }
+        .drag-item:hover {
+            border-color: #f97316;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .drag-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+        .subject-source {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* --- LİG SİSTEMİ STİLLERİ --- */
+        .league-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .league-bronze { background: #fff7ed; color: #7c2d12; border: 1px solid #fdba74; }
+        .league-silver { background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; }
+        .league-gold { background: #fefce8; color: #854d0e; border: 1px solid #fde047; }
+        .league-diamond { background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; }
     </style>
 </head>
 <body class="text-slate-800 bg-slate-50 dark:bg-darkBg dark:text-darkText h-screen overflow-hidden flex flex-col transition-colors duration-300">
@@ -162,9 +280,9 @@
                             <i class="fa-solid fa-layer-group text-5xl md:text-6xl text-warning mb-4 md:mb-6"></i>
                             <h2 class="text-2xl md:text-3xl font-bold mb-2 md:mb-4">Al&Ni Ekosistemi</h2>
                             <p class="text-slate-300 text-sm md:text-base leading-relaxed max-w-md">
-                                <span class="block mb-1"><strong>Sanal Etüt:</strong> Soru sor, XP kazan.</span>
-                                <span class="block mb-1"><strong>Hata Kutusu:</strong> Yanlışlarını tekrarla.</span>
-                                <span class="block"><strong>LifeCalc & Menu Architect:</strong> Diğer projelerimiz.</span>
+                                <span class="block mb-1"><strong>Odak Bahçesi:</strong> Çalıştıkça büyüt.</span>
+                                <span class="block mb-1"><strong>Akıllı Program:</strong> Haftanı planla.</span>
+                                <span class="block"><strong>Not Pazarı:</strong> XP ile not al/sat.</span>
                             </p>
                         </div>
 
@@ -269,17 +387,25 @@
                     <button id="nav-dashboard" onclick="window.loadPage('dashboard')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-chart-pie w-5"></i><span>Genel Bakış</span></button>
                     <button id="nav-smartcoach" onclick="window.loadPage('smartcoach')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-brain w-5 text-purple-600"></i><span class="font-bold text-purple-700 dark:text-purple-400">SmartCoach AI</span></button>
                     
-                    <div class="pt-2 pb-1 text-xs font-bold text-slate-400 px-4">ÇALIŞMA</div>
+                    <div class="pt-2 pb-1 text-xs font-bold text-slate-400 px-4">VERİMLİLİK</div>
+                    <button id="nav-garden" onclick="window.loadPage('garden')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-seedling w-5 text-green-500"></i><span class="font-bold">Odak Bahçesi</span></button>
+                    <button id="nav-scheduler" onclick="window.loadPage('scheduler')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-calendar-week w-5 text-indigo-500"></i><span>Akıllı Program</span></button>
+
+                    <div class="pt-2 pb-1 text-xs font-bold text-slate-400 px-4">TOPLULUK</div>
+                    <button id="nav-league" onclick="window.loadPage('league')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-trophy w-5 text-yellow-500"></i><span>Haftalık Lig</span></button>
+                    <button id="nav-market" onclick="window.loadPage('market')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-shop w-5 text-pink-500"></i><span>Not Pazarı</span></button>
                     <button id="nav-etut" onclick="window.loadPage('etut')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-users-viewfinder w-5 text-blue-500"></i><span class="font-bold">Sanal Etüt</span></button>
+                    <button id="nav-forum" onclick="window.loadPage('forum')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-comments w-5"></i><span>Forum</span></button>
+
+                    <div class="pt-2 pb-1 text-xs font-bold text-slate-400 px-4">ÇALIŞMA</div>
                     <button id="nav-mistakes" onclick="window.loadPage('mistakes')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-triangle-exclamation w-5 text-red-500"></i><span>Hata Kutusu</span></button>
                     <button id="nav-subjects" onclick="window.loadPage('subjects')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-list-check w-5"></i><span>Konu Takip</span></button>
                     <button id="nav-quiz" onclick="window.loadPage('quiz')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-pen-nib w-5"></i><span>Soru Merkezi</span></button>
                     <button id="nav-cards" onclick="window.loadPage('cards')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-layer-group w-5"></i><span>Flashcards</span></button>
                     <button id="nav-mocks" onclick="window.loadPage('mocks')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-chart-line w-5"></i><span>Deneme & Analiz</span></button>
                     
-                    <div class="pt-2 pb-1 text-xs font-bold text-slate-400 px-4">SOSYAL & EKSTRA</div>
-                    <button id="nav-forum" onclick="window.loadPage('forum')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-comments w-5"></i><span>Forum</span></button>
-                    <button id="nav-leaderboard" onclick="window.loadPage('leaderboard')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-trophy w-5 text-yellow-500"></i><span>Liderlik Tablosu</span></button>
+                    <div class="pt-2 pb-1 text-xs font-bold text-slate-400 px-4">EKSTRA</div>
+                    <button id="nav-leaderboard" onclick="window.loadPage('leaderboard')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-trophy w-5 text-yellow-600"></i><span>Genel Sıralama</span></button>
                     <button id="nav-notes" onclick="window.loadPage('notes')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-sticky-note w-5"></i><span>Not Defterim</span></button>
                     <button id="nav-feedback" onclick="window.loadPage('feedback')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-700 hover:text-primary transition"><i class="fa-solid fa-paper-plane w-5"></i><span>Öneri / Şikayet</span></button>
 
@@ -342,7 +468,7 @@
                 </div>
             </header>
             
-            <div id="contentArea" class="flex-1 overflow-y-auto p-4 md:p-8 relative"></div>
+            <div id="contentArea" class="flex-1 overflow-y-auto p-4 md:p-8 pb-32 relative"></div>
         </main>
     </div>
 
@@ -366,7 +492,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, addDoc, collection, query, orderBy, limit, onSnapshot, serverTimestamp, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, addDoc, collection, query, orderBy, limit, onSnapshot, serverTimestamp, where, getDocs, deleteDoc, arrayUnion, increment, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDVVuIdQzbPZqWaMLtkV0mRjr5qHOng460",
@@ -402,7 +528,6 @@
             }
         };
 
-        // Initialize immediately
         window.initializeTheme();
 
         // --- SLIDER LOGIC ---
@@ -415,7 +540,6 @@
             if(track) track.style.transform = `translateX(-${currentSlide * 100}%)`;
         };
         
-        // Auto slide
         setInterval(() => { if(!currentUser) window.moveSlide(1); }, 5000);
 
         // --- CONSTANTS ---
@@ -469,7 +593,20 @@
                     
                     if (snap.exists()) {
                         userData = snap.data();
-                        await checkStreak(docRef, userData); // STREAK KONTROLÜ
+                        
+                        // Eksik veri kontrolü
+                        let updates = {};
+                        if (!userData.currentLeague) updates.currentLeague = "Bronz";
+                        if (!userData.inventory) updates.inventory = [];
+                        if (userData.xp === undefined) updates.xp = 0;
+                        if (userData.streak === undefined) updates.streak = 1;
+                        
+                        if (Object.keys(updates).length > 0) {
+                            await updateDoc(docRef, updates);
+                            userData = { ...userData, ...updates };
+                        }
+
+                        await checkStreak(docRef, userData);
                     } else {
                         userData = { 
                             name: user.displayName || (user.email.split('@')[0]), 
@@ -480,8 +617,10 @@
                             avatar: AVATAR_OPTIONS[0], 
                             pomodoroSessions: 0, 
                             totalScore: 0,
-                            xp: 0, // YENİ: XP Sistemi
-                            streak: 1, // YENİ: Streak
+                            xp: 0, 
+                            streak: 1, 
+                            currentLeague: "Bronz", 
+                            inventory: [], 
                             lastLoginDate: serverTimestamp()
                         };
                         await setDoc(docRef, userData);
@@ -507,45 +646,35 @@
             }
         });
 
-// --- STREAK LOGIC (DÜZELTİLMİŞ) ---
+        // --- STREAK LOGIC (HATA KORUMALI) ---
         async function checkStreak(docRef, data) {
             const now = new Date();
             let lastLogin;
 
-            // Tarih verisinin tipini kontrol ederek dönüştür
             if (data.lastLoginDate && typeof data.lastLoginDate.toDate === 'function') {
-                // Eğer Firestore Timestamp ise
                 lastLogin = data.lastLoginDate.toDate();
             } else if (data.lastLoginDate instanceof Date) {
-                // Eğer zaten JavaScript Date objesi ise
                 lastLogin = data.lastLoginDate;
             } else {
-                // Hiçbiri değilse veya yoksa şu anı kabul et
-                lastLogin = new Date();
+                lastLogin = new Date(); 
             }
             
-            // Tarihleri normalleştir (Saat farkını yoksay)
             const todayStr = now.toDateString();
             const lastLoginStr = lastLogin.toDateString();
             
-            // Eğer bugün giriş yapılmadıysa kontrol et
             if (todayStr !== lastLoginStr) {
                 const diffTime = Math.abs(now - lastLogin);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
                 
                 let newStreak = data.streak || 0;
                 
-                // 1 günden az fark varsa (yani dün girmişse) veya yeni başlıyorsa
-                // Not: diffDays 1 ise "dün", diffDays 0 ise "bugün" (yukarıdaki if bunu eledi ama yine de)
                 if (diffDays <= 2) { 
                     newStreak += 1;
                 } else {
-                    newStreak = 1; // Zincir kırıldı, baştan başla
+                    newStreak = 1; 
                 }
                 
-                // Veriyi güncelle (userData global değişkenini de güncelle ki ekranda hemen görünsün)
-                userData.streak = newStreak; 
-                
+                userData.streak = newStreak;
                 await updateDoc(docRef, { 
                     lastLoginDate: serverTimestamp(),
                     streak: newStreak
@@ -569,7 +698,7 @@
             }
         };
 
-        // --- NAVIGATION LOGIC ---
+        // --- NAVIGATION LOGIC (GÜNCELLENDİ) ---
         window.loadPage = (page) => {
             const content = document.getElementById('contentArea');
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-nav'));
@@ -586,7 +715,6 @@
                 return;
             }
 
-            // Temizle ve Yükle
             if(countdownInterval) clearInterval(countdownInterval);
 
             switch(page) {
@@ -602,8 +730,12 @@
                 case 'cards': content.innerHTML = renderCards(); window.switchCardTab('submit'); break;
                 case 'forum': content.innerHTML = renderForum(); loadForumPosts(); break;
                 case 'feedback': content.innerHTML = renderFeedback(); break;
-                case 'etut': content.innerHTML = renderEtut(); loadEtutQuestions(); break; // YENİ
-                case 'mistakes': content.innerHTML = renderMistakes(); loadMistakes(); break; // YENİ
+                case 'etut': content.innerHTML = renderEtut(); loadEtutQuestions(); break;
+                case 'mistakes': content.innerHTML = renderMistakes(); loadMistakes(); break;
+                case 'garden': content.innerHTML = renderGarden(); loadGarden(); break; 
+                case 'scheduler': content.innerHTML = renderScheduler(); loadScheduler(); break; 
+                case 'league': content.innerHTML = renderLeague(); loadLeagueData(); break;
+                case 'market': content.innerHTML = renderMarket(); window.switchMarketTab('browse'); break; 
                 case 'notifications': 
                     content.innerHTML = renderNotifications(); 
                     fetchNotifications(); 
@@ -611,16 +743,12 @@
             }
         };
 
-        // --- 1. DASHBOARD (UPDATED) ---
+        // --- 1. DASHBOARD ---
         function renderDashboard() {
             const stats = calculateStats();
             const xp = userData.xp || 0;
             const streak = userData.streak || 1;
-            
-            // Level Hesaplama (Her 100 XP 1 Level)
             const level = Math.floor(xp / 100) + 1;
-            const nextLevelXp = level * 100;
-            const xpProgress = ((xp % 100) / 100) * 100;
 
             return `
                 <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
@@ -697,25 +825,20 @@
             `;
         }
 
-        // --- COUNTDOWN LOGIC ---
         function startCountdown() {
             const targetDate = new Date("2026-10-04T00:00:00").getTime();
-            
             const update = () => {
                 const now = new Date().getTime();
                 const distance = targetDate - now;
-                
                 if (distance < 0) {
                     if(document.getElementById("countdownTimer")) document.getElementById("countdownTimer").innerHTML = "SINAV GÜNÜ!";
                     clearInterval(countdownInterval);
                     return;
                 }
-                
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                
                 if(document.getElementById("cdDays")) {
                     document.getElementById("cdDays").innerText = days;
                     document.getElementById("cdHours").innerText = hours.toString().padStart(2, '0');
@@ -723,11 +846,11 @@
                     document.getElementById("cdSecs").innerText = seconds.toString().padStart(2, '0');
                 }
             };
-            
             update();
             countdownInterval = setInterval(update, 1000);
         }
-        // --- 2. SMARTCOACH (MEVCUT - KORUNDU) ---
+
+        // --- 2. SMARTCOACH (MEVCUT) ---
         function renderSmartCoachPage() {
             const s = calculateStats();
             return `
@@ -747,7 +870,7 @@
             `;
         }
 
-        // --- 3. SUBJECTS (MEVCUT - KORUNDU) ---
+        // --- 3. SUBJECTS (MEVCUT) ---
         function renderSubjects() {
             let html = `<div class="grid grid-cols-1 gap-8 max-w-5xl mx-auto">`;
             for(let les in CURRICULUM) {
@@ -766,8 +889,7 @@
             }
             return html + `</div>`;
         }
-
-        // --- 4. LEADERBOARD (MEVCUT - XP DESTEĞİ EKLENDİ) ---
+        // --- 4. LEADERBOARD (MEVCUT) ---
         function renderLeaderboard() {
             return `
                 <div class="max-w-2xl mx-auto">
@@ -789,17 +911,20 @@
 
         async function loadLeaderboardData() {
             const q = query(collection(db, "users"), limit(50));
-            
             try {
                 const snap = await getDocs(q);
                 let users = [];
                 snap.forEach(doc => { users.push({ id: doc.id, ...doc.data() }); });
                 
-                // Sıralama: Önce Total Score, Eşitse XP
+                // Sıralama: Önce Puan (Azalan), Sonra XP (Azalan), Sonra İsim (Artan A-Z)
                 users.sort((a, b) => {
                     const scoreDiff = (b.totalScore || 0) - (a.totalScore || 0);
                     if(scoreDiff !== 0) return scoreDiff;
-                    return (b.xp || 0) - (a.xp || 0);
+                    
+                    const xpDiff = (b.xp || 0) - (a.xp || 0);
+                    if(xpDiff !== 0) return xpDiff;
+                    
+                    return (a.name || "").localeCompare(b.name || "");
                 });
                 
                 let html = '';
@@ -841,81 +966,390 @@
             }
         }
 
-        // --- 5. SANAL ETÜT ODASI (YENİ - XP SİSTEMLİ) ---
-        let tempUploadedImageUrl = ""; // Resim URL'ini tutmak için
-
-        function renderEtut() {
+        // --- 5. ODAK BAHÇESİ ---
+        function renderGarden() {
             return `
                 <div class="max-w-4xl mx-auto">
-                    <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-users-viewfinder text-blue-500 mr-2"></i>Sanal Etüt Odası</h2>
-                            <p class="text-slate-500 dark:text-slate-400 text-sm">Yapamadığın soruları sor, bilenlere yardım et, XP kazan!</p>
-                        </div>
-                        <div class="flex gap-2 text-[10px] font-bold">
-                            <div class="bg-blue-100 text-blue-700 px-2 py-1 rounded border border-blue-200">Soru Sor: +5 XP</div>
-                            <div class="bg-purple-100 text-purple-700 px-2 py-1 rounded border border-purple-200">Cevap Yaz: +10 XP</div>
-                            <div class="bg-green-100 text-green-700 px-2 py-1 rounded border border-green-200">En İyi Cevap: +50 XP</div>
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-seedling text-green-500 mr-2"></i>Odak Bahçesi</h2>
+                        <p class="text-slate-500 dark:text-slate-400">Tamamladığın her Pomodoro için bir bitki kazanırsın.</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-b from-blue-200 to-green-100 dark:from-slate-800 dark:to-slate-900 p-8 rounded-3xl shadow-xl min-h-[400px] border border-white/50 dark:border-slate-700 relative overflow-hidden">
+                        <div class="absolute top-[-50px] right-[-50px] w-32 h-32 bg-yellow-300 rounded-full blur-2xl opacity-50"></div>
+                        <div id="gardenGrid" class="garden-grid">
+                            <div class="text-center w-full col-span-full py-20 text-slate-500 dark:text-slate-400">
+                                <i class="fa-solid fa-spinner fa-spin text-2xl"></i><br>Bahçen sulanıyor...
+                            </div>
                         </div>
                     </div>
-
-                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 mb-8">
-                        <div onclick="document.getElementById('askForm').classList.toggle('hidden')" class="flex justify-between items-center cursor-pointer">
-                            <h3 class="font-bold text-slate-700 dark:text-slate-200">Yeni Soru Oluştur</h3>
-                            <i class="fa-solid fa-chevron-down text-slate-400"></i>
-                        </div>
-                        
-                        <div id="askForm" class="hidden mt-4 space-y-3">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <select id="etutLesson" class="p-3 border dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 dark:text-white outline-none">
-                                    <option value="Genel">Ders Seçiniz...</option>
-                                    <option value="Matematik">Matematik</option>
-                                    <option value="Türkçe">Türkçe</option>
-                                    <option value="Tarih">Tarih</option>
-                                    <option value="Coğrafya">Coğrafya</option>
-                                    <option value="Vatandaşlık">Vatandaşlık</option>
-                                </select>
-                                <button onclick="window.openCloudinaryWidget()" id="uploadBtn" class="p-3 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-camera"></i> Fotoğraf Ekle
-                                </button>
-                            </div>
-                            <div id="imagePreview" class="hidden relative w-full h-32 bg-slate-100 dark:bg-slate-900 rounded-lg overflow-hidden">
-                                <img id="previewImg" src="" class="h-full w-auto mx-auto object-contain">
-                                <button onclick="window.clearImage()" class="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-
-                            <textarea id="etutText" rows="3" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg outline-none" placeholder="Sorunu buraya yaz..."></textarea>
-                            
-                            <button onclick="window.submitEtutQuestion()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-blue-200 dark:shadow-none">
-                                Paylaş (+5 XP)
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="etutFeed" class="space-y-6">
-                        <div class="text-center text-slate-400 mt-8"><i class="fa-solid fa-spinner fa-spin"></i> Sorular yükleniyor...</div>
+                    <div class="mt-6 flex justify-center gap-4 text-sm font-bold text-slate-600 dark:text-slate-300">
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-tree text-green-700"></i> Toplam: <span id="totalPlants">0</span></div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-droplet text-blue-500"></i> Seviye: <span id="gardenLevel">1</span></div>
                     </div>
                 </div>
             `;
         }
 
-        // --- CLOUDINARY ENTEGRASYONU ---
-        window.openCloudinaryWidget = () => {
-            const myWidget = cloudinary.createUploadWidget({
-                cloudName: 'dbwqidxpy', 
-                uploadPreset: 'alnikpss',
-                sources: ['local', 'camera'],
-                multiple: false,
-                folder: 'etut_questions'
-            }, (error, result) => { 
-                if (!error && result && result.event === "success") { 
-                    console.log('Done! Here is the image info: ', result.info); 
-                    tempUploadedImageUrl = result.info.secure_url;
+        async function loadGarden() {
+            const count = userData.pomodoroSessions || 0;
+            const grid = document.getElementById('gardenGrid');
+            if(!grid) return;
+
+            if (count === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 italic mt-20">Henüz hiç bitkin yok. Pomodoro sayacını başlat ve odaklan!</div>';
+                document.getElementById('totalPlants').innerText = 0;
+                return;
+            }
+
+            let html = '';
+            const plants = ['🌻', '🌲', '🌵', '🌴', '🌷', '🍄', '🌸', '🌹', '🌾', '🪴'];
+            for(let i=0; i<count; i++) {
+                const plantIcon = plants[i % plants.length]; 
+                html += `<div class="plant-slot" title="Seans #${i+1}"><div class="plant-icon">${plantIcon}</div></div>`;
+            }
+
+            grid.innerHTML = html;
+            document.getElementById('totalPlants').innerText = count;
+            document.getElementById('gardenLevel').innerText = Math.floor(count / 10) + 1;
+        }
+
+        // --- 6. AKILLI DERS PROGRAMI (DÜZELTİLDİ: GERİ ALMA) ---
+        function renderScheduler() {
+            const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+            return `
+                <div class="h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-calendar-week text-indigo-500 mr-2"></i>Akıllı Program</h2>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">Konuları günlerin üzerine sürükle. İptal etmek için listeye geri sürükle.</p>
+                        </div>
+                        <button onclick="window.saveSchedule()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold shadow-md transition"><i class="fa-solid fa-save mr-2"></i>Kaydet</button>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row gap-6 h-full overflow-hidden">
+                        <div class="w-full lg:w-64 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col shrink-0 max-h-[300px] lg:max-h-full">
+                            <div class="p-4 border-b border-slate-100 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 rounded-t-xl">
+                                Ders Konuları
+                            </div>
+                            <div class="p-2 overflow-y-auto flex-1 subject-source col-body" id="subjectSourceList" ondrop="window.drop(event)" ondragover="window.allowDrop(event)">
+                                </div>
+                        </div>
+
+                        <div class="flex-1 overflow-x-auto pb-4">
+                            <div class="scheduler-container" id="schedulerContainer">
+                                ${days.map(day => `
+                                    <div class="scheduler-col">
+                                        <div class="col-header">${day}</div>
+                                        <div class="col-body" id="col-${day}" ondrop="window.drop(event)" ondragover="window.allowDrop(event)">
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+async function loadScheduler() {
+            const sourceList = document.getElementById('subjectSourceList');
+            if(!sourceList) return;
+            
+            let sourceHtml = '';
+            for(let lesson in CURRICULUM) {
+                // BAŞLIĞA 'data-lesson' EKLİYORUZ
+                sourceHtml += `<div class="text-xs font-bold text-slate-400 uppercase mt-3 mb-1 px-2 no-drag pointer-events-none select-none" data-lesson="${lesson}">${lesson}</div>`;
+                
+                CURRICULUM[lesson].forEach((topic, idx) => {
+                    const id = `drag-${lesson}-${idx}`.replace(/\s+/g, '');
+                    // KONUYA DA 'data-lesson' EKLİYORUZ
+                    sourceHtml += `
+                        <div class="drag-item" id="${id}" draggable="true" ondragstart="window.drag(event)" data-lesson="${lesson}">
+                            ${topic}
+                        </div>
+                    `;
+                });
+            }
+            sourceList.innerHTML = sourceHtml;
+
+            // Kayıtlı veriyi çek ve yerlerine taşı
+            try {
+                const docRef = doc(db, `users/${currentUser.uid}/scheduler/weekly`);
+                const snap = await getDoc(docRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    for (const [day, items] of Object.entries(data)) {
+                        const col = document.getElementById(`col-${day}`);
+                        if (col && Array.isArray(items)) {
+                            items.forEach(itemId => {
+                                const original = document.getElementById(itemId);
+                                if (original) col.appendChild(original);
+                            });
+                        }
+                    }
+                }
+            } catch (e) { console.error("Scheduler Load Error:", e); }
+        }
+
+        window.allowDrop = (ev) => {
+            ev.preventDefault();
+            if(!ev.target.classList.contains('no-drag')) {
+                ev.currentTarget.classList.add('drag-over');
+            }
+        };
+
+        window.drag = (ev) => {
+            ev.dataTransfer.setData("text", ev.target.id);
+            ev.target.classList.add('dragging');
+        };
+
+window.drop = (ev) => {
+            ev.preventDefault();
+            
+            // Hedef alanı bul
+            let targetCol = ev.target;
+            while (targetCol && !targetCol.classList.contains('col-body')) {
+                targetCol = targetCol.parentElement;
+            }
+            
+            if (!targetCol) return;
+            
+            targetCol.classList.remove('drag-over');
+
+            const data = ev.dataTransfer.getData("text");
+            const draggedElement = document.getElementById(data);
+            
+            if (draggedElement) {
+                draggedElement.classList.remove('dragging');
+                
+                // --- DÜZELTME: EĞER HEDEF "DERS KONULARI" LİSTESİ İSE ---
+                if (targetCol.id === 'subjectSourceList') {
+                    // Elemanın üzerindeki 'data-lesson' etiketini oku (Örn: "Matematik")
+                    const lessonName = draggedElement.getAttribute('data-lesson');
                     
+                    // Listede bu derse ait başlığı bul
+                    // (Tırnak işaretlerine dikkat: data-lesson='Matematik')
+                    const header = targetCol.querySelector(`.no-drag[data-lesson='${lessonName}']`);
+
+                    if (header) {
+                        // Başlığı bulduk! Elemanı başlığın BİR SONRAKİ kardeşinin önüne ekle
+                        // Böylece başlığın hemen altına girer.
+                        targetCol.insertBefore(draggedElement, header.nextSibling);
+                        return; // İşlem tamam, çık.
+                    }
+                }
+                // -------------------------------------------------------
+
+                // Diğer durumlarda (Takvime bırakırken) normal ekle
+                targetCol.appendChild(draggedElement);
+            }
+        };
+
+        // --- 7. HAFTALIK LİG SİSTEMİ ---
+        function renderLeague() {
+            const league = userData.currentLeague || "Bronz";
+            return `
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-gradient-to-r from-blue-900 to-slate-900 rounded-2xl p-8 text-white mb-8 text-center relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                        <h2 class="text-3xl font-bold mb-2 uppercase tracking-wide">${league} Ligi</h2>
+                        <p class="text-blue-200 text-sm mb-6">Haftalık sıralama her Pazar 00:00'da sıfırlanır.</p>
+                        <div class="flex justify-center gap-8">
+                            <div class="text-center"><div class="text-2xl font-bold text-green-400"><i class="fa-solid fa-arrow-up"></i> İlk 10</div><div class="text-[10px] uppercase tracking-wider opacity-70">Lig Atlar</div></div>
+                            <div class="text-center"><div class="text-2xl font-bold text-red-400"><i class="fa-solid fa-arrow-down"></i> Son 5</div><div class="text-[10px] uppercase tracking-wider opacity-70">Lig Düşer</div></div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-300">Bu Haftanın Sıralaması</div>
+                        <div id="leagueList" class="divide-y divide-slate-100 dark:divide-slate-700"><div class="p-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadLeagueData() {
+            const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(50));
+            const snap = await getDocs(q);
+            let users = [];
+            snap.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+
+            users.sort((a, b) => {
+                const xpDiff = (b.xp || 0) - (a.xp || 0);
+                if (xpDiff !== 0) return xpDiff;
+                return (a.name || "").localeCompare(b.name || "");
+            });
+
+            let html = '';
+            let rank = 1;
+            users.forEach(u => {
+                const isMe = u.id === currentUser.uid;
+                let statusIcon = rank <= 3 ? '<i class="fa-solid fa-trophy text-yellow-500"></i>' : (rank <= 10 ? '<i class="fa-solid fa-arrow-up text-green-500 text-xs"></i>' : (rank > 15 ? '<i class="fa-solid fa-arrow-down text-red-500 text-xs"></i>' : '<i class="fa-solid fa-minus text-slate-300 text-xs"></i>'));
+                html += `<div class="p-4 flex items-center justify-between ${isMe ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}"><div class="flex items-center gap-4"><div class="w-8 font-bold text-slate-500 text-center">${rank++}</div><img src="${u.avatar}" class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-600 shadow-sm"><div><div class="font-bold text-slate-800 dark:text-white ${isMe ? 'text-indigo-600 dark:text-indigo-400' : ''}">${u.name} ${isMe ? '(Sen)' : ''}</div><div class="text-xs text-slate-500">${u.title || 'Öğrenci'}</div></div></div><div class="flex items-center gap-4"><div class="text-right"><div class="font-bold text-slate-800 dark:text-white">${u.xp || 0} XP</div><div class="text-[10px] text-slate-400">Bu Hafta</div></div><div class="w-6 text-center">${statusIcon}</div></div></div>`;
+            });
+            document.getElementById('leagueList').innerHTML = html;
+        }
+
+        // --- 8. NOT PAZARI (DÜZELTİLDİ: FİYAT VE SİLME) ---
+        function renderMarket() {
+            return `
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <div><h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-shop text-pink-500 mr-2"></i>Not Pazarı</h2><p class="text-slate-500 dark:text-slate-400 text-sm">XP'lerinle not satın al veya kendi notlarını sat.</p></div>
+                        <div class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-xl font-bold border border-yellow-200">Cüzdan: <span id="marketWallet">${userData.xp || 0}</span> XP</div>
+                    </div>
+                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6">
+                        <button onclick="window.switchMarketTab('browse')" id="tabMarketBrowse" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-bold hover:text-pink-600 transition border-b-2 border-transparent">Mağaza</button>
+                        <button onclick="window.switchMarketTab('sell')" id="tabMarketSell" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-bold hover:text-pink-600 transition border-b-2 border-transparent">Not Sat</button>
+                        <button onclick="window.switchMarketTab('inventory')" id="tabMarketInv" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-bold hover:text-pink-600 transition border-b-2 border-transparent">Aldıklarım</button>
+                    </div>
+                    <div id="marketContent" class="min-h-[300px]"></div>
+                </div>
+            `;
+        }
+
+        window.switchMarketTab = async (tab) => {
+            const content = document.getElementById('marketContent');
+            document.getElementById('tabMarketBrowse').classList.remove('text-pink-600', 'border-pink-600');
+            document.getElementById('tabMarketSell').classList.remove('text-pink-600', 'border-pink-600');
+            document.getElementById('tabMarketInv').classList.remove('text-pink-600', 'border-pink-600');
+            const activeBtn = tab === 'browse' ? 'tabMarketBrowse' : (tab === 'sell' ? 'tabMarketSell' : 'tabMarketInv');
+            document.getElementById(activeBtn).classList.add('text-pink-600', 'border-pink-600');
+
+            if (tab === 'sell') {
+                content.innerHTML = `
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 max-w-xl mx-auto">
+                        <h3 class="font-bold text-lg mb-4 dark:text-white">Not Satışa Çıkar</h3>
+                        <div class="space-y-4">
+                            <input id="noteTitle" type="text" placeholder="Not Başlığı (Örn: Tarih Özet)" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                            <textarea id="noteDesc" placeholder="Açıklama" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg" rows="3"></textarea>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input id="notePrice" type="number" placeholder="Fiyat (XP)" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                                <input id="noteLink" type="text" placeholder="Google Drive / PDF Linki" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                            </div>
+                            <button onclick="window.sellNote()" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition">Satışa Koy</button>
+                        </div>
+                    </div>`;
+            } else if (tab === 'browse') {
+                content.innerHTML = '<div class="text-center py-10"><i class="fa-solid fa-spinner fa-spin"></i> Mağaza yükleniyor...</div>';
+                const q = query(collection(db, "marketItems"), orderBy("createdAt", "desc"));
+                const snap = await getDocs(q);
+                if(snap.empty) { content.innerHTML = '<div class="text-center py-10 text-slate-500">Mağazada henüz ürün yok.</div>'; return; }
+                let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+                snap.forEach(doc => {
+                    const item = doc.data();
+                    const isOwn = item.sellerId === currentUser.uid;
+                    const isAdmin = currentUser.email === ADMIN_EMAIL;
+                    const hasBought = (userData.inventory || []).includes(doc.id);
+                    html += `
+                        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col relative group">
+                            ${(isOwn || isAdmin) ? `<button onclick="window.deleteMarketItem('${doc.id}')" class="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition z-10"><i class="fa-solid fa-trash"></i></button>` : ''}
+                            <div class="p-4 flex-1">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-bold text-slate-800 dark:text-white line-clamp-1">${item.title}</h4>
+                                    <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded">${item.price} XP</span>
+                                </div>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Satıcı: ${item.sellerName}</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 line-clamp-2">${item.description}</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-700">
+                                ${isOwn ? '<button class="w-full py-2 bg-slate-200 dark:bg-slate-700 text-slate-500 rounded-lg cursor-not-allowed text-sm font-bold">Senin Ürünün</button>' : (hasBought ? `<a href="${item.link}" target="_blank" class="block w-full py-2 bg-green-500 text-white rounded-lg text-center text-sm font-bold hover:bg-green-600">İndir / Görüntüle</a>` : `<button onclick="window.buyItem('${doc.id}', ${item.price})" class="w-full py-2 bg-pink-600 text-white rounded-lg text-sm font-bold hover:bg-pink-700 transition">Satın Al</button>`)}
+                            </div>
+                        </div>`;
+                });
+                html += '</div>';
+                content.innerHTML = html;
+            } else if (tab === 'inventory') {
+                const inventory = userData.inventory || [];
+                if(inventory.length === 0) { content.innerHTML = '<div class="text-center py-10 text-slate-500">Henüz bir şey satın almadın.</div>'; return; }
+                content.innerHTML = '<div class="text-center py-10"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>';
+                let html = '<div class="space-y-4">';
+                for(const itemId of inventory) {
+                    const itemDoc = await getDoc(doc(db, "marketItems", itemId));
+                    if(itemDoc.exists()) {
+                        const item = itemDoc.data();
+                        html += `<div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex justify-between items-center"><div><div class="font-bold text-slate-800 dark:text-white">${item.title}</div><div class="text-xs text-slate-500">${item.description}</div></div><a href="${item.link}" target="_blank" class="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold hover:bg-green-200 text-sm"><i class="fa-solid fa-download"></i> İndir</a></div>`;
+                    }
+                }
+                html += '</div>';
+                content.innerHTML = html;
+            }
+        };
+
+        window.sellNote = async () => {
+            const title = document.getElementById('noteTitle').value;
+            const desc = document.getElementById('noteDesc').value;
+            const price = parseInt(document.getElementById('notePrice').value);
+            const link = document.getElementById('noteLink').value;
+
+            if(!title || isNaN(price) || !link) return alert("Lütfen tüm alanları doğru doldurun. Fiyat sayı olmalı.");
+
+            try {
+                await addDoc(collection(db, "marketItems"), {
+                    sellerId: currentUser.uid, sellerName: userData.name, title: title, description: desc, price: Number(price), link: link, createdAt: serverTimestamp(), sales: 0
+                });
+                alert("Notun satışa çıktı!");
+                window.switchMarketTab('browse');
+            } catch (e) { console.error("Satış Hatası:", e); alert("Hata oluştu: " + e.message); }
+        };
+
+        window.deleteMarketItem = async (id) => {
+            if(confirm("Bu ürünü silmek istediğine emin misin?")) {
+                await deleteDoc(doc(db, "marketItems", id));
+                alert("Silindi.");
+                window.switchMarketTab('browse');
+            }
+        };
+
+        window.buyItem = async (itemId, price) => {
+            if(userData.xp < price) return alert("Yetersiz XP!");
+            if(!confirm(`${price} XP karşılığında almak istiyor musun?`)) return;
+            try {
+                const newXp = userData.xp - price;
+                userData.xp = newXp;
+                await updateDoc(doc(db, "users", currentUser.uid), { xp: newXp, inventory: arrayUnion(itemId) });
+                if(!userData.inventory) userData.inventory = [];
+                userData.inventory.push(itemId);
+                alert("Satın alma başarılı!");
+                updateSidebar();
+                document.getElementById('marketWallet').innerText = newXp;
+                window.switchMarketTab('inventory');
+            } catch (e) { console.error(e); alert("Satın alma hatası."); }
+        };
+
+        // --- 9. SANAL ETÜT ODASI (DÜZELTİLDİ & SİLME EKLENDİ) ---
+        let tempUploadedImageUrl = ""; 
+        function renderEtut() {
+            return `
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
+                        <div><h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-users-viewfinder text-blue-500 mr-2"></i>Sanal Etüt Odası</h2><p class="text-slate-500 dark:text-slate-400 text-sm">Yapamadığın soruları sor, bilenlere yardım et, XP kazan!</p></div>
+                        <div class="flex gap-2 text-[10px] font-bold"><div class="bg-blue-100 text-blue-700 px-2 py-1 rounded border border-blue-200">Soru Sor: +5 XP</div><div class="bg-purple-100 text-purple-700 px-2 py-1 rounded border border-purple-200">Cevap: +10 XP</div><div class="bg-green-100 text-green-700 px-2 py-1 rounded border border-green-200">En İyi: +50 XP</div></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 mb-8">
+                        <div onclick="document.getElementById('askForm').classList.toggle('hidden')" class="flex justify-between items-center cursor-pointer"><h3 class="font-bold text-slate-700 dark:text-slate-200">Yeni Soru Oluştur</h3><i class="fa-solid fa-chevron-down text-slate-400"></i></div>
+                        <div id="askForm" class="hidden mt-4 space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <select id="etutLesson" class="p-3 border dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 dark:text-white outline-none"><option value="Genel">Ders Seçiniz...</option><option value="Matematik">Matematik</option><option value="Türkçe">Türkçe</option><option value="Tarih">Tarih</option><option value="Coğrafya">Coğrafya</option><option value="Vatandaşlık">Vatandaşlık</option></select>
+                                <button onclick="window.openCloudinaryWidget()" id="uploadBtn" class="p-3 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center gap-2"><i class="fa-solid fa-camera"></i> Fotoğraf Ekle</button>
+                            </div>
+                            <div id="imagePreview" class="hidden relative w-full h-32 bg-slate-100 dark:bg-slate-900 rounded-lg overflow-hidden"><img id="previewImg" src="" class="h-full w-auto mx-auto object-contain"><button onclick="window.clearImage()" class="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button></div>
+                            <textarea id="etutText" rows="3" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg outline-none" placeholder="Sorunu buraya yaz..."></textarea>
+                            <button onclick="window.submitEtutQuestion()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">Paylaş (+5 XP)</button>
+                        </div>
+                    </div>
+                    <div id="etutFeed" class="space-y-6"><div class="text-center text-slate-400 mt-8"><i class="fa-solid fa-spinner fa-spin"></i> Sorular yükleniyor...</div></div>
+                </div>`;
+        }
+
+        window.openCloudinaryWidget = () => {
+            const myWidget = cloudinary.createUploadWidget({ cloudName: 'dbwqidxpy', uploadPreset: 'alnikpss', sources: ['local', 'camera'], multiple: false, folder: 'etut_questions' }, (error, result) => { 
+                if (!error && result && result.event === "success") { 
+                    tempUploadedImageUrl = result.info.secure_url;
                     document.getElementById('imagePreview').classList.remove('hidden');
                     document.getElementById('previewImg').src = tempUploadedImageUrl;
                     document.getElementById('uploadBtn').classList.add('bg-green-50', 'text-green-600', 'border-green-200');
-                    document.getElementById('uploadBtn').innerHTML = '<i class="fa-solid fa-check"></i> Fotoğraf Yüklendi';
+                    document.getElementById('uploadBtn').innerHTML = '<i class="fa-solid fa-check"></i> Yüklendi';
                 }
             });
             myWidget.open();
@@ -929,147 +1363,106 @@
             document.getElementById('uploadBtn').innerHTML = '<i class="fa-solid fa-camera"></i> Fotoğraf Ekle';
         }
 
-        // --- ETÜT İŞLEMLERİ ---
         window.submitEtutQuestion = async () => {
             const lesson = document.getElementById('etutLesson').value;
             const text = document.getElementById('etutText').value;
-
             if(lesson === 'Genel' || !text) return alert("Lütfen ders seçin ve soru metni girin.");
-
-            const btn = document.querySelector('#askForm button');
-            btn.disabled = true;
-            btn.innerText = "Paylaşılıyor...";
-
+            
             try {
-                // Soru Ekle
-                const qRef = await addDoc(collection(db, "etutQuestions"), {
-                    uid: currentUser.uid,
-                    authorName: userData.name,
-                    authorAvatar: userData.avatar,
-                    lesson: lesson,
-                    text: text,
-                    image: tempUploadedImageUrl,
-                    createdAt: serverTimestamp(),
-                    isSolved: false,
-                    commentCount: 0
-                });
-
-                // XP Ver (+5)
+                await addDoc(collection(db, "etutQuestions"), { uid: currentUser.uid, authorName: userData.name, authorAvatar: userData.avatar, lesson, text, image: tempUploadedImageUrl, createdAt: serverTimestamp(), isSolved: false, commentCount: 0 });
                 const newXp = (userData.xp || 0) + 5;
                 userData.xp = newXp;
                 await updateDoc(doc(db, "users", currentUser.uid), { xp: newXp });
-
-                // Bildirim
-                alert("Soru paylaşıldı! +5 XP Kazandın!");
                 
-                // Formu Temizle
+                // Admin'e Bildirim
+                const usersSnap = await getDocs(collection(db, "users"));
+                usersSnap.forEach(async (d) => {
+                    const u = d.data();
+                    if(u.email === ADMIN_EMAIL) {
+                         await addDoc(collection(db, "notifications"), { uid: d.id, message: "Yeni bir sanal etüt sorusu paylaşıldı.", type: 'info', read: false, createdAt: serverTimestamp() });
+                    }
+                });
+
+                alert("Soru paylaşıldı! +5 XP");
                 document.getElementById('etutText').value = "";
                 window.clearImage();
                 document.getElementById('askForm').classList.add('hidden');
-                
-                // Yenile
                 loadEtutQuestions();
-                updateSidebar(); // XP güncellemesi için
+                updateSidebar();
+            } catch (err) { console.error(err); alert("Hata oluştu."); }
+        };
 
-            } catch (err) {
-                console.error(err);
-                alert("Hata oluştu.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Paylaş (+5 XP)";
-            }
+        window.deleteEtutQuestion = async (qId) => {
+            if(!confirm("Bu soruyu silmek istediğine emin misin? Yorumlar da silinecek.")) return;
+            await deleteDoc(doc(db, "etutQuestions", qId));
+            // Yorumları da temizlemek gerekir (basitlik için atlıyoruz ama ana döküman gidince listeden kalkar)
+            loadEtutQuestions();
+        };
+
+        window.deleteEtutComment = async (qId, cId) => {
+            if(!confirm("Yorumu silmek istiyor musun?")) return;
+            await deleteDoc(doc(db, `etutQuestions/${qId}/comments/${cId}`));
+            loadEtutQuestions(); // UI yenileme
         };
 
         async function loadEtutQuestions() {
             const container = document.getElementById('etutFeed');
             const q = query(collection(db, "etutQuestions"), orderBy("createdAt", "desc"), limit(20));
-            
             const snap = await getDocs(q);
-            if(snap.empty) {
-                container.innerHTML = '<div class="text-center text-slate-400 py-10">Henüz soru sorulmamış. İlk soran sen ol!</div>';
-                return;
-            }
-
+            if(snap.empty) { container.innerHTML = '<div class="text-center text-slate-400 py-10">Henüz soru sorulmamış.</div>'; return; }
             let html = '';
             for (const d of snap.docs) {
                 const qData = d.data();
                 const qId = d.id;
                 const isMyQuestion = qData.uid === currentUser.uid;
+                const isAdmin = currentUser.email === ADMIN_EMAIL;
 
-                // Yorumları Çek (Client side'da basitçe çekiyoruz, pagination yok)
                 const commentsQ = query(collection(db, `etutQuestions/${qId}/comments`), orderBy("createdAt", "asc"));
                 const commentsSnap = await getDocs(commentsQ);
-                
                 let commentsHtml = '';
                 commentsSnap.forEach(cDoc => {
                     const c = cDoc.data();
                     const isBest = c.isBestAnswer;
-                    
+                    const isMyComment = c.uid === currentUser.uid;
                     commentsHtml += `
                         <div class="flex gap-3 text-sm ${isBest ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3' : 'border-l-2 border-slate-200 dark:border-slate-700 pl-3'}">
                             <img src="${c.authorAvatar}" class="w-8 h-8 rounded-full">
                             <div class="flex-1">
                                 <div class="flex justify-between items-start">
-                                    <div class="font-bold text-slate-700 dark:text-slate-300">
-                                        ${c.authorName} 
-                                        ${isBest ? '<span class="text-xs text-green-600 ml-2"><i class="fa-solid fa-check-circle"></i> En İyi Cevap</span>' : ''}
+                                    <div class="font-bold text-slate-700 dark:text-slate-300">${c.authorName} ${isBest ? '<span class="text-xs text-green-600 ml-2"><i class="fa-solid fa-check-circle"></i> En İyi Cevap</span>' : ''}</div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="text-xs text-slate-400">${c.createdAt ? new Date(c.createdAt.seconds*1000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : ''}</div>
+                                        ${(isMyComment || isAdmin) ? `<button onclick="window.deleteEtutComment('${qId}', '${cDoc.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>` : ''}
                                     </div>
-                                    <div class="text-xs text-slate-400">${c.createdAt ? new Date(c.createdAt.seconds*1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</div>
                                 </div>
                                 <p class="text-slate-600 dark:text-slate-300 mt-1">${c.text}</p>
-                                
-                                ${isMyQuestion && !qData.isSolved && !isBest && c.uid !== currentUser.uid ? `
-                                    <button onclick="window.markBestAnswer('${qId}', '${cDoc.id}', '${c.uid}')" class="mt-2 text-xs text-slate-400 hover:text-green-500 transition flex items-center gap-1">
-                                        <i class="fa-regular fa-star"></i> En iyi cevap seç (+50 XP Ver)
-                                    </button>
-                                ` : ''}
+                                ${isMyQuestion && !qData.isSolved && !isBest && c.uid !== currentUser.uid ? `<button onclick="window.markBestAnswer('${qId}', '${cDoc.id}', '${c.uid}')" class="mt-2 text-xs text-slate-400 hover:text-green-500 transition flex items-center gap-1"><i class="fa-regular fa-star"></i> En iyi cevap seç (+50 XP Ver)</button>` : ''}
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
-
+                
                 html += `
-                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border ${qData.isSolved ? 'border-green-200 dark:border-green-900' : 'border-slate-100 dark:border-slate-700'} overflow-hidden">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border ${qData.isSolved ? 'border-green-200 dark:border-green-900' : 'border-slate-100 dark:border-slate-700'} overflow-hidden relative group">
+                        ${(isMyQuestion || isAdmin) ? `<button onclick="window.deleteEtutQuestion('${qId}')" class="absolute top-4 right-4 bg-red-500 text-white p-1.5 rounded text-xs opacity-0 group-hover:opacity-100 transition z-10"><i class="fa-solid fa-trash"></i></button>` : ''}
                         <div class="p-4 md:p-6">
                             <div class="flex items-start justify-between mb-4">
-                                <div class="flex items-center gap-3">
-                                    <img src="${qData.authorAvatar}" class="w-10 h-10 rounded-full border border-slate-200">
-                                    <div>
-                                        <div class="font-bold text-slate-800 dark:text-white">${qData.authorName}</div>
-                                        <div class="text-xs text-slate-500">${qData.lesson} • ${qData.createdAt ? new Date(qData.createdAt.seconds*1000).toLocaleString() : ''}</div>
-                                    </div>
-                                </div>
+                                <div class="flex items-center gap-3"><img src="${qData.authorAvatar}" class="w-10 h-10 rounded-full border border-slate-200"><div><div class="font-bold text-slate-800 dark:text-white">${qData.authorName}</div><div class="text-xs text-slate-500">${qData.lesson} • ${qData.createdAt ? new Date(qData.createdAt.seconds*1000).toLocaleString() : ''}</div></div></div>
                                 ${qData.isSolved ? '<div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-check"></i> Çözüldü</div>' : ''}
                             </div>
-                            
                             <p class="text-slate-800 dark:text-slate-200 mb-4 whitespace-pre-wrap">${qData.text}</p>
-                            
-                            ${qData.image ? `
-                                <div class="mb-4 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                                    <img src="${qData.image}" class="max-h-96 w-auto mx-auto" onclick="window.open(this.src)" style="cursor:zoom-in">
-                                </div>
-                            ` : ''}
-
+                            ${qData.image ? `<div class="mb-4 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900"><img src="${qData.image}" class="max-h-96 w-auto mx-auto" onclick="window.open(this.src)" style="cursor:zoom-in"></div>` : ''}
                             <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700">
-                                <div class="space-y-4 mb-4" id="comments-${qId}">
-                                    ${commentsHtml}
-                                </div>
-                                
+                                <div class="space-y-4 mb-4" id="comments-${qId}">${commentsHtml}</div>
                                 <div class="flex gap-2 items-center">
                                     <img src="${userData.avatar}" class="w-8 h-8 rounded-full hidden md:block">
                                     <div class="relative flex-1">
-                                        <input type="text" id="commentInput-${qId}" placeholder="Cevabını yaz (+10 XP)..." 
-                                            class="w-full pl-4 pr-12 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-full text-sm outline-none focus:border-blue-500 transition dark:text-white"
-                                            onkeydown="if(event.key === 'Enter') window.submitComment('${qId}')">
-                                        <button onclick="window.submitComment('${qId}')" class="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition">
-                                            <i class="fa-solid fa-paper-plane text-xs"></i>
-                                        </button>
+                                        <input type="text" id="commentInput-${qId}" placeholder="Cevabını yaz (+10 XP)..." class="w-full pl-4 pr-12 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-full text-sm outline-none focus:border-blue-500 transition dark:text-white" onkeydown="if(event.key === 'Enter') window.submitComment('${qId}')">
+                                        <button onclick="window.submitComment('${qId}')" class="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition"><i class="fa-solid fa-paper-plane text-xs"></i></button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }
             container.innerHTML = html;
         }
@@ -1078,73 +1471,85 @@
             const input = document.getElementById(`commentInput-${qId}`);
             const text = input.value.trim();
             if(!text) return;
-
             try {
-                // Yorum Ekle
-                await addDoc(collection(db, `etutQuestions/${qId}/comments`), {
-                    uid: currentUser.uid,
-                    authorName: userData.name,
-                    authorAvatar: userData.avatar,
-                    text: text,
-                    createdAt: serverTimestamp(),
-                    isBestAnswer: false
-                });
-
-                // Soruya Yorum Sayısını Artır (Opsiyonel ama iyi olur)
-                // await updateDoc(doc(db, "etutQuestions", qId), { commentCount: increment(1) });
-
-                // XP Ver (+10)
+                await addDoc(collection(db, `etutQuestions/${qId}/comments`), { uid: currentUser.uid, authorName: userData.name, authorAvatar: userData.avatar, text, createdAt: serverTimestamp(), isBestAnswer: false });
                 const newXp = (userData.xp || 0) + 10;
                 userData.xp = newXp;
                 await updateDoc(doc(db, "users", currentUser.uid), { xp: newXp });
-
-                // Bildirim ve UI güncelleme
                 input.value = "";
-                loadEtutQuestions(); // Sayfayı yenilemeden sadece içeriği güncellemek daha iyi ama şimdilik load çağırıyoruz.
-                updateSidebar();
-
-            } catch (err) {
-                console.error(err);
-                alert("Yorum gönderilemedi.");
-            }
+                loadEtutQuestions(); updateSidebar();
+            } catch (err) { console.error(err); alert("Yorum gönderilemedi."); }
         };
 
         window.markBestAnswer = async (qId, cId, authorId) => {
-            if(!confirm("Bu cevabı en iyi cevap olarak seçmek istiyor musun? İşlem geri alınamaz.")) return;
-
+            if(!confirm("Bu cevabı en iyi cevap seçmek istiyor musun?")) return;
             try {
-                // 1. Cevabı güncelle
                 await updateDoc(doc(db, `etutQuestions/${qId}/comments/${cId}`), { isBestAnswer: true });
-
-                // 2. Soruyu 'Çözüldü' yap
                 await updateDoc(doc(db, "etutQuestions", qId), { isSolved: true });
-
-                // 3. Cevap sahibine XP ver (+50)
-                // Dikkat: Cevap sahibi biz değilsek, onun dokümanını güncellemeliyiz.
                 const authorRef = doc(db, "users", authorId);
                 const authorSnap = await getDoc(authorRef);
-                if(authorSnap.exists()) {
-                    const currentXp = authorSnap.data().xp || 0;
-                    await updateDoc(authorRef, { xp: currentXp + 50 });
-                }
-
-                // 4. Bildirim gönder
-                await addDoc(collection(db, "notifications"), {
-                    uid: authorId,
-                    message: "Tebrikler! Verdiğin cevap 'En İyi Cevap' seçildi. +50 XP kazandın!",
-                    type: "success",
-                    read: false,
-                    createdAt: serverTimestamp()
-                });
-
+                if(authorSnap.exists()) { await updateDoc(authorRef, { xp: (authorSnap.data().xp || 0) + 50 }); }
+                await addDoc(collection(db, "notifications"), { uid: authorId, message: "Tebrikler! Cevabın 'En İyi Cevap' seçildi. +50 XP kazandın!", type: "success", read: false, createdAt: serverTimestamp() });
                 loadEtutQuestions();
-
-            } catch (err) {
-                console.error(err);
-                alert("İşlem sırasında hata oluştu.");
-            }
+            } catch (err) { console.error(err); alert("Hata oluştu."); }
         };
-        // --- 6. FLASHCARDS (MEVCUT - KORUNDU) ---
+        // --- 9. HATA KUTUSU (SCROLL DÜZELTİLDİ) ---
+        function renderMistakes() {
+            return `
+                <div class="max-w-3xl mx-auto">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-recycle text-red-500 mr-2"></i>Hata Kutusu</h2>
+                        <p class="text-slate-500 dark:text-slate-400">Yanlış yaptığın sorular burada birikir. Tekrar çözüp doğrusunu öğrenince silinir.</p>
+                    </div>
+                    <div id="mistakesList" class="space-y-6 pb-32">
+                        <div class="text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadMistakes() {
+            const container = document.getElementById('mistakesList');
+            const q = query(collection(db, `users/${currentUser.uid}/mistakes`));
+            const snap = await getDocs(q);
+
+            if(snap.empty) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center p-10 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <i class="fa-solid fa-check-circle text-6xl text-green-500 mb-4"></i>
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-white">Harika Gidiyorsun!</h3>
+                        <p class="text-slate-500 dark:text-slate-400">Hata kutun boş. Tüm yanlışlarını temizledin.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            snap.forEach((doc) => {
+                const data = doc.data();
+                html += `
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-red-500 shadow-sm" id="mistake-${doc.id}">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold px-2 py-1 rounded uppercase">${data.lesson || 'Genel'}</span>
+                            <button onclick="window.deleteMistake('${doc.id}')" class="text-slate-400 hover:text-red-500" title="Kutudan Sil"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <p class="text-lg font-bold text-slate-800 dark:text-white mb-6">${data.text}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            ${data.options.map((opt, idx) => `
+                                <button onclick="window.checkMistakeAnswer('${doc.id}', ${idx}, ${data.correct})" 
+                                    class="text-left p-3 rounded-lg border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition mistake-opt-${doc.id}" data-idx="${idx}">
+                                    <span class="font-bold mr-2">${String.fromCharCode(65+idx)})</span> ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="feedback-${doc.id}" class="mt-4 hidden font-bold text-center"></div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // --- 10. FLASHCARDS (SCROLL & ADMIN UYARISI EKLENDİ) ---
         function renderCards() {
             return `
                 <div class="max-w-4xl mx-auto">
@@ -1153,7 +1558,7 @@
                         <button onclick="window.switchCardTab('submit')" id="tabCardSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Kart Gönder</button>
                     </div>
 
-                    <div id="contentCardBrowse" class="hidden text-center py-10">
+                    <div id="contentCardBrowse" class="hidden text-center py-10 pb-32">
                         ${IS_TEST_UNLOCKED 
                             ? `<div id="liveCardsArea" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>` 
                             : `<div class="inline-block p-6 bg-slate-100 dark:bg-slate-700 rounded-full mb-6"><i class="fa-solid fa-lock text-4xl text-slate-400 dark:text-slate-500"></i></div>
@@ -1162,7 +1567,7 @@
                         }
                     </div>
 
-                    <div id="contentCardSubmit" class="hidden">
+                    <div id="contentCardSubmit" class="hidden pb-32">
                          <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 mb-6">
                             <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white">Kart Önerisi Gönder</h3>
                             <div class="space-y-4">
@@ -1201,6 +1606,7 @@
             await addDoc(collection(db, "flashcardSubmissions"), {
                 uid: currentUser.uid, authorName: userData.name, front, back, status: 'pending', createdAt: serverTimestamp()
             });
+            window.notifyAdmin("Yeni bir Flashcard onayı bekliyor.");
             alert("Kart gönderildi!");
             document.getElementById('cardFront').value = ""; document.getElementById('cardBack').value = "";
             loadMyCardSubmissions();
@@ -1232,7 +1638,7 @@
              }).join('');
         }
 
-        // --- 7. NOTES (MEVCUT - KORUNDU) ---
+        // --- 11. NOTES (MEVCUT) ---
         function renderNotes() {
             return `
                 <div class="max-w-4xl mx-auto">
@@ -1241,7 +1647,7 @@
                         <textarea id="newNoteText" class="w-full p-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg outline-none focus:border-primary h-24" placeholder="Yeni bir not al..."></textarea>
                         <button onclick="window.saveNote()" class="mt-2 bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-primaryDark">Notu Kaydet</button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="notesList">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-32" id="notesList">
                         ${myNotes.length === 0 ? '<p class="text-slate-500">Henüz notun yok.</p>' : ''}
                         ${myNotes.map(note => `
                             <div class="sticky-note p-6 relative group">
@@ -1255,7 +1661,7 @@
             `;
         }
 
-        // --- 8. FORUM MODULE (MEVCUT - KORUNDU) ---
+        // --- 12. FORUM MODULE (SCROLL & ADMIN UYARISI EKLENDİ) ---
         function renderForum() {
             return `
                 <div class="max-w-4xl mx-auto">
@@ -1273,7 +1679,7 @@
                         </div>
                     </div>
 
-                    <div id="forumFeed" class="space-y-4">
+                    <div id="forumFeed" class="space-y-4 pb-32">
                         <div class="text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>
                     </div>
                 </div>
@@ -1293,6 +1699,7 @@
                 avatar: userData.avatar,
                 title, content, category, status: 'pending', createdAt: serverTimestamp()
             });
+            window.notifyAdmin("Yeni bir Forum Konusu onayı bekliyor.");
             alert("Konu onaya gönderildi.");
             document.getElementById('forumTitle').value = ""; document.getElementById('forumContent').value = "";
         }
@@ -1301,7 +1708,6 @@
             try {
                 const q = query(collection(db, "forumPosts"), where("status", "==", "approved"));
                 const snap = await getDocs(q);
-                
                 let posts = [];
                 snap.forEach(d => { posts.push({id: d.id, ...d.data()}); });
 
@@ -1353,7 +1759,7 @@
             }
         };
 
-        // --- 9. FEEDBACK MODULE (MEVCUT - KORUNDU) ---
+        // --- 13. FEEDBACK MODULE (MEVCUT) ---
         function renderFeedback() {
             return `
                 <div class="max-w-2xl mx-auto">
@@ -1374,18 +1780,18 @@
             await addDoc(collection(db, "feedback"), {
                 uid: currentUser.uid, name: userData.name, message: txt, createdAt: serverTimestamp(), read: false
             });
+            window.notifyAdmin("Yeni bir Geri Bildirim var.");
             alert("Mesajınız iletildi, teşekkürler!");
             document.getElementById('feedbackText').value = "";
         };
 
-        // --- 10. NOTIFICATIONS MODULE (MEVCUT - KORUNDU) ---
+        // --- 14. NOTIFICATIONS MODULE (TOPLU SİLME EKLENDİ) ---
         function listenForNotificationBadge() {
             if(unsubscribeNotifications) unsubscribeNotifications();
             const q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid), where("read", "==", false));
             unsubscribeNotifications = onSnapshot(q, (snap) => {
                 const badge = document.getElementById('notifBadge');
                 const mobileBadge = document.getElementById('mobileNotifBadge');
-                
                 if(snap.size > 0) {
                     if(badge) { badge.innerText = snap.size; badge.classList.remove('hidden'); }
                     if(mobileBadge) { mobileBadge.innerText = snap.size; mobileBadge.classList.remove('hidden'); }
@@ -1399,8 +1805,15 @@
         function renderNotifications() {
             return `
                 <div class="max-w-3xl mx-auto">
-                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Bildirimler</h2>
-                    <div id="notifList" class="space-y-3">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Bildirimler</h2>
+                        <div class="flex gap-2">
+                            <button onclick="window.toggleSelectAllNotifications()" class="text-xs bg-slate-100 dark:bg-slate-700 px-3 py-2 rounded hover:bg-slate-200 dark:text-white">Hepsini Seç</button>
+                            <button onclick="window.deleteSelectedNotifications()" class="text-xs bg-red-100 text-red-600 px-3 py-2 rounded hover:bg-red-200 border border-red-200">Seçilenleri Sil</button>
+                            <button onclick="window.deleteAllNotifications()" class="text-xs bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700">Tümünü Sil</button>
+                        </div>
+                    </div>
+                    <div id="notifList" class="space-y-3 pb-32">
                          <div class="text-center text-slate-400 mt-10"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>
                     </div>
                 </div>
@@ -1411,7 +1824,6 @@
             let q;
             q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid));
             const snap = await getDocs(q);
-            
             let notifs = [];
             snap.forEach(d => notifs.push({id: d.id, ...d.data()}));
             
@@ -1420,31 +1832,59 @@
 
             const unreadQ = query(collection(db, "notifications"), where("uid", "==", currentUser.uid), where("read", "==", false));
             const unreadSnap = await getDocs(unreadQ);
-            unreadSnap.forEach(d => updateDoc(doc(db, "notifications", d.id), { read: true }));
+            const batch = writeBatch(db);
+            unreadSnap.forEach(d => batch.update(doc(db, "notifications", d.id), { read: true }));
+            await batch.commit();
         }
 
         function displayNotifications(data) {
             const list = document.getElementById('notifList');
             if(!list) return;
+            if(data.length === 0) { list.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 p-8">Bildirim yok.</div>'; return; }
             
-            if(data.length === 0) {
-                list.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 p-8">Bildirim yok.</div>';
-                return;
-            }
-
             let html = '';
             data.forEach(n => {
                 html += `
-                    <div class="p-4 bg-white dark:bg-slate-800 border-l-4 ${n.type==='success'?'border-green-500':'border-red-500'} rounded shadow-sm">
-                        <div class="font-medium text-slate-800 dark:text-white">${n.message}</div>
-                        <div class="text-xs text-slate-400 mt-1">${n.createdAt ? new Date(n.createdAt.seconds*1000).toLocaleString() : ''}</div>
-                    </div>
-                `;
+                    <div class="p-4 bg-white dark:bg-slate-800 border-l-4 ${n.type==='success'?'border-green-500':(n.type==='warning'?'border-yellow-500':'border-blue-500')} rounded shadow-sm flex gap-3 items-start">
+                        <input type="checkbox" class="notif-checkbox mt-1" value="${n.id}">
+                        <div class="flex-1">
+                            ${n.title ? `<div class="font-bold text-sm text-slate-800 dark:text-white mb-1">${n.title}</div>` : ''}
+                            <div class="text-sm font-medium text-slate-700 dark:text-slate-200">${n.message}</div>
+                            <div class="text-xs text-slate-400 mt-1">${n.createdAt ? new Date(n.createdAt.seconds*1000).toLocaleString() : ''}</div>
+                        </div>
+                    </div>`;
             });
             list.innerHTML = html;
         }
 
-        // --- 11. QUIZ CENTER (MEVCUT - KORUNDU) ---
+        window.toggleSelectAllNotifications = () => {
+            const checkboxes = document.querySelectorAll('.notif-checkbox');
+            const allChecked = Array.from(checkboxes).every(c => c.checked);
+            checkboxes.forEach(c => c.checked = !allChecked);
+        };
+
+        window.deleteSelectedNotifications = async () => {
+            const checkboxes = document.querySelectorAll('.notif-checkbox:checked');
+            if(checkboxes.length === 0) return alert("Seçim yapmadınız.");
+            if(!confirm(`${checkboxes.length} bildirimi silmek istiyor musun?`)) return;
+            
+            const batch = writeBatch(db);
+            checkboxes.forEach(c => { batch.delete(doc(db, "notifications", c.value)); });
+            await batch.commit();
+            fetchNotifications();
+        };
+
+        window.deleteAllNotifications = async () => {
+            if(!confirm("TÜM bildirimlerin silinecek! Emin misin?")) return;
+            const q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid));
+            const snap = await getDocs(q);
+            const batch = writeBatch(db);
+            snap.forEach(d => batch.delete(doc(db, "notifications", d.id)));
+            await batch.commit();
+            fetchNotifications();
+        };
+
+        // --- 15. QUIZ CENTER (SCROLL & ADMIN UYARISI EKLENDİ) ---
         function renderQuizCenter() {
             return `
                 <div class="max-w-3xl mx-auto">
@@ -1452,7 +1892,7 @@
                         <button onclick="window.switchQuizTab('solve')" id="tabSolve" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Test Çöz</button>
                         <button onclick="window.switchQuizTab('submit')" id="tabSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Soru Gönder</button>
                     </div>
-                    <div id="contentSolve" class="hidden text-center py-10">
+                    <div id="contentSolve" class="hidden text-center py-10 pb-32">
                         ${IS_TEST_UNLOCKED 
                             ? `<div id="liveQuestionsArea">Live Test Interface Here (Admin açtı!)</div>`
                             : `<div class="inline-block p-6 bg-slate-100 dark:bg-slate-700 rounded-full mb-6"><i class="fa-solid fa-lock text-4xl text-slate-400 dark:text-slate-500"></i></div>
@@ -1460,7 +1900,7 @@
                                <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Veritabanımızda henüz yeterli soru bulunmadığı için bu özellik şu an için kilitlidir.</p>`
                         }
                     </div>
-                    <div id="contentSubmit" class="hidden">
+                    <div id="contentSubmit" class="hidden pb-32">
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                             <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white">Topluluğa Katkıda Bulun</h3>
                             <div class="space-y-4">
@@ -1483,63 +1923,7 @@
             `;
         }
 
-        // --- 12. HATA KUTUSU (YENİ - MISTAKES BOX) ---
-        function renderMistakes() {
-            return `
-                <div class="max-w-3xl mx-auto">
-                    <div class="text-center mb-8">
-                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-recycle text-red-500 mr-2"></i>Hata Kutusu</h2>
-                        <p class="text-slate-500 dark:text-slate-400">Yanlış yaptığın sorular burada birikir. Tekrar çözüp doğrusunu öğrenince silinir.</p>
-                    </div>
-                    <div id="mistakesList" class="space-y-6">
-                        <div class="text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function loadMistakes() {
-            const container = document.getElementById('mistakesList');
-            const q = query(collection(db, `users/${currentUser.uid}/mistakes`));
-            const snap = await getDocs(q);
-
-            if(snap.empty) {
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center p-10 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
-                        <i class="fa-solid fa-check-circle text-6xl text-green-500 mb-4"></i>
-                        <h3 class="text-xl font-bold text-slate-800 dark:text-white">Harika Gidiyorsun!</h3>
-                        <p class="text-slate-500 dark:text-slate-400">Hata kutun boş. Tüm yanlışlarını temizledin.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            let html = '';
-            snap.forEach((doc) => {
-                const data = doc.data();
-                html += `
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-red-500 shadow-sm" id="mistake-${doc.id}">
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold px-2 py-1 rounded uppercase">${data.lesson || 'Genel'}</span>
-                            <button onclick="window.deleteMistake('${doc.id}')" class="text-slate-400 hover:text-red-500" title="Kutudan Sil"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                        <p class="text-lg font-bold text-slate-800 dark:text-white mb-6">${data.text}</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            ${data.options.map((opt, idx) => `
-                                <button onclick="window.checkMistakeAnswer('${doc.id}', ${idx}, ${data.correct})" 
-                                    class="text-left p-3 rounded-lg border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition mistake-opt-${doc.id}" data-idx="${idx}">
-                                    <span class="font-bold mr-2">${String.fromCharCode(65+idx)})</span> ${opt}
-                                </button>
-                            `).join('')}
-                        </div>
-                        <div id="feedback-${doc.id}" class="mt-4 hidden font-bold text-center"></div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        // --- 13. PROFILE (MEVCUT - KORUNDU) ---
+        // --- 16. PROFILE (MEVCUT) ---
         function renderProfile() {
             const uName = userData?.name || '';
             const uTarget = userData?.targetScore || 85;
@@ -1571,36 +1955,85 @@
                 </div>
             `;
         }
-        // --- 14. ADMIN PANEL (MEVCUT - KORUNDU) ---
+
+        // --- 17. ADMIN PANEL (GÜNCELLENDİ: BİLDİRİM BAŞLIĞI EKLENDİ) ---
         function renderAdminPanel() {
             return `
                 <div class="max-w-6xl mx-auto">
                     <h1 class="text-2xl font-bold mb-6 text-slate-800 dark:text-white">Yönetim Paneli</h1>
                     
-                    <div class="flex gap-4 mb-6 overflow-x-auto pb-2">
-                        <button onclick="window.loadAdminData('questions')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white">Bekleyen Sorular</button>
-                        <button onclick="window.loadAdminData('cards')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white">Bekleyen Kartlar</button>
-                        <button onclick="window.loadAdminData('forum')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white">Bekleyen Forum</button>
-                        <button onclick="window.loadAdminData('inbox')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white">Gelen Kutusu</button>
-                        <div class="w-px bg-slate-300 mx-2"></div>
-                        <button onclick="window.loadAdminData('live_questions')" class="px-4 py-2 bg-red-50 border border-red-200 text-red-700 rounded shadow-sm">Canlı Sorular</button>
-                        <button onclick="window.loadAdminData('live_cards')" class="px-4 py-2 bg-red-50 border border-red-200 text-red-700 rounded shadow-sm">Canlı Kartlar</button>
-                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2">
+                             <div class="flex gap-4 mb-4 overflow-x-auto pb-2">
+                                <button onclick="window.loadAdminData('questions')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap">Bekleyen Soru</button>
+                                <button onclick="window.loadAdminData('cards')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap">Bekleyen Kart</button>
+                                <button onclick="window.loadAdminData('forum')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap">Bekleyen Konu</button>
+                                <button onclick="window.loadAdminData('inbox')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap">Gelen Kutusu</button>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden min-h-[400px]">
+                                <div id="adminContentArea" class="divide-y divide-slate-100 dark:divide-slate-700 text-slate-800 dark:text-slate-200">
+                                    <div class="p-8 text-center text-slate-400">İşlem seçiniz.</div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-                        <div class="bg-slate-50 dark:bg-slate-700 p-4 border-b border-slate-200 dark:border-slate-600 font-bold text-slate-600 dark:text-slate-300" id="adminPanelTitle">Veriler</div>
-                        <div id="adminContentArea" class="divide-y divide-slate-100 dark:divide-slate-700 min-h-[300px] text-slate-800 dark:text-slate-200">
-                            <div class="p-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>
+                        <div>
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm sticky top-6">
+                                <h3 class="font-bold text-lg mb-4 dark:text-white">Bildirim Gönder</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kullanıcı ID (Opsiyonel)</label>
+                                        <input type="text" id="adminNotifUid" placeholder="Boş bırakılırsa herkese gider" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Başlık (Opsiyonel)</label>
+                                        <input type="text" id="adminNotifTitle" placeholder="Admin Mesajı" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Mesaj</label>
+                                        <textarea id="adminNotifMsg" rows="3" placeholder="Bildirim metni..." class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-sm"></textarea>
+                                    </div>
+                                    <button onclick="window.adminSendNotification()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition">Gönder</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
         }
 
+        window.adminSendNotification = async () => {
+            const targetUid = document.getElementById('adminNotifUid').value.trim();
+            const title = document.getElementById('adminNotifTitle').value.trim() || "Sistem Mesajı";
+            const message = document.getElementById('adminNotifMsg').value.trim();
+            if(!message) return alert("Mesaj yazmalısın.");
+
+            const notifData = { message, title, type: 'info', read: false, createdAt: serverTimestamp() };
+
+            if(targetUid) {
+                await addDoc(collection(db, "notifications"), { ...notifData, uid: targetUid });
+                alert("Bildirim gönderildi (Tekil).");
+            } else {
+                if(!confirm("TÜM kullanıcılara bildirim gidecek. Emin misin?")) return;
+                const usersSnap = await getDocs(collection(db, "users"));
+                const batch = writeBatch(db);
+                let count = 0;
+                usersSnap.forEach(doc => {
+                    if(doc.id !== currentUser.uid) {
+                        const newRef = doc(collection(db, "notifications"));
+                        batch.set(newRef, { ...notifData, uid: doc.id });
+                        count++;
+                    }
+                });
+                await batch.commit();
+                alert(`Toplam ${count} kullanıcıya bildirim gönderildi.`);
+            }
+            document.getElementById('adminNotifMsg').value = "";
+        };
+
         window.loadAdminData = async (type) => {
             const container = document.getElementById('adminContentArea');
             container.innerHTML = '<div class="p-8 text-center text-slate-400">Yükleniyor...</div>';
-            
             let html = '';
             
             if (type === 'questions') {
@@ -1645,15 +2078,18 @@
                 const q = query(collection(db, "feedback"), orderBy("createdAt", "desc"));
                 const snap = await getDocs(q);
                 snap.forEach(doc => { const d=doc.data(); html += `<div class="p-6"><div class="font-bold text-slate-800 dark:text-white">${d.name}</div><p class="text-slate-600 dark:text-slate-400 mt-1">${d.message}</p><div class="text-xs text-slate-400 mt-2">${d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleString() : ''}</div></div>`; });
-            } else if (type === 'live_questions') {
-                const snap = await getDocs(collection(db, "questions"));
-                snap.forEach(doc => { const d=doc.data(); html += `<div class="p-4 flex justify-between border-b items-center"><div><span class="font-bold">[${d.lesson}]</span> ${d.text}</div><button onclick="window.deleteLiveItem('questions', '${doc.id}')" class="text-red-500 hover:underline">Sil</button></div>`; });
-            } else if (type === 'live_cards') {
-                const snap = await getDocs(collection(db, "flashcards"));
-                snap.forEach(doc => { const d=doc.data(); html += `<div class="p-4 flex justify-between border-b items-center"><div><span class="font-bold">${d.front}</span> = ${d.back}</div><button onclick="window.deleteLiveItem('flashcards', '${doc.id}')" class="text-red-500 hover:underline">Sil</button></div>`; });
             }
 
             container.innerHTML = html || '<div class="p-8 text-center">Veri yok.</div>';
+        };
+
+        // GENEL ADMİN AKSİYON VE UYARI
+        window.notifyAdmin = async (msg) => {
+            const q = query(collection(db, "users"), where("email", "==", ADMIN_EMAIL));
+            const snap = await getDocs(q);
+            snap.forEach(async d => {
+                 await addDoc(collection(db, "notifications"), { uid: d.id, title: "Yönetici Uyarısı", message: msg, type: 'warning', read: false, createdAt: serverTimestamp() });
+            });
         };
 
         window.adminAction = async (type, id, action) => {
@@ -1663,7 +2099,7 @@
             const data = docSnap.data();
 
             const notifMsg = `Gönderin (${type}) yönetici tarafından ${action === 'approve' ? 'onaylandı' : 'reddedildi'}.`;
-            await addDoc(collection(db, "notifications"), { uid: data.uid, message: notifMsg, type: action==='approve'?'success':'error', read: false, createdAt: serverTimestamp() });
+            await addDoc(collection(db, "notifications"), { uid: data.uid, title: "Onay Durumu", message: notifMsg, type: action==='approve'?'success':'error', read: false, createdAt: serverTimestamp() });
 
             if (action === 'reject') {
                 await updateDoc(docRef, { status: 'rejected' });
@@ -1673,8 +2109,7 @@
                 if(type === 'card') await addDoc(collection(db, "flashcards"), { front: data.front, back: data.back, lesson: 'General' });
             }
             alert("İşlem tamam.");
-            const activeType = type === 'question' ? 'questions' : (type === 'card' ? 'cards' : 'forum');
-            loadAdminData(activeType);
+            loadAdminData(type === 'question' ? 'questions' : (type === 'card' ? 'cards' : 'forum'));
         };
         
         window.deleteLiveItem = async (col, id) => {
@@ -1685,10 +2120,10 @@
             }
         };
 
-        // --- 15. MOCKS MODULE (MEVCUT - KORUNDU) ---
+        // --- 18. MOCKS MODULE (SCROLL DÜZELTİLDİ) ---
         function renderMocks() {
             return `
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-32">
                     <div>
                         <h2 class="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Yeni Deneme Ekle</h2>
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-4">
@@ -1718,7 +2153,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-8 bg-white dark:bg-slate-800 p-6 rounded-2xl h-80 border border-slate-100 dark:border-slate-700 shadow-sm">
+                <div class="mt-8 bg-white dark:bg-slate-800 p-6 rounded-2xl h-80 border border-slate-100 dark:border-slate-700 shadow-sm pb-32">
                     <h3 class="font-bold mb-4 dark:text-white">İlerleme Analizi</h3>
                     <canvas id="historyChart"></canvas>
                 </div>
@@ -1810,9 +2245,8 @@
             });
         }
 
-        // --- GLOBAL WRAPPERS & HELPERS ---
+        // --- GLOBAL HELPERS ---
         
-        // Hata Kutusu Mantığı
         window.checkMistakeAnswer = async (docId, selectedIdx, correctIdx) => {
             const feedback = document.getElementById(`feedback-${docId}`);
             const buttons = document.querySelectorAll(`.mistake-opt-${docId}`);
@@ -1820,12 +2254,10 @@
             buttons.forEach(btn => btn.disabled = true);
 
             if (selectedIdx === correctIdx) {
-                // DOĞRU
                 feedback.innerHTML = '<span class="text-green-500"><i class="fa-solid fa-check"></i> Doğru! Kutu temizleniyor...</span>';
                 feedback.classList.remove('hidden');
                 buttons[selectedIdx].classList.add('bg-green-100', 'border-green-500', 'text-green-700');
                 
-                // Sil ve Arayüzü Güncelle
                 setTimeout(async () => {
                     await deleteDoc(doc(db, `users/${currentUser.uid}/mistakes/${docId}`));
                     const el = document.getElementById(`mistake-${docId}`);
@@ -1835,18 +2267,14 @@
                         el.style.transform = 'scale(0.9)';
                         setTimeout(() => {
                             el.remove();
-                            // Eğer liste boşaldıysa UI'ı güncelle
                             if(document.getElementById('mistakesList').children.length === 0) loadMistakes();
                         }, 500);
                     }
                 }, 1500);
             } else {
-                // YANLIŞ
                 feedback.innerHTML = '<span class="text-red-500"><i class="fa-solid fa-xmark"></i> Yanlış. Tekrar dene!</span>';
                 feedback.classList.remove('hidden');
                 buttons[selectedIdx].classList.add('bg-red-100', 'border-red-500', 'text-red-700');
-                
-                // Butonları tekrar aktif et
                 setTimeout(() => {
                      buttons.forEach(btn => {
                          btn.disabled = false;
@@ -1864,15 +2292,15 @@
             }
         };
 
-        window.saveNote = async () => { const txt = document.getElementById('newNoteText').value; if(!txt) return; const noteData = { text: txt, createdAt: serverTimestamp() }; await addDoc(collection(db, `users/${currentUser.uid}/notes`), noteData); document.getElementById('newNoteText').value = ""; loadMyNotes(); };
+        window.saveNote = async () => { const txt = document.getElementById('newNoteText').value; if(!txt) return; await addDoc(collection(db, `users/${currentUser.uid}/notes`), { text: txt, createdAt: serverTimestamp() }); document.getElementById('newNoteText').value = ""; loadMyNotes(); };
         window.deleteNote = async (id) => { if(confirm("Sileyim mi?")) { await deleteDoc(doc(db, `users/${currentUser.uid}/notes/${id}`)); loadMyNotes(); } };
         window.toggleTimer = () => { if(isTimerRunning) { clearInterval(pomodoroInterval); isTimerRunning = false; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>'; } else { isTimerRunning = true; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-pause text-[10px]"></i>'; pomodoroInterval = setInterval(() => { pomodoroTimeLeft--; const m = Math.floor(pomodoroTimeLeft / 60).toString().padStart(2, '0'); const s = (pomodoroTimeLeft % 60).toString().padStart(2, '0'); document.getElementById('timerDisplay').innerText = `${m}:${s}`; if(pomodoroTimeLeft <= 0) { clearInterval(pomodoroInterval); isTimerRunning = false; alert("Pomodoro Bitti! +1 Puan"); savePomodoroSession(); pomodoroTimeLeft = 25 * 60; document.getElementById('timerDisplay').innerText = "25:00"; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>'; } }, 1000); } };
         window.resetTimer = () => { clearInterval(pomodoroInterval); isTimerRunning = false; pomodoroTimeLeft = 25 * 60; document.getElementById('timerDisplay').innerText = "25:00"; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>'; };
         async function savePomodoroSession() { const newCount = (userData.pomodoroSessions || 0) + 1; userData.pomodoroSessions = newCount; document.getElementById('pomodoroCount').innerText = newCount + " Seans"; await updateDoc(doc(db, "users", currentUser.uid), { pomodoroSessions: newCount }); }
         window.updateProfileField = async (key, value) => { userData[key] = value; updateSidebar(); if(key === 'avatar') window.loadPage('profile'); await updateDoc(doc(db, "users", currentUser.uid), { [key]: value }); };
         window.cycleStatus = async (key) => { if(!userData.progress) userData.progress = {}; const current = userData.progress[key] || 'not_started'; const order = ['not_started', 'started', 'completed', 'needs_review']; const next = order[(order.indexOf(current) + 1) % 4]; userData.progress[key] = next; window.loadPage('subjects'); await updateDoc(doc(db, "users", currentUser.uid), { progress: userData.progress }); };
-        window.switchQuizTab = (tab) => { document.getElementById('contentSolve').classList.add('hidden'); document.getElementById('contentSubmit').classList.add('hidden'); document.getElementById('tabSolve').classList.remove('tab-active'); document.getElementById('tabSubmit').classList.remove('tab-active'); if(tab === 'solve') { document.getElementById('contentSolve').classList.remove('hidden'); document.getElementById('tabSolve').classList.add('tab-active'); if(IS_TEST_UNLOCKED) document.getElementById('liveQuestionsArea').innerText = "Testler burada listelenecek (Veritabanı bağlantısı hazır)."; } else { document.getElementById('contentSubmit').classList.remove('hidden'); document.getElementById('tabSubmit').classList.add('tab-active'); loadMyQuestions(); } };
-        window.submitQuestion = async () => { const text = document.getElementById('qText').value; const optA = document.getElementById('optA').value; if(!text || !optA) return alert("Soru ve en az bir şık girin."); const qData = { uid: currentUser.uid, authorName: userData.name, lesson: document.getElementById('qLesson').value, text: text, options: [ document.getElementById('optA').value, document.getElementById('optB').value, document.getElementById('optC').value, document.getElementById('optD').value, document.getElementById('optE').value ], correct: parseInt(document.getElementById('qCorrect').value), status: 'pending', adminNote: '', createdAt: serverTimestamp() }; await addDoc(collection(db, "questionSubmissions"), qData); alert("Sorun gönderildi!"); document.getElementById('qText').value = ""; loadMyQuestions(); };
+        window.switchQuizTab = (tab) => { document.getElementById('contentSolve').classList.add('hidden'); document.getElementById('contentSubmit').classList.add('hidden'); document.getElementById('tabSolve').classList.remove('tab-active'); document.getElementById('tabSubmit').classList.remove('tab-active'); if(tab === 'solve') { document.getElementById('contentSolve').classList.remove('hidden'); document.getElementById('tabSolve').classList.add('tab-active'); if(IS_TEST_UNLOCKED) document.getElementById('liveQuestionsArea').innerText = "Testler burada listelenecek."; } else { document.getElementById('contentSubmit').classList.remove('hidden'); document.getElementById('tabSubmit').classList.add('tab-active'); loadMyQuestions(); } };
+        window.submitQuestion = async () => { const text = document.getElementById('qText').value; const optA = document.getElementById('optA').value; if(!text || !optA) return alert("Soru ve en az bir şık girin."); const qData = { uid: currentUser.uid, authorName: userData.name, lesson: document.getElementById('qLesson').value, text: text, options: [ document.getElementById('optA').value, document.getElementById('optB').value, document.getElementById('optC').value, document.getElementById('optD').value, document.getElementById('optE').value ], correct: parseInt(document.getElementById('qCorrect').value), status: 'pending', adminNote: '', createdAt: serverTimestamp() }; await addDoc(collection(db, "questionSubmissions"), qData); window.notifyAdmin("Yeni bir soru onayı bekliyor."); alert("Sorun gönderildi!"); document.getElementById('qText').value = ""; loadMyQuestions(); };
         async function loadMyQuestions() { if(!currentUser) return; const q = query(collection(db, "questionSubmissions"), where("uid", "==", currentUser.uid), orderBy("createdAt", "desc")); const snapshot = await getDocs(q); myQuestions = []; snapshot.forEach(doc => myQuestions.push({id: doc.id, ...doc.data()})); const list = document.getElementById('myQuestionsList'); if(list) list.innerHTML = myQuestions.map(mq => `<div class="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 flex justify-between items-start"><div><div class="text-xs font-bold text-slate-500 mb-1">${mq.lesson}</div><div class="text-sm font-medium text-slate-800 dark:text-white line-clamp-1">${mq.text}</div>${mq.status === 'rejected' ? `<div class="text-xs text-red-600 mt-2 bg-red-50 p-2 rounded"><strong>Red Sebebi:</strong> ${mq.adminNote}</div>` : ''}</div><div class="ml-4">${mq.status === 'pending' ? '<span class="text-xs font-bold bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Bekliyor</span>' : ''}${mq.status === 'approved' ? '<span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded">Yayında</span>' : ''}${mq.status === 'rejected' ? '<span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded">Red</span>' : ''}</div></div>`).join('') || '<p class="text-sm text-slate-400">Henüz soru göndermediniz.</p>'; }
         window.deleteAccountRequest = async () => { if(confirm("Hesabını silmek istediğine emin misin?")) { try { await deleteDoc(doc(db, "users", currentUser.uid)); await deleteUser(currentUser); alert("Hesabınız silindi."); window.location.reload(); } catch(e) { alert("Hata: " + e.message); } } };
         window.handleLogin = async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch(e){alert(e.message)} };
@@ -1895,7 +2323,6 @@
             document.getElementById('sidebarTitle').innerText = userData.title || 'Öğrenci'; 
             document.getElementById('pomodoroCount').innerText = (userData.pomodoroSessions || 0) + " Seans"; 
             document.getElementById('mobileAvatar').src = userData.avatar;
-            // XP Güncelleme
             if(document.getElementById('sidebarXP')) document.getElementById('sidebarXP').innerText = userData.xp || 0;
         }
     </script>
