@@ -52,8 +52,8 @@
         .avatar-option.selected { border-color: #f97316; ring: 2px solid #f97316; transform: scale(1.1); }
         .perspective { perspective: 1000px; }
         .flip-card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
-        .flip-card:hover .flip-card-inner, .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
-        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1rem; display: flex; align-items: center; justify-content: center; padding: 1rem; text-align: center; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1rem; display: flex; align-items: center; justify-content: center; padding: 2rem; text-align: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
         .flip-card-back { background-color: #f97316; color: white; transform: rotateY(180deg); }
         .sticky-note { background: #fef3c7; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); border-bottom-right-radius: 20px; }
         .dark .sticky-note { background: #f59e0b; color: #000; }
@@ -66,7 +66,12 @@
         .plant-icon { font-size: 2rem; animation: growPlant 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes growPlant { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .scheduler-container { display: flex; overflow-x: auto; gap: 1rem; padding-bottom: 1rem; min-height: 500px; }
+        /* Akıllı Program Mobil Uyumu */
+        .scheduler-container { display: flex; flex-direction: column; gap: 1rem; padding-bottom: 1rem; min-height: 500px; }
+        @media (min-width: 1024px) {
+            .scheduler-container { flex-direction: row; overflow-x: auto; }
+        }
+        
         .scheduler-col { min-width: 200px; flex: 1; background: #f8fafc; border-radius: 0.75rem; border: 1px solid #e2e8f0; display: flex; flex-direction: column; }
         .dark .scheduler-col { background: #1e293b; border-color: #334155; }
         .col-header { padding: 0.75rem; font-weight: bold; text-align: center; border-bottom: 1px solid #e2e8f0; background: #f1f5f9; border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem; }
@@ -74,7 +79,6 @@
         .col-body { padding: 0.5rem; flex: 1; min-height: 100px; }
         .col-body.drag-over { background-color: rgba(249, 115, 22, 0.1); border: 2px dashed #f97316; }
         
-        /* Geri Alma Alanı için Stil */
         #subjectSourceList.drag-over { background-color: rgba(239, 68, 68, 0.1); border: 2px dashed #ef4444; }
 
         .drag-item { background: white; padding: 0.5rem; margin-bottom: 0.5rem; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-size: 0.8rem; cursor: grab; border: 1px solid transparent; transition: all 0.2s; }
@@ -83,12 +87,18 @@
         .drag-item.dragging { opacity: 0.5; transform: scale(0.95); }
         .countdown-item span { display: block; }
 
-        /* Yeni Eklenen: Tab Active State */
+        /* Tab Active State */
         .tab-btn-active { 
             color: #f97316; 
             border-bottom: 2px solid #f97316; 
             background-color: rgba(249, 115, 22, 0.05);
         }
+        
+        /* Şıklar ve Kart Efektleri */
+        .quiz-option { transition: all 0.2s; }
+        .quiz-option:hover:not(:disabled) { transform: translateX(5px); border-color: #f97316; }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
     </style>
 </head>
 <body class="text-slate-800 bg-slate-50 dark:bg-darkBg dark:text-darkText h-screen overflow-hidden flex flex-col transition-colors duration-300">
@@ -391,8 +401,7 @@
         ];
 
         const ADMIN_EMAIL = "alnigamestudios@gmail.com";
-        // IS_TEST_UNLOCKED artık true çünkü özellikleri açıyoruz
-        const IS_TEST_UNLOCKED = true; 
+        const IS_TEST_UNLOCKED = true; // Kilitler kaldırıldı
 
         // --- STATE ---
         let currentUser = null;
@@ -406,6 +415,12 @@
         let isTimerRunning = false;
         let unsubscribeNotifications = null;
         let countdownInterval;
+        
+        // Yeni Oyun Modu Değişkenleri
+        let quizQuestionsPool = []; // Çekilen sorular havuzu
+        let currentQuestion = null; // Ekranda gösterilen soru objesi
+        let flashcardsPool = []; // Çekilen kart havuzu
+        let currentCard = null; // Ekranda gösterilen kart objesi
 
         // --- AUTH & INIT ---
         onAuthStateChanged(auth, async (user) => {
@@ -462,10 +477,8 @@
                     loadMyNotes();
                     listenForNotificationBadge();
                     
-                    // Kilitler kalktığı için canlı verileri de yüklüyoruz
-                    if(window.loadLiveQuestions) window.loadLiveQuestions(); 
-                    if(window.loadLiveCards) window.loadLiveCards();
-
+                    // Canlı verileri ön yükleme yapmıyoruz, kategori seçilince yüklenecek
+                    
                     window.loadPage('dashboard');
 
                 } catch (error) {
@@ -548,17 +561,21 @@
 
             if(countdownInterval) clearInterval(countdownInterval);
 
+            // Modül geçişlerinde temizlik
+            currentQuestion = null;
+            currentCard = null;
+
             switch(page) {
                 case 'dashboard': content.innerHTML = renderDashboard(); renderChart('dashboardChart'); startCountdown(); break;
                 case 'smartcoach': content.innerHTML = renderSmartCoachPage(); break;
                 case 'subjects': content.innerHTML = renderSubjects(); break;
-                case 'quiz': content.innerHTML = renderQuizCenter(); window.switchQuizTab('solve'); break; // Varsayılan olarak çözme sekmesi
+                case 'quiz': content.innerHTML = renderQuizCenter(); window.switchQuizTab('solve'); break; 
                 case 'mocks': content.innerHTML = renderMocks(); renderChart('historyChart'); break;
                 case 'profile': content.innerHTML = renderProfile(); break;
                 case 'admin': content.innerHTML = renderAdminPanel(); loadAdminData('questions'); break;
                 case 'leaderboard': content.innerHTML = renderLeaderboard(); loadLeaderboardData(); break;
                 case 'notes': content.innerHTML = renderNotes(); break;
-                case 'cards': content.innerHTML = renderCards(); window.switchCardTab('browse'); break; // Varsayılan olarak göz at
+                case 'cards': content.innerHTML = renderCards(); window.switchCardTab('browse'); break; 
                 case 'forum': content.innerHTML = renderForum(); loadForumPosts(); break;
                 case 'feedback': content.innerHTML = renderFeedback(); break;
                 case 'etut': content.innerHTML = renderEtut(); loadEtutQuestions(); break;
@@ -748,7 +765,6 @@
                 let users = [];
                 snap.forEach(doc => { users.push({ id: doc.id, ...doc.data() }); });
                 
-                // Sıralama: Puan > XP > İsim (A-Z)
                 users.sort((a, b) => {
                     const scoreDiff = (b.totalScore || 0) - (a.totalScore || 0);
                     if(scoreDiff !== 0) return scoreDiff;
@@ -846,7 +862,7 @@
             document.getElementById('gardenLevel').innerText = Math.floor(count / 10) + 1;
         }
 
-        // --- 6. AKILLI DERS PROGRAMI (GERİ ALMA ÖZELLİĞİ İLE) ---
+        // --- 6. AKILLI DERS PROGRAMI (MOBİL UYUMLU & GERİ ALMA) ---
         function renderScheduler() {
             const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
             return `
@@ -890,12 +906,10 @@
             
             let sourceHtml = '';
             for(let lesson in CURRICULUM) {
-                // BAŞLIĞA 'data-lesson' EKLİYORUZ (GERİ ALMA İÇİN KRİTİK)
                 sourceHtml += `<div class="text-xs font-bold text-slate-400 uppercase mt-3 mb-1 px-2 no-drag pointer-events-none select-none" data-lesson="${lesson}">${lesson}</div>`;
                 
                 CURRICULUM[lesson].forEach((topic, idx) => {
                     const id = `drag-${lesson}-${idx}`.replace(/\s+/g, '');
-                    // KONUYA DA 'data-lesson' EKLİYORUZ
                     sourceHtml += `
                         <div class="drag-item" id="${id}" draggable="true" ondragstart="window.drag(event)" data-lesson="${lesson}">
                             ${topic}
@@ -905,7 +919,6 @@
             }
             sourceList.innerHTML = sourceHtml;
 
-            // Kayıtlı veriyi çek ve yerlerine taşı
             try {
                 const docRef = doc(db, `users/${currentUser.uid}/scheduler/weekly`);
                 const snap = await getDoc(docRef);
@@ -931,7 +944,6 @@
 
         window.allowDrop = (ev) => {
             ev.preventDefault();
-            // Hedef "no-drag" classına sahip değilse izin ver
             if(!ev.target.classList.contains('no-drag')) {
                 ev.currentTarget.classList.add('drag-over');
             }
@@ -944,15 +956,11 @@
 
         window.drop = (ev) => {
             ev.preventDefault();
-            
-            // Hedef alanı bul
             let targetCol = ev.target;
             while (targetCol && !targetCol.classList.contains('col-body')) {
                 targetCol = targetCol.parentElement;
             }
-            
             if (!targetCol) return;
-            
             targetCol.classList.remove('drag-over');
 
             const data = ev.dataTransfer.getData("text");
@@ -960,27 +968,15 @@
             
             if (draggedElement) {
                 draggedElement.classList.remove('dragging');
-                
-                // --- EĞER HEDEF "DERS KONULARI" LİSTESİ İSE GERİ ALMA ---
                 if (targetCol.id === 'subjectSourceList') {
-                    // Elemanın üzerindeki 'data-lesson' etiketini oku
                     const lessonName = draggedElement.getAttribute('data-lesson');
-                    
-                    // Listede bu derse ait başlığı bul
                     const header = targetCol.querySelector(`.no-drag[data-lesson='${lessonName}']`);
-
                     if (header) {
-                        // Başlığı bulduk! Elemanı başlığın BİR SONRAKİ kardeşinin önüne ekle
-                        if(header.nextSibling) {
-                             targetCol.insertBefore(draggedElement, header.nextSibling);
-                        } else {
-                             targetCol.appendChild(draggedElement);
-                        }
+                        if(header.nextSibling) targetCol.insertBefore(draggedElement, header.nextSibling);
+                        else targetCol.appendChild(draggedElement);
                         return; 
                     }
                 }
-                // -------------------------------------------------------
-
                 targetCol.appendChild(draggedElement);
             }
         };
@@ -988,7 +984,6 @@
         window.saveSchedule = async () => {
             const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
             let scheduleData = {};
-
             days.forEach(day => {
                 const col = document.getElementById(`col-${day}`);
                 if(col) {
@@ -998,7 +993,6 @@
                     scheduleData[day] = itemIds;
                 }
             });
-
             try {
                 await setDoc(doc(db, `users/${currentUser.uid}/scheduler/weekly`), scheduleData);
                 alert("Program kaydedildi!");
@@ -1051,7 +1045,7 @@
             document.getElementById('leagueList').innerHTML = html;
         }
 
-        // --- 8. NOT PAZARI (TAB RENKLERİ DÜZELTİLDİ) ---
+        // --- 8. NOT PAZARI ---
         function renderMarket() {
             return `
                 <div class="max-w-4xl mx-auto">
@@ -1071,12 +1065,9 @@
 
         window.switchMarketTab = async (tab) => {
             const content = document.getElementById('marketContent');
-            // Reset Styles
             ['tabMarketBrowse', 'tabMarketSell', 'tabMarketInv'].forEach(id => {
                 document.getElementById(id).classList.remove('tab-btn-active');
             });
-            
-            // Set Active Style
             const activeBtn = tab === 'browse' ? 'tabMarketBrowse' : (tab === 'sell' ? 'tabMarketSell' : 'tabMarketInv');
             document.getElementById(activeBtn).classList.add('tab-btn-active');
 
@@ -1243,7 +1234,6 @@
                 const newXp = (userData.xp || 0) + 5;
                 userData.xp = newXp;
                 await updateDoc(doc(db, "users", currentUser.uid), { xp: newXp });
-                
                 window.notifyAdmin("Yeni bir Etüt Sorusu paylaşıldı.");
                 alert("Soru paylaşıldı! +5 XP");
                 document.getElementById('etutText').value = "";
@@ -1411,17 +1401,62 @@
             container.innerHTML = html;
         }
 
-        // --- 11. FLASHCARDS (CANLI MODÜL, KİLİTLER AÇILDI) ---
+        // --- 11. FLASHCARDS (YENİLENMİŞ OYUN MODU) ---
         function renderCards() {
             return `
-                <div class="max-w-4xl mx-auto">
-                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6">
+                <div class="max-w-4xl mx-auto h-full flex flex-col">
+                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6 shrink-0">
                         <button onclick="window.switchCardTab('browse')" id="tabCardBrowse" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Kartlara Göz At</button>
                         <button onclick="window.switchCardTab('submit')" id="tabCardSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Kart Gönder</button>
                     </div>
 
-                    <div id="contentCardBrowse" class="hidden text-center py-10 pb-32">
-                        <div id="liveCardsArea" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div> 
+                    <div id="contentCardBrowse" class="hidden flex-1 flex flex-col items-center">
+                        <div id="flashcardStartScreen" class="w-full max-w-md text-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700">
+                            <i class="fa-solid fa-layer-group text-5xl text-primary mb-4"></i>
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Flashcard Çalışması</h3>
+                            <p class="text-slate-500 dark:text-slate-400 mb-6">Kategorini seç ve kartları çevirmeye başla!</p>
+                            <select id="flashcardCategorySelect" class="w-full p-3 border dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-900 dark:text-white outline-none mb-4">
+                                <option value="All">Tüm Dersler</option>
+                                <option value="Tarih">Tarih</option>
+                                <option value="Coğrafya">Coğrafya</option>
+                                <option value="Vatandaşlık">Vatandaşlık</option>
+                                <option value="Türkçe">Türkçe</option>
+                                <option value="Matematik">Matematik</option>
+                                <option value="General">Genel</option>
+                            </select>
+                            <button onclick="window.startFlashcardGame()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3 rounded-xl transition shadow-lg shadow-orange-500/30">Başla</button>
+                        </div>
+
+                        <div id="flashcardGameArea" class="hidden w-full max-w-lg flex flex-col items-center flex-1 justify-center min-h-[400px]">
+                            <div class="w-full flex justify-between items-center mb-4 px-4">
+                                <button onclick="window.switchCardTab('browse')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-arrow-left"></i> Çık</button>
+                                <span class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1 rounded-full text-xs font-bold" id="fcCategoryBadge">Genel</span>
+                            </div>
+                            
+                            <div class="flip-card w-full h-80 perspective cursor-pointer group mb-8" onclick="this.classList.toggle('flipped')">
+                                <div class="flip-card-inner relative w-full h-full shadow-xl rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-transform duration-500">
+                                    <div class="flip-card-front flex flex-col items-center justify-center p-8 text-center bg-white dark:bg-slate-800 rounded-2xl">
+                                        <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
+                                            <button onclick="window.reportContent('card', currentCard.id)" class="text-slate-300 hover:text-yellow-500 transition" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
+                                            ${currentUser.email === ADMIN_EMAIL ? `<button onclick="window.deleteLiveItem('flashcards', currentCard.id)" class="text-red-300 hover:text-red-500 transition" title="Yönetici Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                        </div>
+                                        <h3 class="font-bold text-slate-800 dark:text-white text-2xl" id="fcFront">...</h3>
+                                        <p class="text-xs text-slate-400 mt-4 uppercase tracking-widest">Çevirmek için dokun</p>
+                                    </div>
+                                    <div class="flip-card-back flex flex-col items-center justify-center p-8 text-center bg-primary text-white rounded-2xl">
+                                        <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
+                                             <button onclick="window.reportContent('card', currentCard.id, document.getElementById('fcFront').innerText)" class="text-white/50 hover:text-white transition" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
+                                             ${currentUser.email === ADMIN_EMAIL ? `<button onclick="window.deleteLiveItem('flashcards', currentCard.id)" class="text-white/50 hover:text-white transition" title="Yönetici Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                        </div>
+                                        <p class="font-bold text-2xl" id="fcBack">...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button onclick="window.nextCard()" class="bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-3 px-12 rounded-full shadow-lg transition transform hover:-translate-y-1">
+                                Sıradaki Kart <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div id="contentCardSubmit" class="hidden pb-32">
@@ -1448,8 +1483,9 @@
              if(tab === 'browse') {
                  document.getElementById('contentCardBrowse').classList.remove('hidden');
                  document.getElementById('tabCardBrowse').classList.add('tab-btn-active');
-                 // Canlı veri çekiyoruz
-                 loadLiveCards();
+                 // Reset Game View
+                 document.getElementById('flashcardStartScreen').classList.remove('hidden');
+                 document.getElementById('flashcardGameArea').classList.add('hidden');
              } else {
                  document.getElementById('contentCardSubmit').classList.remove('hidden');
                  document.getElementById('tabCardSubmit').classList.add('tab-btn-active');
@@ -1484,22 +1520,78 @@
             }
         }
 
-        // CANLI KARTLARI VERİTABANINDAN ÇEKME
-        async function loadLiveCards() {
-             const snap = await getDocs(collection(db, "flashcards"));
-             if(snap.empty) {
-                 document.getElementById('liveCardsArea').innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">Henüz yayınlanmış kart yok.</div>';
-                 return;
-             }
-             document.getElementById('liveCardsArea').innerHTML = snap.docs.map(d => { const c=d.data(); return `
-                <div class="flip-card h-48 w-full perspective cursor-pointer" onclick="this.classList.toggle('flipped')">
-                    <div class="flip-card-inner relative w-full h-full shadow-md rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                        <div class="flip-card-front flex flex-col items-center justify-center p-4 text-center"><h3 class="font-bold text-slate-800 dark:text-white text-lg">${c.front}</h3></div>
-                        <div class="flip-card-back flex flex-col items-center justify-center p-4 text-center bg-primary text-white rounded-2xl"><p class="font-bold text-xl">${c.back}</p></div>
-                    </div>
-                </div>`; 
-             }).join('');
-        }
+        // --- FLASHCARD OYUN MANTIĞI ---
+        window.startFlashcardGame = async () => {
+            const category = document.getElementById('flashcardCategorySelect').value;
+            const btn = document.querySelector('#flashcardStartScreen button');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...';
+            
+            try {
+                let q;
+                if(category === 'All') {
+                    q = query(collection(db, "flashcards"));
+                } else {
+                    // Not: Bu sorgu için Firestore Index gerekebilir. Hata verirse linke tıkla.
+                    // Şimdilik client-side filtering yapalım güvenli olsun.
+                    q = query(collection(db, "flashcards"));
+                }
+                
+                const snap = await getDocs(q);
+                flashcardsPool = [];
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    // Manuel filtreleme (Category field varsa) veya hepsi
+                    // JSON import'ta category yoksa 'General' varsayıyoruz
+                    if(category === 'All' || d.lesson === category || (!d.lesson && category === 'General')) {
+                        flashcardsPool.push({ id: doc.id, ...d });
+                    }
+                });
+
+                if(flashcardsPool.length === 0) {
+                    alert("Bu kategoride henüz kart yok.");
+                    btn.innerHTML = 'Başla';
+                    return;
+                }
+
+                // Shuffle (Karıştır)
+                flashcardsPool.sort(() => Math.random() - 0.5);
+
+                // UI Geçişi
+                document.getElementById('flashcardStartScreen').classList.add('hidden');
+                document.getElementById('flashcardGameArea').classList.remove('hidden');
+                document.getElementById('fcCategoryBadge').innerText = category === 'All' ? 'Karışık' : category;
+                
+                window.nextCard();
+                btn.innerHTML = 'Başla';
+
+            } catch (e) {
+                console.error(e);
+                alert("Kartlar yüklenirken hata oluştu.");
+                btn.innerHTML = 'Başla';
+            }
+        };
+
+        window.nextCard = () => {
+            if(flashcardsPool.length === 0) {
+                alert("Tüm kartlar bitti! Başa dönülüyor.");
+                window.switchCardTab('browse'); 
+                return;
+            }
+            // Havuzdan rastgele bir tane alıp çıkaralım (tekrarsız olsun diye) veya rastgele seçip bırakalım (sonsuz döngü)
+            // Sonsuz döngü için:
+            const randomIndex = Math.floor(Math.random() * flashcardsPool.length);
+            currentCard = flashcardsPool[randomIndex];
+            
+            // Kartı çevrilmemiş hale getir
+            const cardEl = document.querySelector('.flip-card');
+            cardEl.classList.remove('flipped');
+
+            // İçeriği güncelle (biraz gecikmeli ki animasyon bozulmasın)
+            setTimeout(() => {
+                document.getElementById('fcFront').innerText = currentCard.front;
+                document.getElementById('fcBack').innerText = currentCard.back;
+            }, 200);
+        };
 
         // --- 12. NOTLAR ---
         function renderNotes() {
@@ -1746,18 +1838,57 @@
             fetchNotifications();
         };
 
-        // --- 16. QUIZ CENTER (CANLI MODÜL, KİLİTLER KALDIRILDI) ---
+        // --- 16. QUIZ CENTER (YENİLENMİŞ OYUN MODU) ---
         function renderQuizCenter() {
             return `
-                <div class="max-w-3xl mx-auto">
-                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6">
+                <div class="max-w-3xl mx-auto h-full flex flex-col">
+                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6 shrink-0">
                         <button onclick="window.switchQuizTab('solve')" id="tabSolve" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Test Çöz</button>
                         <button onclick="window.switchQuizTab('submit')" id="tabSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Soru Gönder</button>
                     </div>
                     
-                    <div id="contentSolve" class="hidden text-center py-10 pb-32">
-                        <div id="liveQuestionsArea">
-                            <div class="text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i> Sorular getiriliyor...</div>
+                    <div id="contentSolve" class="hidden flex-1 flex flex-col items-center">
+                        <div id="quizStartScreen" class="w-full max-w-md text-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700">
+                            <i class="fa-solid fa-pen-nib text-5xl text-primary mb-4"></i>
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Test Çöz</h3>
+                            <p class="text-slate-500 dark:text-slate-400 mb-6">Kendini sınamaya hazır mısın? Dersini seç ve başla.</p>
+                            <select id="quizCategorySelect" class="w-full p-3 border dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-900 dark:text-white outline-none mb-4">
+                                <option value="All">Tüm Dersler (Karışık)</option>
+                                <option value="Tarih">Tarih</option>
+                                <option value="Coğrafya">Coğrafya</option>
+                                <option value="Vatandaşlık">Vatandaşlık</option>
+                                <option value="Türkçe">Türkçe</option>
+                                <option value="Matematik">Matematik</option>
+                            </select>
+                            <button onclick="window.startQuizGame()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3 rounded-xl transition shadow-lg shadow-orange-500/30">Teste Başla</button>
+                        </div>
+
+                        <div id="quizGameArea" class="hidden w-full max-w-2xl flex flex-col flex-1 justify-center min-h-[400px]">
+                            <div class="w-full flex justify-between items-center mb-4">
+                                <button onclick="window.switchQuizTab('solve')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-arrow-left"></i> Çık</button>
+                                <span class="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full text-xs font-bold uppercase" id="quizCategoryBadge">Genel</span>
+                            </div>
+
+                            <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 relative">
+                                <div class="absolute top-4 right-4 flex gap-2">
+                                    <button onclick="window.reportContent('question', currentQuestion.id, currentQuestion.text)" class="text-slate-300 hover:text-yellow-500 transition p-2" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
+                                    ${currentUser.email === ADMIN_EMAIL ? `<button onclick="window.deleteLiveItem('questions', currentQuestion.id)" class="text-red-300 hover:text-red-500 transition p-2" title="Yönetici Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                </div>
+
+                                <div class="text-sm text-slate-400 mb-2">Soru</div>
+                                <p class="font-bold text-slate-800 dark:text-white text-lg md:text-xl mb-6 leading-relaxed" id="qGameText">...</p>
+                                
+                                <div class="space-y-3" id="qGameOptions">
+                                    </div>
+
+                                <div id="qGameFeedback" class="mt-6 hidden p-4 rounded-xl font-bold text-center"></div>
+                            </div>
+
+                            <div class="mt-6 text-center">
+                                <button onclick="window.nextQuestion()" id="nextQBtn" class="hidden bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-3 px-12 rounded-full shadow-lg transition transform hover:-translate-y-1">
+                                    Sonraki Soru <i class="fa-solid fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -1787,14 +1918,15 @@
         window.switchQuizTab = (tab) => {
             document.getElementById('contentSolve').classList.add('hidden');
             document.getElementById('contentSubmit').classList.add('hidden');
-            // Reset styles
             document.getElementById('tabSolve').classList.remove('tab-btn-active');
             document.getElementById('tabSubmit').classList.remove('tab-btn-active');
             
             if(tab === 'solve') {
                 document.getElementById('contentSolve').classList.remove('hidden');
                 document.getElementById('tabSolve').classList.add('tab-btn-active');
-                if(window.loadLiveQuestions) window.loadLiveQuestions();
+                // Reset Game View
+                document.getElementById('quizStartScreen').classList.remove('hidden');
+                document.getElementById('quizGameArea').classList.add('hidden');
             } else {
                 document.getElementById('contentSubmit').classList.remove('hidden');
                 document.getElementById('tabSubmit').classList.add('tab-btn-active');
@@ -1802,85 +1934,115 @@
             }
         };
 
-        // CANLI SORULARI ÇEKME VE GÖSTERME
-        window.loadLiveQuestions = async () => {
-            const container = document.getElementById('liveQuestionsArea');
-            if(!container) return;
-            const q = query(collection(db, "questions"), orderBy("createdAt", "desc"), limit(20));
-            
+        // --- QUIZ OYUN MANTIĞI ---
+        window.startQuizGame = async () => {
+            const category = document.getElementById('quizCategorySelect').value;
+            const btn = document.querySelector('#quizStartScreen button');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Hazırlanıyor...';
+
             try {
+                let q;
+                if(category === 'All') {
+                    q = query(collection(db, "questions"));
+                } else {
+                    // Not: Index hatası alırsan linke tıkla veya client-side filtre kullan.
+                    // Client-side filtre (Daha güvenli):
+                    q = query(collection(db, "questions"));
+                }
+
                 const snap = await getDocs(q);
-                if(snap.empty) {
-                    container.innerHTML = '<div class="text-center text-slate-500 py-10">Henüz yayınlanmış soru yok.</div>';
+                quizQuestionsPool = [];
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if(category === 'All' || d.lesson === category) {
+                        quizQuestionsPool.push({ id: doc.id, ...d });
+                    }
+                });
+
+                if(quizQuestionsPool.length === 0) {
+                    alert("Bu kategoride henüz soru yok.");
+                    btn.innerHTML = 'Teste Başla';
                     return;
                 }
-                
-                let html = '<div class="space-y-6 text-left">';
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    html += `
-                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700" id="liveQ-${doc.id}">
-                            <div class="flex justify-between mb-3">
-                                <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded font-bold uppercase">${data.lesson}</span>
-                                <span class="text-xs text-slate-400">Yazar: ${data.authorName}</span>
-                            </div>
-                            <p class="font-bold text-slate-800 dark:text-white mb-4 text-lg">${data.text}</p>
-                            <div class="grid grid-cols-1 gap-2">
-                                ${data.options.map((opt, idx) => `
-                                    <button onclick="window.checkLiveAnswer('${doc.id}', ${idx}, ${data.correct})" 
-                                        class="text-left p-3 rounded-lg border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition live-opt-${doc.id}" data-idx="${idx}">
-                                        <span class="font-bold mr-2">${String.fromCharCode(65+idx)})</span> ${opt}
-                                    </button>
-                                `).join('')}
-                            </div>
-                            <div id="liveFeedback-${doc.id}" class="mt-4 hidden font-bold text-center"></div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                container.innerHTML = html;
+
+                // Shuffle
+                quizQuestionsPool.sort(() => Math.random() - 0.5);
+
+                // UI Transition
+                document.getElementById('quizStartScreen').classList.add('hidden');
+                document.getElementById('quizGameArea').classList.remove('hidden');
+                document.getElementById('quizCategoryBadge').innerText = category === 'All' ? 'Karma Test' : category;
+
+                window.nextQuestion();
+                btn.innerHTML = 'Teste Başla';
+
             } catch (e) {
                 console.error(e);
-                container.innerHTML = '<div class="text-red-500">Yüklenirken hata oluştu.</div>';
+                alert("Hata oluştu.");
+                btn.innerHTML = 'Teste Başla';
             }
         };
 
-        window.checkLiveAnswer = (qId, selectedIdx, correctIdx) => {
-            const feedback = document.getElementById(`liveFeedback-${qId}`);
-            const buttons = document.querySelectorAll(`.live-opt-${qId}`);
+        window.nextQuestion = () => {
+            if(quizQuestionsPool.length === 0) {
+                alert("Test bitti! Başa dönülüyor.");
+                window.switchQuizTab('solve');
+                return;
+            }
+
+            // Sonsuz döngü için random seçip bırakıyoruz (veya çıkarabiliriz)
+            // Tekrarsız için:
+            // currentQuestion = quizQuestionsPool.pop();
+            // Sonsuz için:
+            const randomIndex = Math.floor(Math.random() * quizQuestionsPool.length);
+            currentQuestion = quizQuestionsPool[randomIndex];
+
+            // Render
+            document.getElementById('qGameText').innerText = currentQuestion.text;
+            const optsDiv = document.getElementById('qGameOptions');
+            optsDiv.innerHTML = '';
             
-            buttons.forEach(btn => btn.disabled = true); // Şıkları kilitle
+            currentQuestion.options.forEach((opt, idx) => {
+                optsDiv.innerHTML += `
+                    <button onclick="window.checkGameAnswer(${idx})" 
+                        class="quiz-option w-full text-left p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 bg-white dark:bg-slate-800 transition flex items-center gap-3" id="gameOpt-${idx}">
+                        <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-600 flex items-center justify-center font-bold text-slate-500 dark:text-slate-300 text-sm shrink-0">${String.fromCharCode(65+idx)}</div>
+                        <span class="text-slate-700 dark:text-slate-200">${opt}</span>
+                    </button>
+                `;
+            });
+
+            document.getElementById('qGameFeedback').classList.add('hidden');
+            document.getElementById('nextQBtn').classList.add('hidden');
+        };
+
+        window.checkGameAnswer = (selectedIdx) => {
+            const correctIdx = currentQuestion.correct;
+            const feedback = document.getElementById('qGameFeedback');
+            const buttons = document.querySelectorAll('.quiz-option');
+            
+            // Disable all
+            buttons.forEach(btn => btn.disabled = true);
 
             if(selectedIdx === correctIdx) {
-                feedback.innerHTML = '<span class="text-green-500"><i class="fa-solid fa-check"></i> Doğru Cevap! Tebrikler.</span>';
-                buttons[selectedIdx].classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+                feedback.innerHTML = '<span class="text-green-600"><i class="fa-solid fa-check-circle"></i> Doğru Cevap! Harikasın.</span>';
+                feedback.className = "mt-6 p-4 rounded-xl font-bold text-center bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800";
+                document.getElementById(`gameOpt-${selectedIdx}`).classList.add('ring-2', 'ring-green-500', 'bg-green-50', 'dark:bg-green-900/20');
             } else {
-                feedback.innerHTML = `<span class="text-red-500"><i class="fa-solid fa-xmark"></i> Yanlış Cevap. Doğru: ${String.fromCharCode(65+correctIdx)})</span>`;
-                buttons[selectedIdx].classList.add('bg-red-100', 'border-red-500', 'text-red-700');
-                buttons[correctIdx].classList.add('bg-green-100', 'border-green-500', 'text-green-700'); // Doğruyu göster
+                feedback.innerHTML = `<span class="text-red-600"><i class="fa-solid fa-times-circle"></i> Yanlış Cevap. Doğru şık: ${String.fromCharCode(65+correctIdx)}</span>`;
+                feedback.className = "mt-6 p-4 rounded-xl font-bold text-center bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800";
+                document.getElementById(`gameOpt-${selectedIdx}`).classList.add('ring-2', 'ring-red-500', 'bg-red-50', 'dark:bg-red-900/20');
+                document.getElementById(`gameOpt-${correctIdx}`).classList.add('ring-2', 'ring-green-500', 'bg-green-50', 'dark:bg-green-900/20'); // Doğruyu göster
                 
-                // HATA KUTUSUNA EKLEME (Yanlış yapılırsa otomatik eklenir)
-                window.addToMistakes(qId);
+                // Hata Kutusuna Ekle
+                window.addToMistakes(currentQuestion.id);
             }
+
             feedback.classList.remove('hidden');
+            document.getElementById('nextQBtn').classList.remove('hidden');
         };
 
-        window.addToMistakes = async (qId) => {
-            // Soru detayını al
-            const docRef = doc(db, "questions", qId);
-            const docSnap = await getDoc(docRef);
-            if(docSnap.exists()) {
-                const data = docSnap.data();
-                // Kullanıcının mistake koleksiyonuna ekle
-                await setDoc(doc(db, `users/${currentUser.uid}/mistakes/${qId}`), {
-                    lesson: data.lesson,
-                    text: data.text,
-                    options: data.options,
-                    correct: data.correct,
-                    addedAt: serverTimestamp()
-                });
-            }
-        };
+        // ... addToMistakes fonksiyonu Part 4 içinde tanımlı ...
 
         window.submitQuestion = async () => {
             const text = document.getElementById('qText').value;
@@ -1977,7 +2139,7 @@
             await updateDoc(doc(db, "users", currentUser.uid), { [key]: value }); 
         };
 
-        // --- 18. ADMIN PANEL (DÜZENLENDİ: Layout & Flashcard JSON) ---
+        // --- 18. ADMIN PANEL (DÜZELTİLDİ: Layout & Flashcard JSON) ---
         function renderAdminPanel() {
             return `
                 <div class="max-w-6xl mx-auto">
@@ -2115,7 +2277,6 @@
                 await updateDoc(docRef, { status: 'approved' });
                 // Onaylananları ana koleksiyona taşı (CANLI VERİTABANI)
                 if(type === 'question') {
-                    // Kullanıcı gönderilerini onaylarken 'live' koleksiyona atıyoruz
                     await addDoc(collection(db, "questions"), {
                         lesson: data.lesson, text: data.text, options: data.options, correct: data.correct,
                         authorName: data.authorName, uid: data.uid, createdAt: serverTimestamp(), status: 'approved'
@@ -2340,6 +2501,53 @@
 
         // --- GLOBAL HELPERS & CLOSING ---
         
+        // ŞİKAYET MEKANİZMASI
+        window.reportContent = async (type, id, contentSummary) => {
+            if(!confirm("Bu içeriği hatalı/uygunsuz olarak bildirmek istiyor musun?")) return;
+            
+            const message = `KULLANICI ŞİKAYETİ: Bir ${type} şikayet edildi.\nID: ${id}\nİçerik Özeti: ${contentSummary || 'Belirtilmedi'}`;
+            
+            // Admin'e bildirim gönder
+            const q = query(collection(db, "users"), where("email", "==", ADMIN_EMAIL));
+            const snap = await getDocs(q);
+            snap.forEach(async d => {
+                 await addDoc(collection(db, "notifications"), { 
+                     uid: d.id, 
+                     title: "⚠️ İçerik Şikayeti", 
+                     message: message, 
+                     type: 'error', 
+                     read: false, 
+                     createdAt: serverTimestamp() 
+                 });
+            });
+            alert("Bildiriminiz yöneticilere iletildi. Teşekkürler.");
+        };
+
+        window.deleteLiveItem = async (col, id) => {
+            if(confirm("YÖNETİCİ YETKİSİ: Bu canlı veriyi silmek üzeresin!")) {
+                await deleteDoc(doc(db, col, id));
+                alert("Silindi.");
+                // Sayfayı yenile veya yeniden yükle
+                if(col === 'questions') { window.startQuizGame(); }
+                if(col === 'flashcards') { window.nextCard(); }
+            }
+        };
+
+        window.addToMistakes = async (qId) => {
+            const docRef = doc(db, "questions", qId);
+            const docSnap = await getDoc(docRef);
+            if(docSnap.exists()) {
+                const data = docSnap.data();
+                await setDoc(doc(db, `users/${currentUser.uid}/mistakes/${qId}`), {
+                    lesson: data.lesson,
+                    text: data.text,
+                    options: data.options,
+                    correct: data.correct,
+                    addedAt: serverTimestamp()
+                });
+            }
+        };
+
         window.checkMistakeAnswer = async (docId, selectedIdx, correctIdx) => {
             const feedback = document.getElementById(`feedback-${docId}`);
             const buttons = document.querySelectorAll(`.mistake-opt-${docId}`);
