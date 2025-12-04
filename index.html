@@ -2318,6 +2318,68 @@
                 document.getElementById('bulkJsonData').value = ""; 
             } catch (e) { console.error(e); alert("❌ HATA: " + e.message); } 
         };
+        
+        // --- EKSİK OLAN FLASHCARD YÜKLEME FONKSİYONU ---
+        window.bulkUploadFlashcards = async () => {
+            // 1. Elementi Bul
+            const inputEl = document.getElementById('bulkJsonFlashcards');
+            if (!inputEl) return alert("Hata: JSON kutusu bulunamadı.");
+            
+            const input = inputEl.value.trim();
+            if(!input) return alert("Lütfen kutuya JSON verisi yapıştırın.");
+
+            try {
+                // 2. JSON Ayrıştırma
+                const cards = JSON.parse(input);
+                
+                // 3. Yapı Kontrolü
+                if(!Array.isArray(cards)) throw new Error("Veri [...] köşeli parantez ile başlamalıdır.");
+                if(cards.length === 0) throw new Error("Liste boş.");
+
+                if(!confirm(`${cards.length} adet Flashcard YAYINA alınacak. Emin misin?`)) return;
+
+                // Butonu geçici olarak kilitle
+                const btn = document.querySelector('button[onclick="window.bulkUploadFlashcards()"]');
+                if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> İşleniyor...'; }
+
+                // 4. Veritabanına Yazma (Batch işlemi)
+                const batch = writeBatch(db);
+                let count = 0;
+
+                cards.forEach((c, index) => {
+                    // Anahtarların (Keys) doğru olduğundan emin oluyoruz
+                    if(c.front && c.back) {
+                        const newRef = doc(collection(db, "flashcards")); 
+                        batch.set(newRef, {
+                            front: c.front, 
+                            back: c.back,
+                            lesson: c.lesson || "General", // Ders belirtilmemişse 'General' yap
+                            authorName: "Sistem", 
+                            uid: currentUser.uid, 
+                            createdAt: serverTimestamp()
+                        });
+                        count++;
+                    } else {
+                        console.warn(`Satır ${index+1} atlandı: 'front' veya 'back' verisi eksik.`);
+                    }
+                });
+
+                if(count === 0) throw new Error("Yüklenecek geçerli kart bulunamadı. JSON formatında 'front' ve 'back' alanlarının olduğundan emin ol.");
+
+                await batch.commit();
+                
+                alert(`✅ BAŞARILI! ${count} adet kart sisteme yüklendi.`);
+                inputEl.value = ""; // Kutuyu temizle
+
+            } catch (e) { 
+                console.error("Yükleme Hatası:", e); 
+                alert("❌ HATA: " + e.message + "\n\nLütfen JSON formatını kontrol et."); 
+            } finally {
+                // Butonu eski haline getir
+                const btn = document.querySelector('button[onclick="window.bulkUploadFlashcards()"]');
+                if(btn) { btn.disabled = false; btn.innerHTML = 'Kartları Yükle'; }
+            }
+        };
 
         window.startFlashcardGame = async () => {
             const category = document.getElementById('flashcardCategorySelect').value;
