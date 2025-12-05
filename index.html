@@ -491,39 +491,59 @@
             }
         });
         // --- STREAK LOGIC (HATA KORUMALI) ---
+        // --- STREAK LOGIC (DÜZELTİLDİ: Takvim Günü Bazlı Hesaplama) ---
         async function checkStreak(docRef, data) {
             const now = new Date();
-            let lastLogin;
+            let lastLoginDate;
 
+            // Veritabanından gelen tarihi al, yoksa şu anı kabul et
             if (data.lastLoginDate && typeof data.lastLoginDate.toDate === 'function') {
-                lastLogin = data.lastLoginDate.toDate();
+                lastLoginDate = data.lastLoginDate.toDate();
             } else if (data.lastLoginDate instanceof Date) {
-                lastLogin = data.lastLoginDate;
+                lastLoginDate = data.lastLoginDate;
             } else {
-                lastLogin = new Date(); 
+                lastLoginDate = new Date(); 
             }
             
-            const todayStr = now.toDateString();
-            const lastLoginStr = lastLogin.toDateString();
-            
-            if (todayStr !== lastLoginStr) {
-                const diffTime = Math.abs(now - lastLogin);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                
-                let newStreak = data.streak || 0;
-                
-                if (diffDays <= 2) { 
-                    newStreak += 1;
-                } else {
-                    newStreak = 1; 
-                }
-                
-                userData.streak = newStreak;
-                await updateDoc(docRef, { 
-                    lastLoginDate: serverTimestamp(),
-                    streak: newStreak
-                });
+            // Tarihleri "Saat/Dakika/Saniye"den arındırıp saf gün haline getiriyoruz (Gece yarısı 00:00:00)
+            const todayReset = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const lastLoginReset = new Date(lastLoginDate.getFullYear(), lastLoginDate.getMonth(), lastLoginDate.getDate());
+
+            // Milisaniye farkını al
+            const diffTime = todayReset - lastLoginReset;
+            // Gün farkına çevir (1 gün = 86400000 ms)
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            // Durum 1: Eğer fark 0 ise (Bugün zaten girmiş), hiçbir şey yapma ve çık.
+            if (diffDays === 0) return;
+
+            let newStreak = data.streak || 0;
+
+            // Durum 2: Eğer fark 1 ise (Dün girmiş, bugün de giriyor) -> Zinciri Artır
+            if (diffDays === 1) {
+                newStreak += 1;
+            } 
+            // Durum 3: Eğer fark 1'den büyükse (Dün girmemiş, zincir kopmuş) -> Zinciri 1'e Sıfırla
+            else if (diffDays > 1) {
+                newStreak = 1; 
             }
+            // (diffDays < 0 durumu teknik olarak imkansız ama olursa dokunma)
+
+            // State güncelle
+            userData.streak = newStreak;
+            
+            // Veritabanı güncelle
+            await updateDoc(docRef, { 
+                lastLoginDate: serverTimestamp(),
+                streak: newStreak
+            });
+
+            // Arayüzü anlık güncelle (Sayfa yenilemeye gerek kalmasın)
+            updateSidebar();
+            
+            // Dashboard açıksa oradaki sayıyı da güncelle
+            const dashboardStreak = document.querySelector('.fa-fire')?.nextElementSibling?.querySelector('.font-bold');
+            if(dashboardStreak) dashboardStreak.innerText = newStreak + " Gün";
         }
 
         // --- MOBILE MENU LOGIC ---
@@ -1839,20 +1859,22 @@
         };
 
         // --- 16. QUIZ CENTER (YENİLENMİŞ OYUN MODU) ---
+        // --- 16. QUIZ CENTER (GÜNCELLENDİ: MOBİL KAYDIRMA & KÜÇÜLTME) ---
         function renderQuizCenter() {
             return `
                 <div class="max-w-3xl mx-auto h-full flex flex-col">
-                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6 shrink-0">
+                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-4 shrink-0">
                         <button onclick="window.switchQuizTab('solve')" id="tabSolve" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Test Çöz</button>
                         <button onclick="window.switchQuizTab('submit')" id="tabSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Soru Gönder</button>
                     </div>
                     
-                    <div id="contentSolve" class="hidden flex-1 flex flex-col items-center">
-                        <div id="quizStartScreen" class="w-full max-w-md text-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700">
-                            <i class="fa-solid fa-pen-nib text-5xl text-primary mb-4"></i>
-                            <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Test Çöz</h3>
-                            <p class="text-slate-500 dark:text-slate-400 mb-6">Kendini sınamaya hazır mısın? Dersini seç ve başla.</p>
-                            <select id="quizCategorySelect" class="w-full p-3 border dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-900 dark:text-white outline-none mb-4">
+                    <div id="contentSolve" class="hidden flex-1 overflow-y-auto w-full px-2"> 
+                        
+                        <div id="quizStartScreen" class="w-full max-w-md mx-auto text-center p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 mt-4">
+                            <i class="fa-solid fa-pen-nib text-4xl md:text-5xl text-primary mb-4"></i>
+                            <h3 class="text-lg md:text-xl font-bold text-slate-800 dark:text-white mb-2">Test Çöz</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Kendini sınamaya hazır mısın? Dersini seç ve başla.</p>
+                            <select id="quizCategorySelect" class="w-full p-3 border dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-900 dark:text-white outline-none mb-4 text-sm">
                                 <option value="All">Tüm Dersler (Karışık)</option>
                                 <option value="Tarih">Tarih</option>
                                 <option value="Coğrafya">Coğrafya</option>
@@ -1863,42 +1885,42 @@
                             <button onclick="window.startQuizGame()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3 rounded-xl transition shadow-lg shadow-orange-500/30">Teste Başla</button>
                         </div>
 
-                        <div id="quizGameArea" class="hidden w-full max-w-2xl flex flex-col flex-1 justify-center min-h-[400px]">
-                            <div class="w-full flex justify-between items-center mb-4">
-                                <button onclick="window.switchQuizTab('solve')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-arrow-left"></i> Çık</button>
-                                <span class="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full text-xs font-bold uppercase" id="quizCategoryBadge">Genel</span>
+                        <div id="quizGameArea" class="hidden w-full max-w-2xl mx-auto flex flex-col py-4 pb-24"> <div class="w-full flex justify-between items-center mb-3">
+                                <button onclick="window.switchQuizTab('solve')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-sm"><i class="fa-solid fa-arrow-left"></i> Çık</button>
+                                <span class="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase" id="quizCategoryBadge">Genel</span>
                             </div>
 
-                            <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 relative">
-                                <div class="absolute top-4 right-4 flex gap-2">
-                                    <button onclick="window.reportContent('question', currentQuestion.id, currentQuestion.text)" class="text-slate-300 hover:text-yellow-500 transition p-2" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
+                            <div class="bg-white dark:bg-slate-800 p-5 md:p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 relative">
+                                <div class="absolute top-3 right-3 flex gap-1">
+                                    <button onclick="window.openReportModal('questions', currentQuestion.id, currentQuestion.text)" class="text-slate-300 hover:text-yellow-500 transition p-2" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
                                     ${currentUser.email === ADMIN_EMAIL ? `<button onclick="window.deleteLiveItem('questions', currentQuestion.id)" class="text-red-300 hover:text-red-500 transition p-2" title="Yönetici Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
                                 </div>
 
-                                <div class="text-sm text-slate-400 mb-2">Soru</div>
-                                <p class="font-bold text-slate-800 dark:text-white text-lg md:text-xl mb-6 leading-relaxed" id="qGameText">...</p>
+                                <div class="text-xs text-slate-400 mb-2 font-bold uppercase tracking-wider">Soru</div>
                                 
-                                <div class="space-y-3" id="qGameOptions">
+                                <p class="font-bold text-slate-800 dark:text-white text-base md:text-xl mb-6 leading-relaxed" id="qGameText">...</p>
+                                
+                                <div class="space-y-2 md:space-y-3" id="qGameOptions">
                                     </div>
 
-                                <div id="qGameFeedback" class="mt-6 hidden p-4 rounded-xl font-bold text-center"></div>
+                                <div id="qGameFeedback" class="mt-4 hidden p-3 rounded-xl font-bold text-center text-sm md:text-base"></div>
                             </div>
 
                             <div class="mt-6 text-center">
-                                <button onclick="window.nextQuestion()" id="nextQBtn" class="hidden bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-3 px-12 rounded-full shadow-lg transition transform hover:-translate-y-1">
+                                <button onclick="window.nextQuestion()" id="nextQBtn" class="hidden bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-3 px-8 md:px-12 rounded-full shadow-lg transition transform hover:-translate-y-1 w-full md:w-auto">
                                     Sonraki Soru <i class="fa-solid fa-arrow-right ml-2"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div id="contentSubmit" class="hidden pb-32">
-                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                    <div id="contentSubmit" class="hidden flex-1 overflow-y-auto pb-32 px-2">
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 mt-4">
                             <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white">Topluluğa Katkıda Bulun</h3>
                             <div class="space-y-4">
                                 <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Ders</label><select id="qLesson" class="w-full p-3 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white"><option>Türkçe</option><option>Matematik</option><option>Tarih</option><option>Coğrafya</option><option>Vatandaşlık</option></select></div>
                                 <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Soru Metni</label><textarea id="qText" rows="3" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg" placeholder="Soruyu buraya yazın..."></textarea></div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input id="optA" type="text" placeholder="A Şıkkı" class="p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
                                     <input id="optB" type="text" placeholder="B Şıkkı" class="p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
                                     <input id="optC" type="text" placeholder="C Şıkkı" class="p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
