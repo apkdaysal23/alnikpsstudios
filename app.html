@@ -342,33 +342,51 @@
 // app.html içindeki onAuthStateChanged kısmını bununla güncelle
         onAuthStateChanged(auth, async (user) => {
     if (user) {
+        // 1. Giriş yapılmış, kullanıcıyı tanımla
         currentUser = user;
+        
+        // 2. Dashboard'u görünür yap (Giriş ekranını sildiğimiz için bu şart)
         document.getElementById('appContainer').classList.remove('hidden'); 
 
-        // --- ADMİN KONTROLÜ BAŞLANGIÇ ---
+        // 3. Admin Kontrolü: Admin butonu sadece sana gözüksün
         const ADMIN_EMAIL = "alnigamestudios@gmail.com";
         const adminBtn = document.getElementById('adminLink');
-        
         if (user.email.toLowerCase() === ADMIN_EMAIL) {
-            if(adminBtn) adminBtn.classList.remove('hidden'); // Adminse butonu göster
+            if(adminBtn) adminBtn.classList.remove('hidden');
         } else {
-            if(adminBtn) adminBtn.classList.add('hidden');    // Değilse gizli tut
+            if(adminBtn) adminBtn.classList.add('hidden');
         }
-        // --- ADMİN KONTROLÜ BİTİŞ ---
         
+        // 4. Veritabanından kullanıcı verilerini çek
         const docRef = doc(db, "users", user.uid);
         const snap = await getDoc(docRef);
+
         if (snap.exists()) {
             userData = snap.data();
+
+            // --- BAN KONTROLÜ (KRİTİK) ---
+            if (userData.isBanned) {
+                alert("DİKKAT: Hesabınız kural ihlali nedeniyle süresiz olarak askıya alınmıştır.");
+                await signOut(auth);
+                window.location.href = './'; // index.html'e geri gönder
+                return;
+            }
+            // ----------------------------
+
+            // 5. Her şey yolundaysa uygulamayı yükle
             updateSidebar();
             loadMocks();
             loadMyQuestions();
             loadMyNotes();
             listenForNotificationBadge();
             window.loadPage('dashboard');
+            
+            // Günlük zinciri (Streak) kontrol et
+            await checkStreak(docRef, userData);
         }
     } else {
-        window.location.href = 'index.html';
+        // Giriş yapılmamışsa ana vitrine (index.html) gönder
+        window.location.href = './';
     }
 });
         // --- STREAK LOGIC (HATA KORUMALI) ---
@@ -2670,4 +2688,5 @@
 }
     </script>
 </body>
+
 </html>
