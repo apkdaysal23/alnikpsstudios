@@ -345,23 +345,28 @@
         currentUser = user;
         const ADMIN_EMAIL = "alnigamestudios@gmail.com";
         
-        // --- 1. BAKIM MODU KONTROLÜ ---
+        // --- 1. BAKIM MODU KONTROLÜ (KİLİT MEKANİZMASI) ---
         const maintenanceSnap = await getDoc(doc(db, "settings", "maintenance"));
         const isMaintenance = maintenanceSnap.exists() ? maintenanceSnap.data().active : false;
         
+        // Eğer bakım varsa ve giren admin DEĞİLSE:
         if (isMaintenance && user.email.toLowerCase() !== ADMIN_EMAIL) {
+            // Body'yi temizle ve uyarısını çak
             document.body.innerHTML = `
-                <div style="height:100vh; background:#020617; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:sans-serif; text-align:center; padding:20px;">
-                    <h1 style="color:#f97316; font-size:4rem;">⚠️</h1>
-                    <h2 style="font-size:2rem; font-weight:900;">ŞU AN GÜNCELLEME YAPIYORUZ</h2>
-                    <p style="color:#64748b; max-width:500px; margin-top:10px;">KPSS Studio'yu senin için daha güçlü hale getirmek için kısa bir mola verdik. Birkaç dakika sonra tekrar dene!</p>
-                    <button onclick="location.reload()" style="margin-top:20px; background:#f97316; color:white; border:none; padding:12px 30px; border-radius:12px; font-weight:bold; cursor:pointer;">Tekrar Dene</button>
+                <div style="height:100vh; background:#020617; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:sans-serif; text-align:center; padding:20px; selection:none;">
+                    <div style="font-size:6rem; margin-bottom:20px; filter: drop-shadow(0 0 20px rgba(249,115,22,0.3));">🚧</div>
+                    <h1 style="color:#f97316; font-size:2.5rem; font-weight:900; margin:0; text-transform:uppercase; letter-spacing:-1px;">Sistem Güncelleniyor</h1>
+                    <p style="color:#64748b; max-width:500px; margin-top:15px; font-weight:600; line-height:1.6;">Patron şu an sisteme yeni mühimmatlar ekliyor. <br> KPSS Studio'yu senin için daha güçlü hale getirmek için kısa bir mola verdik. <br><br> Lütfen birkaç dakika sonra tekrar dene!</p>
+                    <button onclick="location.reload()" style="margin-top:30px; background:#f97316; color:white; border:none; padding:15px 40px; border-radius:15px; font-weight:900; cursor:pointer; font-size:14px; text-transform:uppercase; box-shadow:0 10px 20px rgba(249,115,22,0.2);">Yeniden Bağlanmayı Dene</button>
                 </div>`;
-            await signOut(auth);
+            
+            // BURADA SIGN-OUT YAPMIYORUZ! 
+            // Sadece return diyoruz ki diğer kodlar (dashboard yükleme vs) çalışmasın.
+            // Sayfa yenilense de bu blokta takılı kalacak.
             return;
         }
 
-        // --- 2. KULLANICI VERİSİ & BAN & AKTİFLİK ---
+        // --- 2. KULLANICI VERİSİ & BAN KONTROLÜ ---
         const docRef = doc(db, "users", user.uid);
         const snap = await getDoc(docRef);
 
@@ -369,22 +374,22 @@
             userData = snap.data();
 
             if (userData.isBanned) {
-                alert("Üzgünüz, hesabınız kurallara aykırı hareket nedeniyle engellenmiştir.");
+                alert("HESAP ENGELİ: Kural ihlali nedeniyle erişiminiz sistem kurucusu tarafından kesilmiştir.");
                 await signOut(auth);
                 window.location.href = './';
                 return;
             }
 
-            // AKTİFLİK GÜNCELLEME (Admin Paneli İçin)
+            // Aktiflik güncelle (Admin panelinde 'Son Giriş' olarak görünür)
             await updateDoc(docRef, { lastLoginDate: serverTimestamp() });
 
-            // Admin Butonu Görünürlüğü
-            const adminBtn = document.getElementById('adminLink');
-            if (user.email.toLowerCase() === ADMIN_EMAIL) {
-                if(adminBtn) adminBtn.classList.remove('hidden');
-            }
-
+            // Dashboard'u Göster
             document.getElementById('appContainer').classList.remove('hidden');
+            
+            // Admin butonu sadece sana gözüksün
+            const adminBtn = document.getElementById('adminLink');
+            if (user.email.toLowerCase() === ADMIN_EMAIL && adminBtn) adminBtn.classList.remove('hidden');
+
             updateSidebar();
             loadMocks();
             loadMyQuestions();
@@ -394,6 +399,7 @@
             await checkStreak(docRef, userData);
         }
     } else {
+        // Eğer birisi linkle app.html'e girmeye çalışırsa index'e at
         window.location.href = './';
     }
 });
@@ -2698,4 +2704,5 @@
 </body>
 
 </html>
+
 
