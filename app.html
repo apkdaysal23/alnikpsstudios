@@ -342,50 +342,58 @@
 // app.html içindeki onAuthStateChanged kısmını bununla güncelle
         onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // 1. Giriş yapılmış, kullanıcıyı tanımla
         currentUser = user;
-        
-        // 2. Dashboard'u görünür yap (Giriş ekranını sildiğimiz için bu şart)
-        document.getElementById('appContainer').classList.remove('hidden'); 
-
-        // 3. Admin Kontrolü: Admin butonu sadece sana gözüksün
         const ADMIN_EMAIL = "alnigamestudios@gmail.com";
-        const adminBtn = document.getElementById('adminLink');
-        if (user.email.toLowerCase() === ADMIN_EMAIL) {
-            if(adminBtn) adminBtn.classList.remove('hidden');
-        } else {
-            if(adminBtn) adminBtn.classList.add('hidden');
-        }
         
-        // 4. Veritabanından kullanıcı verilerini çek
+        // --- 1. BAKIM MODU KONTROLÜ ---
+        const maintenanceSnap = await getDoc(doc(db, "settings", "maintenance"));
+        const isMaintenance = maintenanceSnap.exists() ? maintenanceSnap.data().active : false;
+        
+        if (isMaintenance && user.email.toLowerCase() !== ADMIN_EMAIL) {
+            document.body.innerHTML = `
+                <div style="height:100vh; background:#020617; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:sans-serif; text-align:center; padding:20px;">
+                    <h1 style="color:#f97316; font-size:4rem;">⚠️</h1>
+                    <h2 style="font-size:2rem; font-weight:900;">ŞU AN GÜNCELLEME YAPIYORUZ</h2>
+                    <p style="color:#64748b; max-width:500px; margin-top:10px;">KPSS Studio'yu senin için daha güçlü hale getirmek için kısa bir mola verdik. Birkaç dakika sonra tekrar dene!</p>
+                    <button onclick="location.reload()" style="margin-top:20px; background:#f97316; color:white; border:none; padding:12px 30px; border-radius:12px; font-weight:bold; cursor:pointer;">Tekrar Dene</button>
+                </div>`;
+            await signOut(auth);
+            return;
+        }
+
+        // --- 2. KULLANICI VERİSİ & BAN & AKTİFLİK ---
         const docRef = doc(db, "users", user.uid);
         const snap = await getDoc(docRef);
 
         if (snap.exists()) {
             userData = snap.data();
 
-            // --- BAN KONTROLÜ (KRİTİK) ---
             if (userData.isBanned) {
-                alert("DİKKAT: Hesabınız kural ihlali nedeniyle süresiz olarak askıya alınmıştır.");
+                alert("Üzgünüz, hesabınız kurallara aykırı hareket nedeniyle engellenmiştir.");
                 await signOut(auth);
-                window.location.href = './'; // index.html'e geri gönder
+                window.location.href = './';
                 return;
             }
-            // ----------------------------
 
-            // 5. Her şey yolundaysa uygulamayı yükle
+            // AKTİFLİK GÜNCELLEME (Admin Paneli İçin)
+            await updateDoc(docRef, { lastLoginDate: serverTimestamp() });
+
+            // Admin Butonu Görünürlüğü
+            const adminBtn = document.getElementById('adminLink');
+            if (user.email.toLowerCase() === ADMIN_EMAIL) {
+                if(adminBtn) adminBtn.classList.remove('hidden');
+            }
+
+            document.getElementById('appContainer').classList.remove('hidden');
             updateSidebar();
             loadMocks();
             loadMyQuestions();
             loadMyNotes();
             listenForNotificationBadge();
             window.loadPage('dashboard');
-            
-            // Günlük zinciri (Streak) kontrol et
             await checkStreak(docRef, userData);
         }
     } else {
-        // Giriş yapılmamışsa ana vitrine (index.html) gönder
         window.location.href = './';
     }
 });
@@ -2690,3 +2698,4 @@
 </body>
 
 </html>
+
