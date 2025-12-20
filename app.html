@@ -244,7 +244,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, addDoc, collection, query, orderBy, limit, onSnapshot, serverTimestamp, where, getDocs, deleteDoc, arrayUnion, increment, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
         const firebaseConfig = {
             apiKey: "AIzaSyDVVuIdQzbPZqWaMLtkV0mRjr5qHOng460",
             authDomain: "alnikpss.firebaseapp.com",
@@ -254,6 +254,9 @@
             appId: "1:546288972320:web:997647b8542e41f28f8245",
             measurementId: "G-XGCG35CPFJ"
         };
+
+        const API_KEY = "AIzaSyA13E4mr1jBSpAIBDenu3kE_X6hihbohVI";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -634,23 +637,159 @@
 
         // --- 2. SMARTCOACH (MEVCUT) ---
         function renderSmartCoachPage() {
-            const s = calculateStats();
-            return `
-                <div class="max-w-4xl mx-auto">
-                    <div class="text-center mb-10">
-                        <div class="inline-block p-4 bg-purple-100 dark:bg-purple-900 rounded-full mb-4"><i class="fa-solid fa-brain text-4xl text-purple-600 dark:text-purple-300"></i></div>
-                        <h1 class="text-3xl font-bold text-slate-800 dark:text-white">SmartCoach AI Analizi</h1>
-                        <p class="text-slate-500 dark:text-slate-400">Veritabanındaki tüm hareketlerin taranarak oluşturulmuştur.</p>
+    return `
+        <div class="h-full flex flex-col bg-white dark:bg-darkBg -m-4 md:-m-8">
+            <!-- Üst Bar -->
+            <div class="h-16 bg-gradient-to-r from-primary to-primaryDark text-white px-6 flex items-center justify-between shadow-lg shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-blue-500 shadow-sm"><h3 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Durum Tespiti</h3><p class="text-sm text-slate-600 dark:text-slate-400">${s.situationAnalysis}</p></div>
-                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-yellow-500 shadow-sm"><h3 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Strateji Önerisi</h3><p class="text-sm text-slate-600 dark:text-slate-400">${s.strategyAdvice}</p></div>
-                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-red-500 shadow-sm"><h3 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Zayıf Noktalar</h3><p class="text-sm text-slate-600 dark:text-slate-400">${s.weaknessAnalysis}</p></div>
-                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-green-500 shadow-sm"><h3 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Motivasyon</h3><p class="text-sm text-slate-600 dark:text-slate-400">${s.motivationMsg}</p></div>
+                    <div>
+                        <h1 class="text-base font-black">KPSS SmartCoach</h1>
+                        <p class="text-xs opacity-80">Yapay Zeka Danışmanın</p>
                     </div>
                 </div>
-            `;
-        }
+                <div class="flex items-center gap-2">
+                    <div class="hidden md:flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-xs font-bold">Aktif</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Alanı -->
+            <div id="chatWindow" class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50 dark:bg-darkBg custom-scrollbar">
+                <div id="emptyState" class="h-full flex items-center justify-center">
+                    <div class="max-w-2xl w-full text-center space-y-6">
+                        <!-- Hero Icon -->
+                        <div class="inline-flex p-6 bg-gradient-to-br from-primary/10 to-primaryDark/10 rounded-3xl">
+                            <i class="fa-solid fa-brain text-6xl text-primary"></i>
+                        </div>
+
+                        <!-- Başlık -->
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-3">
+                                Merhaba, ${userData.name}!
+                            </h2>
+                            <p class="text-slate-600 dark:text-slate-400 text-lg">
+                                KPSS hedefine ulaşman için buradayım. <br class="hidden md:block">
+                                Soru sor, motivasyon al, strateji belirle.
+                            </p>
+                        </div>
+
+                        <!-- Hızlı Başlangıç Önerileri -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-8">
+                            <button onclick="document.getElementById('aiInput').value='Hangi derslere öncelik vermeliyim?'; window.askSmartCoach();" 
+                                class="group p-4 bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary transition-all text-left">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-list-check text-blue-600 dark:text-blue-400"></i>
+                                    </div>
+                                    <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">Hangi derslere öncelik vermeliyim?</span>
+                                </div>
+                            </button>
+
+                            <button onclick="document.getElementById('aiInput').value='Çalışma programı öner'; window.askSmartCoach();" 
+                                class="group p-4 bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary transition-all text-left">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-calendar-days text-green-600 dark:text-green-400"></i>
+                                    </div>
+                                    <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">Çalışma programı öner</span>
+                                </div>
+                            </button>
+
+                            <button onclick="document.getElementById('aiInput').value='Motivasyon konuşması yap'; window.askSmartCoach();" 
+                                class="group p-4 bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary transition-all text-left">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-fire text-purple-600 dark:text-purple-400"></i>
+                                    </div>
+                                    <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">Motivasyon konuşması yap</span>
+                                </div>
+                            </button>
+
+                            <button onclick="document.getElementById('aiInput').value='İlerleme analizi yap'; window.askSmartCoach();" 
+                                class="group p-4 bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary transition-all text-left">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-chart-line text-orange-600 dark:text-orange-400"></i>
+                                    </div>
+                                    <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">İlerleme analizi yap</span>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Bilgilendirme -->
+                        <div class="mt-8 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30 rounded-xl">
+                            <div class="flex items-start gap-3 text-left">
+                                <i class="fa-solid fa-circle-info text-amber-600 dark:text-amber-400 text-lg mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="text-xs font-bold text-amber-900 dark:text-amber-300 mb-1">
+                                        Yapay Zeka Asistan Uyarısı
+                                    </p>
+                                    <p class="text-xs text-amber-800/90 dark:text-amber-400/90 leading-relaxed">
+                                        SmartCoach, Google Gemini altyapısı kullanan yapay zeka destekli bir danışmandır ve yanılabilir. 
+                                        Verdiği bilgiler referans amaçlıdır. Kritik kararlar için uzman desteği almanız önerilir.
+                                        <span class="block mt-2 text-[10px] opacity-70">Al&Ni Studios © 2024 • KPSS Hazırlık Platformu</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mesaj Input Alanı -->
+            <div class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 p-4 shrink-0">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex gap-3">
+                        <div class="flex-1 relative">
+                            <textarea 
+                                id="aiInput" 
+                                rows="1" 
+                                placeholder="Mesajını yaz... (Enter ile gönder)" 
+                                class="w-full p-4 pr-12 border-2 border-slate-300 dark:border-slate-600 rounded-2xl focus:border-primary dark:focus:border-primary outline-none bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 resize-none transition-all"
+                                oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 120) + 'px'"
+                                onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); window.askSmartCoach(); }"
+                            ></textarea>
+                        </div>
+                        <button 
+                            onclick="window.askSmartCoach()" 
+                            class="w-14 h-14 bg-gradient-to-br from-primary to-primaryDark hover:shadow-xl hover:shadow-primary/30 text-white rounded-2xl flex items-center justify-center transition-all active:scale-95 shrink-0 font-bold"
+                        >
+                            <i class="fa-solid fa-paper-plane text-lg"></i>
+                        </button>
+                    </div>
+                    <p class="text-center text-xs text-slate-500 dark:text-slate-400 mt-3">
+                        SmartCoach yanılabilir. Önemli bilgileri doğrulayın.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(148, 163, 184, 0.4);
+                border-radius: 10px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(148, 163, 184, 0.6);
+            }
+            
+            #aiInput:focus {
+                box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+            }
+        </style>
+    `;
+}
 
         // --- 3. SUBJECTS (MEVCUT) ---
         function renderSubjects() {
@@ -2700,9 +2839,86 @@
     document.getElementById('mobileAvatar').src = userData.avatar;
     if(document.getElementById('sidebarXP')) document.getElementById('sidebarXP').innerText = userData.xp || 0;
 }
+
+        window.askSmartCoach = async () => {
+    const input = document.getElementById('aiInput');
+    const chatWindow = document.getElementById('chatWindow');
+    const prompt = input.value.trim();
+
+    if (!prompt) return;
+    document.getElementById('emptyState')?.remove();
+
+    // 1. KULLANICI MESAJI (WhatsApp Sağ Balon)
+    chatWindow.insertAdjacentHTML('beforeend', `
+        <div class="flex justify-end mb-2 animate-in slide-in-from-right-2">
+            <div class="bg-[#dcf8c6] dark:bg-[#005c4b] text-slate-800 dark:text-[#e9edef] px-3 py-2 rounded-lg rounded-tr-none text-[14px] shadow-sm max-w-[85%] relative">
+                ${prompt}
+                <div class="text-[9px] text-right mt-1 opacity-50">Okundu ✓✓</div>
+            </div>
+        </div>`);
+    
+    input.value = ""; input.style.height = 'auto';
+    window.scrollToBottom();
+
+    // 2. ÖZEL YANIT KONTROLÜ (Easter Egg)
+    if (prompt.toLowerCase().includes("sevgilimi çok seviyorum")) {
+        setTimeout(() => {
+            chatWindow.insertAdjacentHTML('beforeend', `
+                <div class="flex justify-start mb-4 animate-in fade-in">
+                    <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-4 py-2 rounded-lg rounded-tl-none text-[14px] shadow-sm max-w-[85%] font-medium border-l-4 border-primary">
+                        o da seni çok seviyor 🤍
+                    </div>
+                </div>`);
+            window.scrollToBottom();
+        }, 800);
+        return;
+    }
+
+    // 3. YÜKLENİYOR (WhatsApp Style)
+    const loadingId = "loading-" + Date.now();
+    chatWindow.insertAdjacentHTML('beforeend', `<div class="flex justify-start mb-4 animate-pulse" id="${loadingId}"><div class="bg-white dark:bg-[#202c33] px-3 py-1 rounded-lg text-[10px] dark:text-slate-400">yazıyor...</div></div>`);
+    window.scrollToBottom();
+
+    try {
+        const stats = calculateStats();
+        const requestData = {
+            contents: [{ parts: [{ text: `Sen KPSS koçusun. Kullanıcı: ${userData.name}, %${stats.totalProgress} bitti. Kısa ve samimi ol. Hoca diye başla. \n Soru: ${prompt}` }] }]
+        };
+
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData)
+        });
+
+        const data = await response.json();
+        const text = data.candidates[0].content.parts[0].text;
+        
+        document.getElementById(loadingId)?.remove();
+
+        // 4. AI YANITI (WhatsApp Sol Balon)
+        chatWindow.insertAdjacentHTML('beforeend', `
+            <div class="flex justify-start mb-4 animate-in slide-in-from-left-2 duration-500">
+                <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-4 py-2 rounded-lg rounded-tl-none text-[14px] shadow-sm max-w-[85%] font-medium border-l-4 border-primary leading-relaxed">
+                    ${text.replace(/\n/g, '<br>')}
+                </div>
+            </div>`);
+
+    } catch (e) {
+        if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+        chatWindow.insertAdjacentHTML('beforeend', `<div class="text-center"><span class="bg-red-50 text-red-600 text-[10px] p-2 rounded-lg font-bold">Hoca bağlantıda bir kopukluk oldu.</span></div>`);
+    }
+    window.scrollToBottom();
+};
+
+window.scrollToBottom = () => {
+    const chatWindow = document.getElementById('chatWindow');
+    if (chatWindow) chatWindow.scrollTop = chatWindow.scrollHeight;
+};
     </script>
 </body>
 
 </html>
+
 
 
