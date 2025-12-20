@@ -792,6 +792,8 @@ const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-
     `;
 }
 
+
+
         // --- 3. SUBJECTS (MEVCUT) ---
         function renderSubjects() {
             let html = `<div class="grid grid-cols-1 gap-8 max-w-5xl mx-auto">`;
@@ -2849,41 +2851,60 @@ const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-
     if (!prompt) return;
     document.getElementById('emptyState')?.remove();
 
-    // 1. KULLANICI MESAJI (WhatsApp Sağ Balon)
+    // Kullanıcı mesajını ekle
     chatWindow.insertAdjacentHTML('beforeend', `
-        <div class="flex justify-end mb-2 animate-in slide-in-from-right-2">
-            <div class="bg-[#dcf8c6] dark:bg-[#005c4b] text-slate-800 dark:text-[#e9edef] px-3 py-2 rounded-lg rounded-tr-none text-[14px] shadow-sm max-w-[85%] relative">
+        <div class="flex justify-end mb-4 animate-in slide-in-from-right-2">
+            <div class="bg-[#dcf8c6] dark:bg-[#005c4b] text-slate-800 dark:text-[#e9edef] px-4 py-2 rounded-xl rounded-tr-none text-[15px] shadow-sm max-w-[85%]">
                 ${prompt}
-                <div class="text-[9px] text-right mt-1 opacity-50">Okundu ✓✓</div>
+                <div class="text-[10px] text-right mt-1 opacity-50">Okundu ✓✓</div>
             </div>
         </div>`);
     
     input.value = ""; input.style.height = 'auto';
     window.scrollToBottom();
 
-    // 2. ÖZEL YANIT KONTROLÜ (Easter Egg)
-    if (prompt.toLowerCase().includes("sevgilimi çok seviyorum")) {
-        setTimeout(() => {
-            chatWindow.insertAdjacentHTML('beforeend', `
-                <div class="flex justify-start mb-4 animate-in fade-in">
-                    <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-4 py-2 rounded-lg rounded-tl-none text-[14px] shadow-sm max-w-[85%] font-medium border-l-4 border-primary">
-                        o da seni çok seviyor 🤍
-                    </div>
-                </div>`);
-            window.scrollToBottom();
-        }, 800);
-        return;
-    }
-
-    // 3. YÜKLENİYOR (WhatsApp Style)
     const loadingId = "loading-" + Date.now();
-    chatWindow.insertAdjacentHTML('beforeend', `<div class="flex justify-start mb-4 animate-pulse" id="${loadingId}"><div class="bg-white dark:bg-[#202c33] px-3 py-1 rounded-lg text-[10px] dark:text-slate-400">yazıyor...</div></div>`);
+    chatWindow.insertAdjacentHTML('beforeend', `<div class="flex justify-start mb-4 animate-pulse" id="${loadingId}"><div class="bg-white dark:bg-[#202c33] px-3 py-1 rounded-lg text-[10px] dark:text-slate-400">Hoca düşünüyor...</div></div>`);
     window.scrollToBottom();
 
     try {
-        const stats = calculateStats();
+        // askSmartCoach fonksiyonunun içindeki systemInstruction kısmını şu şekilde modernize edelim:
+
+const stats = calculateStats();
+let aiMode = "";
+
+// Karakter Belirleme Mantığı
+if (stats.totalProgress < 20) {
+    aiMode = "Sen şu an 'Yol Gösteren Dost' modundasın. Kullanıcı henüz yolun çok başında, onu korkutmadan, küçük adımlarla motive etmelisin.";
+} else if (stats.avgScore < 70 && stats.totalProgress > 50) {
+    aiMode = "Sen şu an 'Gerçekçi Mentor' modundasın. Kullanıcı konuları bitirmiş ama netleri düşük. Samimi ama hatalarını dürüstçe yüzüne vuran, taktik veren bir tavır takın.";
+} else if (stats.avgScore >= 85) {
+    aiMode = "Sen şu an 'Şampiyon Antrenörü' modundasın. Karşında derece adayı bir öğrenci var. Onu rehavetten koru, en zor detaylara odaklanmasını sağla.";
+} else {
+    aiMode = "Sen 'Samimi ve Dengeli bir KPSS Hocası' modundasın. Neşeli, arkadaşça ama sınav ciddiyetini koruyan bir tavır sergile.";
+}
+
+const systemInstruction = `
+    ${aiMode}
+    
+    ÖĞRENCİ KİMLİĞİ:
+    - İsim: ${userData.name}
+    - Hedef Puan: ${userData.targetScore}
+    - Mevcut Durum: %${stats.totalProgress} tamamlandı.
+    
+    KURALLAR:
+    1. Kullanıcıyı ismiyle selamla (Hocam, ${userData.name} dostum, Şampiyon vb.).
+    2. Cevap verirken sadece bilgi verme; o anki moduna göre (yukarıda belirtilen) duygusal bir bağ kur.
+    3. Eğer hedef puanı ${userData.targetScore} ise ve durumu buna uzaksa, ona gerçekçi bir yol haritası çiz.
+    4. Arkadaşça bir dil kullan (Kanka gibi değil, sevilen bir hoca gibi). "Yaparsın", "Hallederiz", "Bak burası önemli" gibi ifadeler kullan.
+`;
+
         const requestData = {
-            contents: [{ parts: [{ text: `Sen KPSS koçusun. Kullanıcı: ${userData.name}, %${stats.totalProgress} bitti. Kısa ve samimi ol. Hoca diye başla. \n Soru: ${prompt}` }] }]
+            contents: [{ 
+                parts: [{ 
+                    text: `${systemInstruction} \n\n Kullanıcı Sorusu: ${prompt}` 
+                }] 
+            }]
         };
 
         const response = await fetch(API_URL, {
@@ -2897,17 +2918,32 @@ const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-
         
         document.getElementById(loadingId)?.remove();
 
-        // 4. AI YANITI (WhatsApp Sol Balon)
+
+        // --- ÖZEL EASTER EGG (SEVGİLİ KONTROLÜ) ---
+    if (prompt.toLowerCase().includes("sevgilimi çok seviyorum")) {
+        setTimeout(() => {
+            chatWindow.insertAdjacentHTML('beforeend', `
+                <div class="flex justify-start mb-6 animate-in fade-in duration-700">
+                    <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md border-l-4 border-pink-500 font-bold italic">
+                        o da seni çok seviyor 🤍
+                    </div>
+                </div>`);
+            window.scrollToBottom();
+        }, 600);
+        return;
+    }
+
+        // AI YANITI
         chatWindow.insertAdjacentHTML('beforeend', `
-            <div class="flex justify-start mb-4 animate-in slide-in-from-left-2 duration-500">
-                <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-4 py-2 rounded-lg rounded-tl-none text-[14px] shadow-sm max-w-[85%] font-medium border-l-4 border-primary leading-relaxed">
-                    ${text.replace(/\n/g, '<br>')}
+            <div class="flex justify-start mb-6 animate-in slide-in-from-left-2 duration-500">
+                <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md max-w-[90%] border-l-4 border-primary leading-relaxed">
+                    ${formatAiResponse(text)}
                 </div>
             </div>`);
 
     } catch (e) {
-        if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
-        chatWindow.insertAdjacentHTML('beforeend', `<div class="text-center"><span class="bg-red-50 text-red-600 text-[10px] p-2 rounded-lg font-bold">Hoca bağlantıda bir kopukluk oldu.</span></div>`);
+        document.getElementById(loadingId)?.remove();
+        chatWindow.insertAdjacentHTML('beforeend', `<div class="text-center my-4"><span class="bg-red-50 text-red-600 text-[10px] p-2 rounded-lg font-bold">Hoca bağlantıda bir kopukluk oldu.</span></div>`);
     }
     window.scrollToBottom();
 };
@@ -2916,13 +2952,19 @@ window.scrollToBottom = () => {
     const chatWindow = document.getElementById('chatWindow');
     if (chatWindow) chatWindow.scrollTop = chatWindow.scrollHeight;
 };
+
+window.formatAiResponse = (text) => {
+    // Markdown Bold ( **text** ) -> HTML Bold
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Yeni satırları <br> yap
+    text = text.replace(/\n/g, '<br>');
+    // Madde işaretlerini güzelleştir
+    text = text.replace(/^- (.*?)<br>/gm, '• $1<br>');
+    return text;
+};
     </script>
 </body>
 
 </html>
-
-
-
-
 
 
