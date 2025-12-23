@@ -1,0 +1,2401 @@
+<!doctype html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Al&Ni DGS Studio</title>
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    // 1. TAILWIND AYARLARI
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: "#f97316",
+            primaryDark: "#ea580c",
+          },
+          boxShadow: {
+            soft: "0 12px 30px rgba(0,0,0,.08)",
+          }
+        }
+      }
+    };
+
+    // 2. DARK MODE MEKANİZMASI (Global Scope)
+
+    // Sayfa yüklenirken rengi ayarla
+    function initTheme() {
+      // LocalStorage'da 'dark' varsa VEYA (kayıt yoksa VE sistem karanlıksa) -> Dark yap
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+    initTheme(); // Hemen çalıştır
+
+    // Butona basınca çalışacak fonksiyon
+    function toggleTheme() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    }
+  </script>
+
+  <style>
+    .tab-btn-active {
+      color: #0f172a !important;
+      border-bottom: 3px solid #f97316;
+      background: rgba(249, 115, 22, .06);
+    }
+
+    .dark .tab-btn-active {
+      color: #fff !important;
+    }
+
+    .flip-card {
+      perspective: 1000px;
+    }
+
+    .flip-card-inner {
+      transform-style: preserve-3d;
+    }
+
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front,
+    .flip-card-back {
+      backface-visibility: hidden;
+    }
+
+    .flip-card-back {
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+  <!-- AUTH SCREEN -->
+  <div id="authScreen" class="min-h-screen flex items-center justify-center p-4">
+    <div
+      class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-soft">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <div class="text-xs font-black tracking-widest text-slate-400">AL&NI</div>
+          <h1 class="text-2xl font-black">DGS Studio</h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Öğrenci Girişi</p>
+        </div>
+        <button id="toggleDark" onclick="toggleTheme()"
+          class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+
+      <!-- Sadece Giriş Formu Kaldı -->
+      <div id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-black text-slate-500 mb-1 ml-1">E-POSTA</label>
+          <input id="loginEmail" type="email"
+            class="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none focus:border-primary transition font-bold"
+            placeholder="ornek@email.com" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-500 mb-1 ml-1">ŞİFRE</label>
+          <input id="loginPassword" type="password"
+            class="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none focus:border-primary transition font-bold"
+            placeholder="••••••••" />
+        </div>
+
+        <button onclick="handleLogin()" id="loginBtnUI"
+          class="w-full bg-slate-900 dark:bg-slate-100 hover:bg-black dark:hover:bg-white text-white dark:text-slate-900 font-black py-4 rounded-2xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2">
+          <span>Giriş Yap</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <div id="loginErrorMsg"
+          class="hidden p-3 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-200 text-xs font-black text-center">
+          Hata mesajı burada görünecek.
+        </div>
+
+        <p class="text-xs text-slate-400 text-center mt-4">
+          Hesabın yoksa ana sitemizden kayıt oluşturmalısın.
+        </p>
+      </div>
+
+      <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+        <p class="text-[10px] text-slate-400 font-black">AL&NI Game Studios © 2025</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <!-- APP SCREEN -->
+  <div id="app" class="hidden flex min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+
+    <!-- SIDEBAR (SOL MENÜ - SABİT) -->
+    <aside
+      class="w-72 hidden lg:flex flex-col h-screen sticky top-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shrink-0 overflow-y-auto custom-scrollbar z-40">
+
+      <!-- LOGO & TOGGLE -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <div class="text-[10px] font-black tracking-[0.2em] text-slate-400">AL&NI</div>
+          <div
+            class="text-xl font-black bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+            DGS Studio</div>
+        </div>
+        <button id="toggleDark2" onclick="toggleTheme()"
+          class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition text-slate-600 dark:text-slate-300">
+          <i class="fa-solid fa-circle-half-stroke"></i>
+        </button>
+      </div>
+
+      <!-- USER CARD -->
+      <div
+        class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 mb-6">
+        <img id="sidebarAvatar" class="w-12 h-12 rounded-xl border border-slate-200 dark:border-slate-700 object-cover"
+          src="">
+        <div class="flex-1 min-w-0">
+          <div id="sidebarName" class="font-black leading-tight truncate text-sm text-slate-800 dark:text-slate-200">...
+          </div>
+          <div id="sidebarTitle" class="text-[10px] uppercase font-bold text-slate-400 tracking-wide mt-0.5">Öğrenci
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS GRID -->
+      <div class="grid grid-cols-2 gap-2 mb-6">
+        <div
+          class="p-3 rounded-2xl bg-orange-50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-900/20">
+          <div class="text-[9px] uppercase font-black text-orange-400 tracking-wider">XP</div>
+          <div id="sidebarXP" class="text-lg font-black text-orange-600 dark:text-orange-400">0</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20">
+          <div class="text-[9px] uppercase font-black text-blue-400 tracking-wider">Puan</div>
+          <div id="sidebarScore" class="text-lg font-black text-blue-600 dark:text-blue-400">0</div>
+        </div>
+      </div>
+
+      <!-- COUNTDOWN -->
+      <div class="mb-6 relative group overflow-hidden rounded-2xl">
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-800 to-black dark:from-slate-800 dark:to-slate-950">
+        </div>
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500"></div>
+        <div class="relative p-4 text-center">
+          <div class="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-black mb-1">DGS 2026</div>
+          <div id="yksCountdown" class="text-lg font-black font-mono tracking-tighter text-white">Hesaplanıyor...</div>
+        </div>
+      </div>
+
+      <!-- NAVIGATION -->
+      <nav class="space-y-1 flex-1">
+        <!-- YENİ EKLENEN DASHBOARD BUTONU -->
+        <button id="nav-dashboard" onclick="loadPage('dashboard')"
+          class="w-full text-left p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 transition-all group">
+          <div
+            class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition">
+            <i class="fa-solid fa-chart-pie"></i>
+          </div>
+          Genel Bakış
+        </button>
+
+        <div class="h-px bg-slate-100 dark:bg-slate-800 my-2"></div>
+
+        <button id="nav-program" onclick="loadPage('program')"
+          class="w-full text-left p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 transition-all group">
+          <div
+            class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition">
+            <i class="fa-solid fa-calendar-days"></i>
+          </div>
+          Akıllı Program
+        </button>
+        <button id="nav-topics" onclick="loadPage('topics')"
+          class="w-full text-left p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 transition-all group">
+          <div
+            class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          Konu Takip
+        </button>
+
+        <div class="h-px bg-slate-100 dark:bg-slate-800 my-2"></div>
+
+        <button id="nav-quiz" onclick="loadPage('quiz')"
+          class="w-full text-left p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 transition-all group">
+          <div
+            class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 group-hover:scale-110 transition">
+            <i class="fa-solid fa-pen-nib"></i>
+          </div>
+          Quiz Center
+        </button>
+        <button id="nav-flashcards" onclick="loadPage('flashcards')"
+          class="w-full text-left p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 transition-all group">
+          <div
+            class="w-8 h-8 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-pink-600 dark:text-pink-400 group-hover:scale-110 transition">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          Flashcards
+        </button>
+        <button id="nav-mistakes" onclick="loadPage('mistakes')"
+          class="w-full text-left p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 transition-all group">
+          <div
+            class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 group-hover:scale-110 transition">
+            <i class="fa-solid fa-recycle"></i>
+          </div>
+          Hata Kutusu
+        </button>
+        <button id="nav-mocks" onclick="loadPage('mocks')"
+          class="w-full text-left p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 transition-all group">
+          <div
+            class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          Mock Exams
+        </button>
+        <button id="nav-coach" onclick="loadPage('coach')"
+          class="w-full text-left p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 transition-all group">
+          <div
+            class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          SmartCoach
+        </button>
+        <button id="nav-admin" onclick="loadPage('admin')"
+          class="w-full text-left p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 transition-all group hidden">
+          <div
+            class="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:scale-110 transition">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          Admin Panel
+        </button>
+      </nav>
+
+      <!-- FOOTER ACTIONS -->
+      <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+        <a href="app.html"
+          class="block w-full text-left p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-xs text-slate-500 transition">
+          <i class="fa-solid fa-arrow-left mr-2"></i> KPSS Modülüne Dön
+        </a>
+        <button onclick="logout()"
+          class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 text-left transition flex items-center gap-2">
+          <i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENT AREA (SAĞ TARAF) -->
+    <main class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+      <!-- MOBILE TOPBAR (Sadece Mobilde Görünür) -->
+      <div
+        class="lg:hidden shrink-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-100 dark:border-slate-800 z-30">
+        <div class="p-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img id="mobileAvatar" class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700" src="">
+            <div>
+              <div id="mobileName" class="font-black leading-tight text-sm">...</div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">YKS Studio</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleMobileNav()"
+              class="w-9 h-9 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <button id="toggleDark3" onclick="toggleTheme()"
+              class="w-9 h-9 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300">
+              <i class="fa-solid fa-moon"></i>
+            </button>
+          </div>
+        </div>
+        <!-- MOBILE MENU -->
+        <div id="mobileNav"
+          class="hidden p-3 pt-0 pb-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="loadPage('program'); toggleMobileNav(true)"
+              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Program</button>
+            <button onclick="loadPage('topics'); toggleMobileNav(true)"
+              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Takip</button>
+            <button onclick="loadPage('quiz'); toggleMobileNav(true)"
+              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Quiz</button>
+            <button onclick="loadPage('flashcards'); toggleMobileNav(true)"
+              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Cards</button>
+            <button onclick="loadPage('mocks'); toggleMobileNav(true)"
+              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Mock</button>
+            <button onclick="loadPage('coach'); toggleMobileNav(true)"
+              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Coach</button>
+            <button id="mobileAdminBtn" onclick="loadPage('admin'); toggleMobileNav(true)"
+              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs hidden">Admin</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DYNAMIC CONTENT (Değişen Kısım) -->
+      <div id="contentArea" class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+        <!-- Buraya JS ile içerik dolacak -->
+      </div>
+    </main>
+  </div>
+
+  <!-- REPORT MODAL -->
+  <div id="reportModal" class="hidden fixed inset-0 z-50 bg-black/50 p-4">
+    <div
+      class="max-w-md mx-auto bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-100 dark:border-slate-800">
+      <div class="flex items-center justify-between mb-3">
+        <div class="font-black text-lg">İçerik Şikayet</div>
+        <button onclick="closeReportModal()"
+          class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="text-xs text-slate-500 dark:text-slate-400 font-black mb-2">Özet</div>
+      <div id="reportSummary"
+        class="text-sm p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 mb-3">
+      </div>
+      <textarea id="reportReason"
+        class="w-full p-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 outline-none"
+        rows="3" placeholder="Kısa sebep (opsiyonel)"></textarea>
+      <button onclick="submitReport()"
+        class="w-full mt-3 bg-yellow-500 hover:bg-yellow-600 text-white font-black py-3 rounded-2xl">
+        Gönder
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    // ==========================
+    // FIREBASE IMPORTS (CDN)
+    // ==========================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
+      collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp, writeBatch
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import {
+      getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, deleteUser
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    // ==========================
+    // CONFIG
+    // ==========================
+
+    // ==========================
+    // CONFIG (DGS AYARLARI)
+    // ==========================
+
+    // DGS Konu Listesi (Senin verdiğin liste)
+    const DGS_TOPICS = {
+      "DGS Matematik": [
+        "Temel Kavramlar (Sayılar)", "Sayı Basamakları", "Bölme-Bölünebilme", "OBEB-OKEK",
+        "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar",
+        "Köklü Sayılar", "Çarpanlara Ayırma", "Oran-Orantı", "Problemler (Genel)",
+        "Sayı Problemleri", "Kesir Problemleri", "İşçi-Havuz Problemleri", "Yaş Problemleri",
+        "Yüzde Problemleri", "Kar-Zarar Problemleri", "Tablo-Grafik Problemleri",
+        "Hız Problemleri", "Karışım Problemleri", "Hareket Problemleri", "Kümeler",
+        "Fonksiyon", "İşlem", "Modüler Aritmetik", "Permütasyon", "Kombinasyon",
+        "Olasılık", "Sayısal Mantık"
+      ],
+      "DGS Geometri": [
+        "Geometrik Kavramlar", "Açılar", "Üçgenler", "Üçgen Çeşitleri", "Açıortay", "Kenarortay",
+        "Pisagor Teoremi", "Öklid Bağıntıları", "Üçgende Açıortay Teoremleri", "Üçgende Kenarortay Teoremleri",
+        "Üçgende Alan", "Üçgende Benzerlik", "Çokgenler", "Dörtgenler", "Paralelkenar",
+        "Dikdörtgen", "Kare", "Yamuk", "Deltoid", "Çemberde Açı", "Çemberde Uzunluk",
+        "Dairede Alan", "Çemberde Benzerlik", "Noktanın Analitik İncelenmesi", "Analitik Düzlem",
+        "Doğrunun Denklemleri", "Prizma", "Dikdörtgenler Prizması", "Küp", "Silindir",
+        "Dönel Silindir", "Piramit", "Düzgün Piramit", "Kesik Piramit", "Küre"
+      ],
+      "DGS Türkçe": [
+        "Sözcükte Anlam (Gerçek, Mecaz, Terim)", "Sözcüklerde Anlam İlişkileri", "Söz Sanatları",
+        "Söz Öbekleri (Deyim, Atasözü)", "Cümlede Anlam ve Yorum", "Cümlenin Yapısı",
+        "Anlatım Biçimleri", "Düşünceyi Geliştirme Yolları", "Paragrafın İçeriği ve Konusu",
+        "Paragrafın Ana Düşüncesi", "Paragrafın Yapısı", "Sözel Mantık (Çıkarım, Sıralama, Tablo)"
+      ]
+    };
+
+    // Firebase'de "exams/dgs" yoluna kaydetmek için bunu değiştiriyoruz:
+    const EXAM = "dgs";
+
+    // Eski YKS_TOPICS değişkenini kodda DGS_TOPICS olarak kullanacağız.
+    // Kolaylık olsun diye değişkene atıyoruz:
+    const YKS_TOPICS = DGS_TOPICS;
+
+    const ADMIN_EMAIL = "alnigamestudios@gmail.com";
+    const API_URL = ""; // SmartCoach için (istersen) buraya endpoint yaz
+
+    // >>> KENDİ FIREBASE CONFIG'İNİ GİR <<<
+    const firebaseConfig = {
+      apiKey: "AIzaSyDVVuIdQzbPZqWaMLtkV0mRjr5qHOng460",
+      authDomain: "alnikpss.firebaseapp.com",
+      projectId: "alnikpss",
+      storageBucket: "alnikpss.firebasestorage.app",
+      messagingSenderId: "546288972320",
+      appId: "1:546288972320:web:997647b8542e41f28f8245",
+      measurementId: "G-XGCG35CPFJ"
+    };
+
+    // ==========================
+    // INIT
+    // ==========================
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // ==========================
+    // HELPERS / PATHS
+    // ==========================
+    const colPath = (base) => `exams/${EXAM}/${base}`;
+    const userExamPath = (uid, base) => `users/${uid}/exams/${EXAM}/${base}`;
+
+    const AVATAR_OPTIONS = [
+      "https://i.pravatar.cc/120?img=1",
+      "https://i.pravatar.cc/120?img=2",
+      "https://i.pravatar.cc/120?img=3",
+      "https://i.pravatar.cc/120?img=4",
+      "https://i.pravatar.cc/120?img=5",
+      "https://i.pravatar.cc/120?img=6",
+      "https://i.pravatar.cc/120?img=7",
+      "https://i.pravatar.cc/120?img=8"
+    ];
+
+    // ==========================
+    // GLOBAL STATE
+    // ==========================
+    let currentUser = null;
+    let userData = null;
+
+    // quiz
+    let quizQuestionsPool = [];
+    let currentQuestion = null;
+
+    // flashcards
+    let flashcardsPool = [];
+    let currentCard = null;
+
+    // mocks
+    let mockHistory = [];
+    let mockChart = null;
+
+    // report
+    let reportPayload = { col: "", id: "", summary: "" };
+
+
+
+    // ==========================
+    // COUNTDOWN
+    // ==========================
+    function startCountdown() {
+      const targetDate = new Date("June 20, 2026 10:15:00").getTime(); // Tahmini tarih
+
+      setInterval(() => {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        if (distance < 0) {
+          document.getElementById("yksCountdown").innerHTML = "SINAV GÜNÜ!";
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+        const el = document.getElementById("yksCountdown");
+        if (el) el.innerHTML = `${days}g ${hours}s ${minutes}dk`;
+      }, 1000);
+    }
+    startCountdown();
+
+    // Toggle eventlerini güncelle
+    const toggleFunc = () => {
+      const isDark = document.documentElement.classList.contains("dark");
+      applyTheme(!isDark);
+    };
+
+    document.getElementById("toggleDark")?.addEventListener("click", toggleFunc);
+    document.getElementById("toggleDark2")?.addEventListener("click", toggleFunc);
+    document.getElementById("toggleDark3")?.addEventListener("click", toggleFunc);
+
+    // ==========================
+    // AUTH UI
+    // ==========================
+    // ==========================
+    // AUTH LOGIC (UPDATED)
+    // ==========================
+
+
+    window.handleLogin = async () => {
+      const email = document.getElementById("loginEmail").value.trim();
+      const pass = document.getElementById("loginPassword").value;
+      const btn = document.getElementById("loginBtnUI");
+      const errBox = document.getElementById("loginErrorMsg");
+
+      // UI Reset
+      if (errBox) errBox.classList.add("hidden");
+
+      if (!email || !pass) {
+        if (errBox) {
+          errBox.innerText = "Lütfen e-posta ve şifre gir.";
+          errBox.classList.remove("hidden");
+        }
+        return;
+      }
+
+      // Loading State
+      const originalText = btn ? btn.innerHTML : "Giriş";
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        // Başarılı olursa onAuthStateChanged otomatik çalışır.
+      } catch (e) {
+        console.error("Login Hatası:", e);
+
+        let msg = "Giriş yapılamadı.";
+        if (e.code === "auth/invalid-email") msg = "Geçersiz e-posta adresi.";
+        if (e.code === "auth/user-not-found") msg = "Bu e-posta kayıtlı değil.";
+        if (e.code === "auth/wrong-password") msg = "Şifre hatalı.";
+        if (e.code === "auth/invalid-credential") msg = "Bilgiler hatalı.";
+        if (e.code === "auth/too-many-requests") msg = "Çok deneme yaptın, bekle.";
+
+        if (errBox) {
+          errBox.innerText = msg;
+          errBox.classList.remove("hidden");
+        } else {
+          alert(msg);
+        }
+
+        // Butonu düzelt
+        if (btn) {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      }
+    };
+
+
+
+
+    window.handleRegister = async () => {
+      try {
+        if (!document.getElementById("privacyCheck").checked) throw new Error("Gizlilik onayı gerekli.");
+        const name = document.getElementById("regName").value.trim();
+        const email = document.getElementById("regEmail").value.trim();
+        const pass = document.getElementById("regPassword").value;
+        if (!name || !email || !pass) throw new Error("Eksik alan var.");
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+
+        const baseUser = {
+          name,
+          email,
+          avatar: AVATAR_OPTIONS[0],
+          xp: 0,
+          totalScore: 0,
+          createdAt: serverTimestamp()
+        };
+        await setDoc(doc(db, "users", cred.user.uid), baseUser);
+
+        // Exam scoped defaults
+        await setDoc(doc(db, userExamPath(cred.user.uid, "meta"), "stats"), {
+          mockCount: 0,
+          lastScore: 0,
+          createdAt: serverTimestamp()
+        });
+
+      } catch (e) {
+        alert("Kayıt Hatası: " + e.message);
+      }
+    };
+
+    window.logout = async () => {
+      try {
+        await signOut(auth);
+        // location.reload() KULLANMIYORUZ.
+        // Firebase listener (onAuthStateChanged) zaten çıkış olduğunu anlayıp ekranı değiştirecek.
+        console.log("Başarıyla çıkış yapıldı.");
+      } catch (e) {
+        console.error("Çıkış hatası:", e);
+        alert("Çıkış yapılırken hata oluştu.");
+      }
+    };
+
+    // ==========================
+    // APP BOOTSTRAP
+    // ==========================
+    // ==========================
+    // APP BOOTSTRAP (GÜNCELLENMİŞ)
+    // ==========================
+    onAuthStateChanged(auth, async (u) => {
+      if (!u) {
+        // Kullanıcı yoksa veya çıkış yaptıysa:
+        currentUser = null;
+        userData = null;
+
+        // Ekranları değiştir
+        document.getElementById("app").classList.add("hidden");
+        document.getElementById("app").classList.remove("flex"); // Flex class'ını kaldır
+        document.getElementById("authScreen").classList.remove("hidden");
+
+        // Formu temizle
+        document.getElementById("loginEmail").value = "";
+        document.getElementById("loginPassword").value = "";
+        return;
+      }
+
+      // Kullanıcı giriş yaptıysa:
+      currentUser = u;
+      document.getElementById("authScreen").classList.add("hidden");
+
+      // App ekranını aç (Flex yapısını koruyarak)
+      const appDiv = document.getElementById("app");
+      appDiv.classList.remove("hidden");
+      appDiv.classList.add("flex");
+
+      // Verileri çek
+      try {
+        const snap = await getDoc(doc(db, "users", u.uid));
+        // Eğer kullanıcı verisi yoksa varsayılan oluştur (Hata almamak için)
+        userData = snap.exists() ? snap.data() : { name: "Öğrenci", avatar: AVATAR_OPTIONS[0], xp: 0, totalScore: 0 };
+
+        // Kenar çubuğunu güncelle
+        updateSidebar();
+
+        // Admin kontrolü
+        const isAdmin = currentUser.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+        const adminNav = document.getElementById("nav-admin");
+        const adminMob = document.getElementById("mobileAdminBtn");
+
+        if (adminNav) adminNav.classList.toggle("hidden", !isAdmin);
+        if (adminMob) adminMob.classList.toggle("hidden", !isAdmin);
+
+        // Sayfayı yükle
+        loadPage("dashboard");
+
+      } catch (e) {
+        console.error("Kullanıcı verisi çekilemedi:", e);
+        alert("Veriler yüklenirken bağlantı sorunu oldu.");
+      }
+    });
+
+    async function loadUserData() {
+      const ref = doc(db, "users", currentUser.uid);
+      const snap = await getDoc(ref);
+      userData = snap.exists() ? snap.data() : { name: "Kullanıcı", avatar: AVATAR_OPTIONS[0], xp: 0, totalScore: 0 };
+
+      // ensure exam stats doc
+      const statsRef = doc(db, userExamPath(currentUser.uid, "meta"), "stats");
+      const statsSnap = await getDoc(statsRef);
+      if (!statsSnap.exists()) {
+        await setDoc(statsRef, { mockCount: 0, lastScore: 0, createdAt: serverTimestamp() });
+      }
+    }
+
+    function updateSidebar() {
+      if (!userData || !currentUser) return;
+
+      const isAdmin = currentUser.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+      document.getElementById("sidebarName").innerText = userData.name || "Kullanıcı";
+      document.getElementById("sidebarAvatar").src = userData.avatar || AVATAR_OPTIONS[0];
+      document.getElementById("sidebarXP").innerText = userData.xp || 0;
+      document.getElementById("sidebarScore").innerText = userData.totalScore || 0;
+
+      document.getElementById("mobileName").innerText = userData.name || "Kullanıcı";
+      document.getElementById("mobileAvatar").src = userData.avatar || AVATAR_OPTIONS[0];
+
+      const titleEl = document.getElementById("sidebarTitle");
+      if (isAdmin) {
+        titleEl.innerText = "Yönetici";
+        titleEl.classList.add("text-red-500");
+      } else {
+        titleEl.innerText = "Öğrenci";
+        titleEl.classList.remove("text-red-500");
+      }
+    }
+
+    // ==========================
+    // MOBILE NAV
+    // ==========================
+    window.toggleMobileNav = (forceClose = false) => {
+      const el = document.getElementById("mobileNav");
+      if (!el) return;
+      if (forceClose) { el.classList.add("hidden"); return; }
+      el.classList.toggle("hidden");
+    };
+
+    // ==========================
+    // ROUTER
+    // ==========================
+    const contentArea = document.getElementById("contentArea");
+    const setActiveNav = (id) => {
+      // Önce tüm butonların aktiflik sınıflarını temizle
+      document.querySelectorAll("aside nav button").forEach(b => {
+        b.classList.remove("active-nav", "bg-slate-100", "dark:bg-slate-800");
+      });
+
+      // Sonra tıklanan butona aktiflik sınıfını ekle
+      const btn = document.getElementById("nav-" + id);
+      if (btn) {
+        btn.classList.add("active-nav", "bg-slate-100", "dark:bg-slate-800");
+      }
+    };
+
+    window.loadPage = async (page) => {
+      setActiveNav(page);
+
+      // YENİ: Dashboard kontrolü eklendi
+      if (page === "dashboard") {
+        contentArea.innerHTML = renderDashboard();
+        loadDashboardStats();
+      }
+
+      if (page === "quiz") contentArea.innerHTML = renderQuiz();
+      if (page === "flashcards") contentArea.innerHTML = renderFlashcards();
+      if (page === "mistakes") { contentArea.innerHTML = renderMistakes(); loadMistakes(); }
+      if (page === "mocks") { contentArea.innerHTML = renderMocks(); loadMocks(); }
+      if (page === "coach") contentArea.innerHTML = renderCoach();
+      if (page === "admin") { contentArea.innerHTML = renderAdmin(); loadAdminData("questions"); }
+      if (page === "program") { contentArea.innerHTML = renderProgram(); loadProgram(); }
+      if (page === "topics") { contentArea.innerHTML = renderTopicTracker(); loadTopicsProgress(); }
+    };
+
+    // --- DASHBOARD (YENİ) ---
+    function renderDashboard() {
+      return `
+        <div class="space-y-6 pb-24">
+          <!-- WELCOME HEADER -->
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+             <div>
+               <h1 class="text-3xl font-black text-slate-800 dark:text-white">Merhaba, ${userData.name || "Öğrenci"} 👋</h1>
+               <p class="text-slate-500 dark:text-slate-400 font-bold">Bugün kazanmak için harika bir gün!</p>
+             </div>
+             <div class="flex gap-2">
+                <div class="bg-slate-800 text-white px-4 py-2 rounded-xl font-black flex items-center gap-2">
+                   <i class="fa-solid fa-fire text-orange-500"></i> <span>XP: ${userData.xp || 0}</span>
+                </div>
+             </div>
+          </div>
+
+          <!-- BIG COUNTDOWN CARD -->
+          <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-900 to-slate-900 p-8 text-white shadow-xl group">
+             <div class="absolute top-0 right-0 p-32 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+             <div class="relative z-10">
+                <div class="text-xs font-black tracking-[0.2em] opacity-70 mb-1">BÜYÜK SINAV</div>
+                <h2 class="text-4xl font-black mb-1">19 Temmuz 2026</h2>
+                <p class="text-blue-200 text-sm font-bold mb-6">Hayallerine giden yol.</p>
+                
+                <div class="flex gap-4 text-center">
+                   <div class="bg-white/10 backdrop-blur rounded-2xl p-3 min-w-[70px]">
+                      <div class="text-2xl font-black" id="dDay">0</div><div class="text-[10px] opacity-70 font-bold">GÜN</div>
+                   </div>
+                   <div class="bg-white/10 backdrop-blur rounded-2xl p-3 min-w-[70px]">
+                      <div class="text-2xl font-black" id="dHour">0</div><div class="text-[10px] opacity-70 font-bold">SAAT</div>
+                   </div>
+                   <div class="bg-white/10 backdrop-blur rounded-2xl p-3 min-w-[70px]">
+                      <div class="text-2xl font-black" id="dMin">0</div><div class="text-[10px] opacity-70 font-bold">DK</div>
+                   </div>
+                </div>
+             </div>
+          </div>
+
+          <!-- SMART COACH BANNER -->
+          <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-3xl p-6 text-white shadow-lg flex justify-between items-center relative overflow-hidden cursor-pointer hover:scale-[1.01] transition" onclick="loadPage('coach')">
+             <div class="absolute -left-10 -bottom-10 text-9xl text-white/10"><i class="fa-solid fa-brain"></i></div>
+             <div class="relative z-10 pl-2">
+                <div class="font-black text-lg mb-1"><i class="fa-solid fa-robot mr-2"></i> SmartCoach Öngörüsü</div>
+                <p class="text-purple-100 font-bold italic">"Son çözdüğün denemede matematikte artış var, harikasın!"</p>
+                <div class="text-xs mt-2 text-purple-200 font-bold">Detaylı analiz için tıkla →</div>
+             </div>
+             <button class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl font-black text-sm backdrop-blur transition">AI Raporu</button>
+          </div>
+
+          <!-- STATS GRID -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+             <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
+                <div class="text-xs font-black text-slate-400 mb-2">Genel Puanın</div>
+                <div class="text-3xl font-black text-slate-800 dark:text-white">${userData.totalScore || 0}</div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+                   <div class="bg-orange-500 h-full rounded-full" style="width: ${Math.min((userData.totalScore || 0) / 5, 100)}%"></div>
+                </div>
+             </div>
+             <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
+                <div class="text-xs font-black text-slate-400 mb-2">Çözülen Deneme</div>
+                <div class="text-3xl font-black text-slate-800 dark:text-white" id="dashMockCount">-</div>
+             </div>
+             <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
+                <div class="text-xs font-black text-slate-400 mb-2">Hata Kutusu</div>
+                <div class="text-3xl font-black text-red-500" id="dashMistakeCount">-</div>
+             </div>
+          </div>
+
+          <!-- CHART SECTION -->
+          <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft">
+             <h3 class="font-black mb-4">Puan Grafiği</h3>
+             <div class="h-64"><canvas id="dashChart"></canvas></div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadDashboardStats() {
+      // Countdown Logic
+      const target = new Date("July 19, 2026 10:15:00").getTime();
+      const updateTime = () => {
+        const now = new Date().getTime();
+        const diff = target - now;
+        if (document.getElementById("dDay")) {
+          document.getElementById("dDay").innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+          document.getElementById("dHour").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          document.getElementById("dMin").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        }
+      };
+      updateTime();
+
+      // Stats
+      const mocks = await getDocs(query(collection(db, userExamPath(currentUser.uid, "mockExams")), orderBy("createdAt", "desc"), limit(10)));
+      const mistakes = await getDocs(collection(db, userExamPath(currentUser.uid, "mistakes")));
+
+      document.getElementById("dashMockCount").innerText = mocks.size;
+      document.getElementById("dashMistakeCount").innerText = mistakes.size;
+
+      // Chart
+      const data = mocks.docs.map(d => d.data()).reverse();
+      new Chart(document.getElementById("dashChart"), {
+        type: "line",
+        data: {
+          labels: data.map(x => x.date),
+          datasets: [{ label: "Puan", data: data.map(x => x.totalScore), borderColor: "#f97316", tension: 0.4, fill: true, backgroundColor: "rgba(249,115,22,0.1)" }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: true } } }
+      });
+    }
+
+    // ==========================
+    // QUIZ PAGE
+    // ==========================
+    function renderQuiz() {
+      const isAdmin = currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+      return `
+        <div class="max-w-3xl mx-auto h-full flex flex-col">
+          <div class="flex border-b border-slate-200 dark:border-slate-800 mb-4 shrink-0">
+            <button onclick="switchQuizTab('solve')" id="tabSolve" class="flex-1 py-4 text-center text-slate-600 dark:text-slate-300 font-black tab-btn-active">Test Çöz</button>
+            <button onclick="switchQuizTab('submit')" id="tabSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-black hover:text-slate-700 dark:hover:text-slate-200">Soru Gönder</button>
+          </div>
+
+          <div id="contentSolve" class="flex-1 overflow-y-auto w-full px-2">
+            <div id="quizStartScreen" class="w-full max-w-md mx-auto text-center p-6 bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 mt-4">
+              <i class="fa-solid fa-pen-nib text-5xl text-primary mb-4"></i>
+              <h3 class="text-xl font-black mb-2">YKS Test</h3>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Dersini seç ve başla.</p>
+
+              <select id="quizCategorySelect" class="w-full p-3 border dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-950 dark:text-white outline-none mb-4 text-sm">
+                 <option value="All">Tüm Dersler (Karışık)</option>
+  <option value="DGS Matematik">DGS Matematik</option>
+  <option value="DGS Geometri">DGS Geometri</option>
+  <option value="DGS Türkçe">DGS Türkçe</option>
+</select>
+
+              <button onclick="startQuizGame()" class="w-full bg-primary hover:bg-primaryDark text-white font-black py-3 rounded-2xl transition">
+                Teste Başla
+              </button>
+            </div>
+
+            <div id="quizGameArea" class="hidden w-full max-w-2xl mx-auto flex flex-col py-4 pb-24">
+              <div class="w-full flex justify-between items-center mb-3">
+                <button onclick="switchQuizTab('solve')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-sm font-black">
+                  <i class="fa-solid fa-arrow-left"></i> Çık
+                </button>
+                <span class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1 rounded-full text-xs font-black uppercase" id="quizCategoryBadge">Genel</span>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 p-5 md:p-8 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 relative">
+                <div class="absolute top-3 right-3 flex gap-1">
+                  <button onclick="openReportModal('questions', currentQuestion?.id, currentQuestion?.text)" class="text-slate-300 hover:text-yellow-500 transition p-2" title="Şikayet Et">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                  </button>
+                  ${isAdmin ? `
+                    <button onclick="deleteLiveItem('questions', currentQuestion?.id)" class="text-red-300 hover:text-red-500 transition p-2" title="Yönetici Sil">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>` : ``}
+                </div>
+
+                <div class="text-xs text-slate-400 mb-2 font-black uppercase tracking-widest">Soru</div>
+                <p class="font-black text-slate-900 dark:text-white text-base md:text-xl mb-6 leading-relaxed" id="qGameText">...</p>
+
+                <div class="space-y-2 md:space-y-3" id="qGameOptions"></div>
+                <div id="qGameFeedback" class="mt-4 hidden p-3 rounded-2xl font-black text-center text-sm md:text-base"></div>
+              </div>
+
+              <div class="mt-6 text-center">
+                <button onclick="nextQuestion()" id="nextQBtn" class="hidden bg-slate-900 dark:bg-slate-800 hover:bg-black dark:hover:bg-slate-700 text-white font-black py-3 px-10 rounded-full shadow-lg transition w-full md:w-auto">
+                  Sonraki Soru <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="contentSubmit" class="hidden flex-1 overflow-y-auto pb-32 px-2">
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 mt-4">
+              <h3 class="font-black text-lg mb-4">Topluluğa Katkı</h3>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-black text-slate-500 uppercase mb-1">Ders</label>
+                  <select id="qLesson" class="w-full p-3 border dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-950 dark:text-white">
+                    <option>DGS Matematik</option>
+  <option>DGS Geometri</option>
+  <option>DGS Türkçe</option>
+</select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-black text-slate-500 uppercase mb-1">Soru Metni</label>
+                  <textarea id="qText" rows="3" class="w-full p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl" placeholder="Soruyu buraya yaz..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input id="optA" type="text" placeholder="A Şıkkı" class="p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
+                  <input id="optB" type="text" placeholder="B Şıkkı" class="p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
+                  <input id="optC" type="text" placeholder="C Şıkkı" class="p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
+                  <input id="optD" type="text" placeholder="D Şıkkı" class="p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
+                  <input id="optE" type="text" placeholder="E Şıkkı (opsiyonel)" class="p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
+                  <select id="qCorrect" class="p-3 border rounded-2xl bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-700 dark:text-white font-black">
+                    <option value="0">Doğru: A</option><option value="1">Doğru: B</option><option value="2">Doğru: C</option><option value="3">Doğru: D</option><option value="4">Doğru: E</option>
+                  </select>
+                </div>
+
+                <button onclick="submitQuestion()" class="w-full bg-slate-900 dark:bg-slate-800 text-white font-black py-3 rounded-2xl hover:bg-black transition">
+                  Yönetici Onayına Gönder
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <h3 class="font-black text-md mb-4">Gönderdiğin Sorular</h3>
+              <div id="myQuestionsList" class="space-y-3"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    window.switchQuizTab = (tab) => {
+      const solve = document.getElementById("contentSolve");
+      const submit = document.getElementById("contentSubmit");
+      const tSolve = document.getElementById("tabSolve");
+      const tSubmit = document.getElementById("tabSubmit");
+
+      solve.classList.add("hidden");
+      submit.classList.add("hidden");
+      tSolve.classList.remove("tab-btn-active");
+      tSubmit.classList.remove("tab-btn-active");
+
+      if (tab === "solve") {
+        solve.classList.remove("hidden");
+        tSolve.classList.add("tab-btn-active");
+        document.getElementById("quizStartScreen").classList.remove("hidden");
+        document.getElementById("quizGameArea").classList.add("hidden");
+      } else {
+        submit.classList.remove("hidden");
+        tSubmit.classList.add("tab-btn-active");
+        loadMyQuestions();
+      }
+    };
+
+    window.startQuizGame = async () => {
+      const category = document.getElementById("quizCategorySelect").value;
+      const btn = document.querySelector("#quizStartScreen button");
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Hazırlanıyor...';
+      btn.disabled = true;
+
+      try {
+        const snap = await getDocs(query(collection(db, colPath("questions"))));
+        quizQuestionsPool = [];
+        snap.forEach(d => {
+          const q = d.data();
+          if (category === "All" || q.lesson === category) quizQuestionsPool.push({ id: d.id, ...q });
+        });
+
+        if (quizQuestionsPool.length === 0) {
+          alert("Bu kategoride soru yok.");
+          btn.innerHTML = "Teste Başla";
+          btn.disabled = false;
+          return;
+        }
+
+        quizQuestionsPool.sort(() => Math.random() - 0.5);
+
+        document.getElementById("quizStartScreen").classList.add("hidden");
+        document.getElementById("quizGameArea").classList.remove("hidden");
+        document.getElementById("quizCategoryBadge").innerText = category === "All" ? "Karma Test" : category;
+
+        nextQuestion();
+      } catch (e) {
+        console.error(e);
+        alert("Hata: " + e.message);
+      } finally {
+        btn.innerHTML = "Teste Başla";
+        btn.disabled = false;
+      }
+    };
+
+    window.nextQuestion = () => {
+      if (!quizQuestionsPool.length) {
+        alert("Test bitti!");
+        switchQuizTab("solve");
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * quizQuestionsPool.length);
+      currentQuestion = quizQuestionsPool[randomIndex];
+
+      document.getElementById("qGameText").innerText = currentQuestion.text;
+
+      const optsDiv = document.getElementById("qGameOptions");
+      optsDiv.innerHTML = "";
+
+      currentQuestion.options.forEach((opt, idx) => {
+        if (!opt) return;
+        optsDiv.innerHTML += `
+          <button onclick="checkGameAnswer(${idx})" class="quiz-option w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-950 bg-white dark:bg-slate-900 transition flex items-center gap-3" id="gameOpt-${idx}">
+            <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-slate-500 dark:text-slate-300 text-sm shrink-0">
+              ${String.fromCharCode(65 + idx)}
+            </div>
+            <span class="text-slate-800 dark:text-slate-200 font-black">${opt}</span>
+          </button>
+        `;
+      });
+
+      document.getElementById("qGameFeedback").classList.add("hidden");
+      document.getElementById("nextQBtn").classList.add("hidden");
+
+      document.querySelectorAll(".quiz-option").forEach(b => b.disabled = false);
+    };
+
+    window.checkGameAnswer = async (selectedIdx) => {
+      const correctIdx = Number(currentQuestion.correct);
+      const feedback = document.getElementById("qGameFeedback");
+      const buttons = document.querySelectorAll(".quiz-option");
+      buttons.forEach(b => b.disabled = true);
+
+      const selBtn = document.getElementById(`gameOpt-${selectedIdx}`);
+      const corBtn = document.getElementById(`gameOpt-${correctIdx}`);
+
+      if (selectedIdx === correctIdx) {
+        feedback.innerHTML = `<span class="text-green-700 dark:text-green-300"><i class="fa-solid fa-check-circle"></i> Doğru!</span>`;
+        feedback.className = "mt-4 p-4 rounded-2xl font-black text-center bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800";
+        selBtn?.classList.add("ring-2", "ring-green-500");
+        await gainXP(2);
+      } else {
+        feedback.innerHTML = `<span class="text-red-700 dark:text-red-300"><i class="fa-solid fa-times-circle"></i> Yanlış. Doğru: ${String.fromCharCode(65 + correctIdx)}</span>`;
+        feedback.className = "mt-4 p-4 rounded-2xl font-black text-center bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800";
+        selBtn?.classList.add("ring-2", "ring-red-500");
+        corBtn?.classList.add("ring-2", "ring-green-500");
+
+        await addToMistakes(currentQuestion.id);
+      }
+
+      feedback.classList.remove("hidden");
+      document.getElementById("nextQBtn").classList.remove("hidden");
+    };
+
+    async function gainXP(amount) {
+      const newXp = (userData.xp || 0) + amount;
+      userData.xp = newXp;
+      await updateDoc(doc(db, "users", currentUser.uid), { xp: newXp });
+      updateSidebar();
+    }
+
+    window.submitQuestion = async () => {
+      const text = document.getElementById("qText").value.trim();
+      const optA = document.getElementById("optA").value.trim();
+      const optB = document.getElementById("optB").value.trim();
+      const optC = document.getElementById("optC").value.trim();
+      const optD = document.getElementById("optD").value.trim();
+      const optE = document.getElementById("optE").value.trim();
+      const lesson = document.getElementById("qLesson").value;
+      const correct = Number(document.getElementById("qCorrect").value);
+
+      if (!text || !optA || !optB || !optC || !optD) return alert("Soru + en az A/B/C/D şart.");
+
+      const payload = {
+        uid: currentUser.uid,
+        authorName: userData.name,
+        lesson,
+        text,
+        options: [optA, optB, optC, optD, optE].filter(x => x !== ""),
+        correct,
+        status: "pending",
+        adminNote: "",
+        createdAt: serverTimestamp()
+      };
+
+      await addDoc(collection(db, colPath("questionSubmissions")), payload);
+      alert("Soru onaya gönderildi.");
+      document.getElementById("qText").value = "";
+      await gainXP(5);
+      loadMyQuestions();
+      notifyAdmin(`[YKS] Yeni soru onaya düştü: ${lesson}`);
+    };
+
+    async function loadMyQuestions() {
+      const list = document.getElementById("myQuestionsList");
+      if (!list) return;
+
+      const qy = query(
+        collection(db, colPath("questionSubmissions")),
+        where("uid", "==", currentUser.uid),
+        orderBy("createdAt", "desc"),
+        limit(30)
+      );
+
+      const snap = await getDocs(qy);
+      if (snap.empty) {
+        list.innerHTML = `<div class="text-sm text-slate-400 font-black">Henüz soru göndermedin.</div>`;
+        return;
+      }
+
+      list.innerHTML = snap.docs.map(d => {
+        const s = d.data();
+        const badge =
+          s.status === "approved" ? "bg-green-100 text-green-700" :
+            s.status === "rejected" ? "bg-red-100 text-red-700" :
+              "bg-yellow-100 text-yellow-700";
+
+        return `
+          <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-xs font-black text-slate-500 mb-1">${s.lesson}</div>
+              <div class="text-sm font-black text-slate-900 dark:text-white truncate">${s.text}</div>
+              ${s.status === "rejected" && s.adminNote ? `<div class="text-xs mt-2 p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-200"><b>Red:</b> ${s.adminNote}</div>` : ""}
+            </div>
+            <div class="shrink-0">
+              <span class="text-xs font-black px-2 py-1 rounded-xl ${badge}">${s.status}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // ==========================
+    // FLASHCARDS
+    // ==========================
+    function renderFlashcards() {
+      const isAdmin = currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+      return `
+        <div class="max-w-4xl mx-auto h-full flex flex-col">
+          <div class="flex border-b border-slate-200 dark:border-slate-800 mb-6 shrink-0">
+            <button onclick="switchCardTab('browse')" id="tabCardBrowse" class="flex-1 py-4 text-center text-slate-600 dark:text-slate-300 font-black tab-btn-active">Kartlara Göz At</button>
+            <button onclick="switchCardTab('submit')" id="tabCardSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-black hover:text-slate-700 dark:hover:text-slate-200">Kart Gönder</button>
+          </div>
+
+          <div id="contentCardBrowse" class="flex-1 flex flex-col items-center">
+            <div id="flashcardStartScreen" class="w-full max-w-md text-center p-8 bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800">
+              <i class="fa-solid fa-layer-group text-5xl text-primary mb-4"></i>
+              <h3 class="text-xl font-black mb-2">Flashcard</h3>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Kategorini seç ve başla.</p>
+
+              <select id="flashcardCategorySelect" class="w-full p-3 border dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-950 dark:text-white outline-none mb-4">
+                <option value="All">Tüm Dersler</option>
+  <option value="DGS Matematik">DGS Matematik</option>
+  <option value="DGS Geometri">DGS Geometri</option>
+  <option value="DGS Türkçe">DGS Türkçe</option>
+  <option value="General">Genel</option>
+</select>
+
+              <button onclick="startFlashcardGame()" class="w-full bg-primary hover:bg-primaryDark text-white font-black py-3 rounded-2xl transition">
+                Başla
+              </button>
+            </div>
+
+            <div id="flashcardGameArea" class="hidden w-full max-w-lg flex flex-col items-center flex-1 justify-center min-h-[420px]">
+              <div class="w-full flex justify-between items-center mb-4 px-4">
+                <button onclick="switchCardTab('browse')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white font-black">
+                  <i class="fa-solid fa-arrow-left"></i> Çık
+                </button>
+                <span class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1 rounded-full text-xs font-black" id="fcCategoryBadge">Genel</span>
+              </div>
+
+              <div class="flip-card w-full h-80 cursor-pointer group mb-6" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner relative w-full h-full shadow-xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-transform duration-500">
+                  <div class="flip-card-front flex flex-col items-center justify-center p-8 text-center bg-white dark:bg-slate-900 rounded-3xl">
+                    <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
+                      <button onclick="openReportModal('flashcards', currentCard?.id, currentCard?.front)" class="text-slate-300 hover:text-yellow-500 transition" title="Şikayet Et">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                      </button>
+                      ${isAdmin ? `
+                        <button onclick="deleteLiveItem('flashcards', currentCard?.id)" class="text-red-300 hover:text-red-500 transition" title="Yönetici Sil">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>` : ``}
+                    </div>
+                    <h3 class="font-black text-slate-900 dark:text-white text-2xl" id="fcFront">...</h3>
+                    <p class="text-xs text-slate-400 mt-4 uppercase tracking-widest font-black">Çevirmek için dokun</p>
+                  </div>
+
+                  <div class="flip-card-back flex flex-col items-center justify-center p-8 text-center bg-primary text-white rounded-3xl">
+                    <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
+                      <button onclick="openReportModal('flashcards', currentCard?.id, currentCard?.front)" class="text-white/60 hover:text-white transition" title="Şikayet Et">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                      </button>
+                      ${isAdmin ? `
+                        <button onclick="deleteLiveItem('flashcards', currentCard?.id)" class="text-white/60 hover:text-white transition" title="Yönetici Sil">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>` : ``}
+                    </div>
+                    <p class="font-black text-2xl" id="fcBack">...</p>
+                  </div>
+                </div>
+              </div>
+
+              <button onclick="nextCard()" class="bg-slate-900 dark:bg-slate-800 hover:bg-black dark:hover:bg-slate-700 text-white font-black py-3 px-12 rounded-full shadow-lg transition">
+                Sıradaki Kart <i class="fa-solid fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="contentCardSubmit" class="hidden pb-32 w-full">
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 mb-6">
+              <h3 class="font-black text-lg mb-4">Kart Gönder (Onay)</h3>
+              <div class="space-y-4">
+                <select id="cardLesson" class="w-full p-3 border dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-950 dark:text-white">
+                  <option value="General">Genel</option>
+  <option>DGS Matematik</option>
+  <option>DGS Geometri</option>
+  <option>DGS Türkçe</option>
+</select>
+                <input id="cardFront" type="text" placeholder="Ön yüz" class="w-full p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
+                <input id="cardBack" type="text" placeholder="Arka yüz" class="w-full p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
+                <button onclick="submitCard()" class="w-full bg-slate-900 dark:bg-slate-800 text-white font-black py-3 rounded-2xl hover:bg-black transition">
+                  Yönetici Onayına Gönder
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <h3 class="font-black text-md mb-3">Gönderimlerin</h3>
+              <div id="myCardsList" class="space-y-3"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    window.switchCardTab = (tab) => {
+      document.getElementById("contentCardBrowse").classList.add("hidden");
+      document.getElementById("contentCardSubmit").classList.add("hidden");
+      document.getElementById("tabCardBrowse").classList.remove("tab-btn-active");
+      document.getElementById("tabCardSubmit").classList.remove("tab-btn-active");
+
+      if (tab === "browse") {
+        document.getElementById("contentCardBrowse").classList.remove("hidden");
+        document.getElementById("tabCardBrowse").classList.add("tab-btn-active");
+        document.getElementById("flashcardStartScreen").classList.remove("hidden");
+        document.getElementById("flashcardGameArea").classList.add("hidden");
+      } else {
+        document.getElementById("contentCardSubmit").classList.remove("hidden");
+        document.getElementById("tabCardSubmit").classList.add("tab-btn-active");
+        loadMyCardSubmissions();
+      }
+    };
+
+    window.startFlashcardGame = async () => {
+      const category = document.getElementById("flashcardCategorySelect").value;
+      const btn = document.querySelector("#flashcardStartScreen button");
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...';
+      btn.disabled = true;
+
+      try {
+        const snap = await getDocs(query(collection(db, colPath("flashcards"))));
+        flashcardsPool = [];
+        snap.forEach(d => {
+          const c = d.data();
+          if (category === "All" || c.lesson === category || (!c.lesson && category === "General")) {
+            flashcardsPool.push({ id: d.id, ...c });
+          }
+        });
+
+        if (!flashcardsPool.length) {
+          alert("Bu kategoride kart yok.");
+          return;
+        }
+
+        flashcardsPool.sort(() => Math.random() - 0.5);
+
+        document.getElementById("flashcardStartScreen").classList.add("hidden");
+        document.getElementById("flashcardGameArea").classList.remove("hidden");
+        document.getElementById("fcCategoryBadge").innerText = category === "All" ? "Karışık" : category;
+
+        nextCard();
+      } catch (e) {
+        console.error(e);
+        alert("Kartlar yüklenemedi: " + e.message);
+      } finally {
+        btn.innerHTML = "Başla";
+        btn.disabled = false;
+      }
+    };
+
+    window.nextCard = () => {
+      if (!flashcardsPool.length) {
+        alert("Kart bitti!");
+        switchCardTab("browse");
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * flashcardsPool.length);
+      currentCard = flashcardsPool[randomIndex];
+
+      const cardEl = document.querySelector(".flip-card");
+      const updateText = () => {
+        document.getElementById("fcFront").innerText = currentCard.front || "...";
+        document.getElementById("fcBack").innerText = currentCard.back || "...";
+      };
+
+      if (cardEl && cardEl.classList.contains("flipped")) {
+        cardEl.classList.remove("flipped");
+        setTimeout(updateText, 300);
+      } else {
+        updateText();
+      }
+    };
+
+    window.submitCard = async () => {
+      const front = document.getElementById("cardFront").value.trim();
+      const back = document.getElementById("cardBack").value.trim();
+      const lesson = document.getElementById("cardLesson").value;
+
+      if (!front || !back) return alert("Ön ve arka yüz dolu olmalı.");
+
+      await addDoc(collection(db, colPath("flashcardSubmissions")), {
+        uid: currentUser.uid,
+        authorName: userData.name,
+        lesson,
+        front,
+        back,
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
+
+      alert("Kart onaya gönderildi.");
+      document.getElementById("cardFront").value = "";
+      document.getElementById("cardBack").value = "";
+      await gainXP(5);
+      loadMyCardSubmissions();
+      notifyAdmin(`[YKS] Yeni flashcard onaya düştü: ${lesson}`);
+    };
+
+    async function loadMyCardSubmissions() {
+      const list = document.getElementById("myCardsList");
+      if (!list) return;
+
+      const qy = query(
+        collection(db, colPath("flashcardSubmissions")),
+        where("uid", "==", currentUser.uid),
+        orderBy("createdAt", "desc"),
+        limit(30)
+      );
+
+      const snap = await getDocs(qy);
+      if (snap.empty) {
+        list.innerHTML = `<div class="text-sm text-slate-400 font-black">Henüz kart göndermedin.</div>`;
+        return;
+      }
+
+      list.innerHTML = snap.docs.map(d => {
+        const c = d.data();
+        const badge =
+          c.status === "approved" ? "bg-green-100 text-green-700" :
+            c.status === "rejected" ? "bg-red-100 text-red-700" :
+              "bg-yellow-100 text-yellow-700";
+
+        return `
+          <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-start gap-3">
+            <div class="min-w-0">
+              <div class="text-xs font-black text-slate-500 mb-1">${c.lesson || "General"}</div>
+              <div class="font-black truncate">${c.front}</div>
+              <div class="text-sm text-slate-600 dark:text-slate-400 font-black truncate">${c.back}</div>
+            </div>
+            <span class="text-xs font-black px-2 py-1 rounded-xl ${badge}">${c.status}</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // ==========================
+    // MISTAKES (Hata Kutusu)
+    // ==========================
+    function renderMistakes() {
+      return `
+        <div class="max-w-3xl mx-auto">
+          <div class="text-center mb-8">
+            <h2 class="text-2xl font-black"><i class="fa-solid fa-recycle text-red-500 mr-2"></i>Hata Kutusu</h2>
+            <p class="text-slate-500 dark:text-slate-400 font-black text-sm">Yanlış yaptığın sorular burada birikir.</p>
+          </div>
+          <div id="mistakesList" class="space-y-6 pb-32">
+            <div class="text-center text-slate-400 font-black"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function addToMistakes(qId) {
+      const qRef = doc(db, colPath("questions"), qId);
+      const snap = await getDoc(qRef);
+      if (!snap.exists()) return;
+
+      const q = snap.data();
+      await setDoc(doc(db, userExamPath(currentUser.uid, "mistakes"), qId), {
+        ...q,
+        qId,
+        addedAt: serverTimestamp()
+      });
+    }
+
+    async function loadMistakes() {
+      const container = document.getElementById("mistakesList");
+      if (!container) return;
+
+      const snap = await getDocs(query(collection(db, userExamPath(currentUser.uid, "mistakes")), orderBy("addedAt", "desc")));
+      if (snap.empty) {
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center p-10 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
+            <i class="fa-solid fa-check-circle text-6xl text-green-500 mb-4"></i>
+            <h3 class="text-xl font-black">Harika!</h3>
+            <p class="text-slate-500 dark:text-slate-400 font-black text-sm">Hata kutun boş.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = "";
+      snap.forEach(d => {
+        const data = d.data();
+        const id = d.id;
+        html += `
+          <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border-l-4 border-red-500 shadow-soft" id="mistake-${id}">
+            <div class="flex justify-between items-start mb-4">
+              <span class="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-300 text-xs font-black px-2 py-1 rounded-xl uppercase">${data.lesson || "Genel"}</span>
+              <button onclick="deleteMistake('${id}')" class="text-slate-400 hover:text-red-500" title="Sil"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <p class="text-lg font-black mb-6">${data.text}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              ${(data.options || []).map((opt, idx) => `
+                <button onclick="checkMistakeAnswer('${id}', ${idx}, ${data.correct})"
+                  class="text-left p-3 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-950 transition font-black mistake-opt-${id}">
+                  <span class="font-black mr-2">${String.fromCharCode(65 + idx)})</span> ${opt}
+                </button>
+              `).join("")}
+            </div>
+            <div id="feedback-${id}" class="mt-4 hidden font-black text-center"></div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    window.checkMistakeAnswer = async (docId, selectedIdx, correctIdx) => {
+      const feedback = document.getElementById(`feedback-${docId}`);
+      const buttons = document.querySelectorAll(`.mistake-opt-${docId}`);
+      buttons.forEach(b => b.disabled = true);
+
+      if (selectedIdx === correctIdx) {
+        feedback.innerHTML = `<span class="text-green-600 dark:text-green-300"><i class="fa-solid fa-check"></i> Doğru! Siliniyor...</span>`;
+        feedback.classList.remove("hidden");
+        setTimeout(async () => {
+          await deleteDoc(doc(db, userExamPath(currentUser.uid, "mistakes"), docId));
+          const el = document.getElementById(`mistake-${docId}`);
+          if (el) {
+            el.style.transition = "all .4s";
+            el.style.opacity = "0";
+            el.style.transform = "scale(.95)";
+            setTimeout(() => { el.remove(); }, 420);
+          }
+          await gainXP(3);
+          // refresh empty state if needed
+          setTimeout(() => loadMistakes(), 450);
+        }, 900);
+      } else {
+        feedback.innerHTML = `<span class="text-red-600 dark:text-red-300"><i class="fa-solid fa-xmark"></i> Yanlış. Tekrar dene!</span>`;
+        feedback.classList.remove("hidden");
+        setTimeout(() => {
+          buttons.forEach(b => b.disabled = false);
+          feedback.classList.add("hidden");
+        }, 900);
+      }
+    };
+
+    window.deleteMistake = async (id) => {
+      if (!confirm("Bu soruyu kutudan silmek istiyor musun?")) return;
+      await deleteDoc(doc(db, userExamPath(currentUser.uid, "mistakes"), id));
+      loadMistakes();
+    };
+
+    // ==========================
+    // MOCK EXAMS (UPDATED)
+    // ==========================
+    function renderMocks() {
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-24">
+          <!-- HESAPLAMA MODÜLÜ -->
+          <div class="lg:col-span-5 space-y-6">
+            <h2 class="text-2xl font-black">DGS Deneme & Puan</h2>
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft">
+              
+              <!-- NET GİRİŞLERİ -->
+              <div class="mb-4">
+                <h4 class="font-black text-primary mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">DGS Netleri</h4>
+                <div class="space-y-3">
+                   <div>
+                     <label class="text-[10px] uppercase font-black text-slate-400">Sayısal (Mat + Geo) (50 Soru)</label>
+                     <input type="number" id="dgsSay" class="w-full p-3 rounded-xl border dark:border-slate-800 dark:bg-slate-950 font-bold" placeholder="Örn: 35.5">
+                   </div>
+                   <div>
+                     <label class="text-[10px] uppercase font-black text-slate-400">Sözel (Türkçe) (50 Soru)</label>
+                     <input type="number" id="dgsSoz" class="w-full p-3 rounded-xl border dark:border-slate-800 dark:bg-slate-950 font-bold" placeholder="Örn: 42.0">
+                   </div>
+                   <div>
+                     <label class="text-[10px] uppercase font-black text-slate-400">ÖBP (Ön Lisans Başarı Puanı)</label>
+                     <input type="number" id="dgsObp" class="w-full p-3 rounded-xl border dark:border-slate-800 dark:bg-slate-950 font-bold" placeholder="Örn: 60 (40-80 arası)">
+                   </div>
+                </div>
+              </div>
+
+              <button onclick="saveMockResult()" class="w-full bg-slate-900 dark:bg-slate-800 hover:bg-black text-white font-black py-3 rounded-2xl shadow-lg transform hover:scale-[1.02] transition">
+                <i class="fa-solid fa-calculator mr-2"></i> Hesapla ve Kaydet
+              </button>
+            </div>
+          </div>
+
+          <!-- GEÇMİŞ VE GRAFİK -->
+          <div class="lg:col-span-7 flex flex-col gap-6">
+             <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft h-64">
+               <canvas id="mockChart"></canvas>
+             </div>
+             
+             <div class="flex-1 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft overflow-hidden flex flex-col">
+                <div class="p-4 border-b border-slate-100 dark:border-slate-800 font-black bg-slate-50 dark:bg-slate-950">Son Denemeler</div>
+                <div id="mockList" class="flex-1 overflow-y-auto p-2 space-y-2 max-h-80">
+                   <div class="text-center text-slate-400 p-4">Yükleniyor...</div>
+                </div>
+             </div>
+          </div>
+        </div>
+      `;
+    }
+
+    window.saveMockResult = async () => {
+      // Değerleri al
+      const sayNet = Number(document.getElementById("dgsSay").value) || 0;
+      const sozNet = Number(document.getElementById("dgsSoz").value) || 0;
+      let obp = Number(document.getElementById("dgsObp").value) || 0;
+
+      // ÖBP Kontrol (40 ile 80 arasında olmalı, yoksa varsayılan 50 alalım)
+      if (obp < 40) obp = 40;
+      if (obp > 80) obp = 80;
+
+      // --- DGS PUAN HESAPLAMA SİMÜLASYONU (Yaklaşık Katsayılar) ---
+      // Not: ÖSYM her sene standart sapmaya göre değiştirir.
+      // Taban Puan (Yaklaşık): Sayısal 135, Eşit Ağırlık 133, Sözel 120 civarı başlar.
+
+      const obpPuan = obp * 0.6; // ÖBP katkısı
+
+      // Sayısal Puan: (Say Net x 3) + (Söz Net x 0.6) + ÖBP
+      const sayScore = 135 + (sayNet * 3.1) + (sozNet * 0.5) + obpPuan;
+
+      // Sözel Puan: (Söz Net x 3) + (Say Net x 0.6) + ÖBP
+      const sozScore = 120 + (sozNet * 2.8) + (sayNet * 0.5) + obpPuan;
+
+      // EA Puan: (Say Net x 1.8) + (Söz Net x 1.8) + ÖBP
+      const eaScore = 133 + (sayNet * 1.7) + (sozNet * 1.7) + obpPuan;
+
+      // Ana skor olarak en yüksek olanı kaydedelim
+      const finalScore = Math.max(sayScore, sozScore, eaScore).toFixed(2);
+
+      const payload = {
+        say: Number(sayScore.toFixed(2)),
+        soz: Number(sozScore.toFixed(2)),
+        ea: Number(eaScore.toFixed(2)),
+        totalScore: Number(finalScore), // Grafikte bu gösterilecek
+        date: new Date().toLocaleDateString("tr-TR"),
+        createdAt: serverTimestamp()
+      };
+
+      await addDoc(collection(db, userExamPath(currentUser.uid, "mockExams")), payload);
+
+      // Kullanıcı genel skorunu güncelle
+      userData.totalScore = Number(finalScore);
+      await updateDoc(doc(db, "users", currentUser.uid), { totalScore: Number(finalScore) });
+      updateSidebar();
+
+      alert(`Sonuç Kaydedildi!\nSAYISAL: ${payload.say}\nSÖZEL: ${payload.soz}\nEA: ${payload.ea}`);
+      loadPage("mocks");
+    };
+
+    // Chart render kısmını da güncellememiz lazım, data yapısı değişti.
+    async function loadMocks() {
+      const listEl = document.getElementById("mockList");
+      if (!listEl) return;
+
+      const qy = query(collection(db, userExamPath(currentUser.uid, "mockExams")), orderBy("createdAt", "desc"), limit(20));
+      const snap = await getDocs(qy);
+      mockHistory = snap.docs.map(d => d.data());
+
+      if (mockHistory.length === 0) {
+        listEl.innerHTML = `<div class="p-6 text-slate-400 font-black text-center">Henüz deneme kaydetmedin.</div>`;
+      } else {
+        listEl.innerHTML = mockHistory.map(m => `
+             <div class="p-3 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-950 transition">
+      <div>
+        <div class="font-black text-sm">${m.date}</div>
+        <div class="text-[10px] text-slate-500 font-black">SAY: ${m.say || 0} | SÖZ: ${m.soz || 0} | EA: ${m.ea || 0}</div>
+      </div>
+      <div class="text-lg font-black text-primary">${m.totalScore}</div>
+    </div>
+          `).join("");
+      }
+
+      renderMockChart();
+    }
+
+
+
+    function renderMockChart() {
+      const canvas = document.getElementById("mockChart");
+      if (!canvas) return;
+
+      const labels = mockHistory.slice().reverse().map(x => x.date);
+      const data = mockHistory.slice().reverse().map(x => x.score);
+
+      if (mockChart) mockChart.destroy();
+
+      mockChart = new Chart(canvas, {
+        type: "line",
+        data: { labels, datasets: [{ label: "Puan", data, tension: 0.35, fill: true }] },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+
+    // ==========================
+    // SMART COACH (WhatsApp style)
+    // ==========================
+    function renderCoach() {
+      return `
+        <div class="max-w-3xl mx-auto">
+          <h2 class="text-2xl font-black mb-4">SmartCoach</h2>
+          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft overflow-hidden">
+            <div id="chatWindow" class="p-4 h-[460px] overflow-y-auto bg-slate-50 dark:bg-slate-950">
+              <div id="emptyState" class="text-center text-slate-400 font-black mt-10">
+                <i class="fa-solid fa-comments text-4xl mb-2"></i><br/>
+                Hoca burada. Sor bakalım.
+              </div>
+            </div>
+            <div class="p-3 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+              <div class="flex items-end gap-2">
+                <textarea id="aiInput" class="flex-1 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 outline-none resize-none" rows="1" placeholder="Mesaj yaz..."></textarea>
+                <button onclick="askSmartCoach()" class="w-12 h-12 rounded-2xl bg-primary hover:bg-primaryDark text-white font-black flex items-center justify-center">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </div>
+              <div class="text-[10px] text-slate-400 font-black mt-2">API_URL boşsa demo cevap verir.</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function scrollToBottom() {
+      const w = document.getElementById("chatWindow");
+      if (w) w.scrollTop = w.scrollHeight;
+    }
+
+    window.askSmartCoach = async () => {
+      const input = document.getElementById("aiInput");
+      const chatWindow = document.getElementById("chatWindow");
+      const prompt = input.value.trim();
+      if (!prompt) return;
+
+      document.getElementById("emptyState")?.remove();
+
+      chatWindow.insertAdjacentHTML("beforeend", `
+        <div class="flex justify-end mb-2">
+          <div class="bg-[#dcf8c6] dark:bg-[#005c4b] text-slate-800 dark:text-[#e9edef] px-3 py-2 rounded-2xl rounded-tr-none text-sm shadow max-w-[85%] font-black">
+            ${escapeHtml(prompt)}
+            <div class="text-[9px] text-right mt-1 opacity-50">Okundu ✓✓</div>
+          </div>
+        </div>
+      `);
+      input.value = "";
+      scrollToBottom();
+
+      const loadingId = "loading-" + Date.now();
+      chatWindow.insertAdjacentHTML("beforeend", `
+        <div class="flex justify-start mb-4 animate-pulse" id="${loadingId}">
+          <div class="bg-white dark:bg-[#202c33] px-3 py-2 rounded-2xl text-[11px] dark:text-slate-300 font-black">yazıyor...</div>
+        </div>
+      `);
+      scrollToBottom();
+
+      try {
+        let text = "";
+        if (!API_URL) {
+          // demo
+          text = `Hoca, ${prompt.length > 30 ? "güzel soru" : "tamam"} 😄\nBugün 25 dakika odak + 20 soru dene.`;
+        } else {
+          const res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              exam: EXAM,
+              user: { name: userData.name, xp: userData.xp || 0, score: userData.totalScore || 0 },
+              prompt
+            })
+          });
+          const data = await res.json();
+          text = data?.text || "Hoca cevap veremedi.";
+        }
+
+        document.getElementById(loadingId)?.remove();
+        chatWindow.insertAdjacentHTML("beforeend", `
+          <div class="flex justify-start mb-4">
+            <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-4 py-2 rounded-2xl rounded-tl-none text-sm shadow max-w-[85%] font-black border-l-4 border-primary leading-relaxed">
+              ${escapeHtml(text).replace(/\n/g, "<br>")}
+            </div>
+          </div>
+        `);
+        scrollToBottom();
+      } catch (e) {
+        document.getElementById(loadingId)?.remove();
+        chatWindow.insertAdjacentHTML("beforeend", `
+          <div class="text-center mb-3">
+            <span class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-200 text-[11px] px-3 py-2 rounded-2xl font-black">
+              Hoca bağlantıda kopukluk oldu.
+            </span>
+          </div>
+        `);
+      }
+      scrollToBottom();
+    };
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m]));
+    }
+
+    // ==========================
+    // ADMIN PANEL + BULK UPLOAD
+    // ==========================
+    function renderAdmin() {
+      return `
+        <div class="max-w-6xl mx-auto">
+          <h1 class="text-2xl font-black mb-6">Admin Panel (YKS)</h1>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+              <div class="flex gap-3 mb-4 overflow-x-auto pb-2">
+                <button onclick="loadAdminData('questions')" class="px-4 py-2 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-2xl shadow-soft font-black whitespace-nowrap">Bekleyen Soru</button>
+                <button onclick="loadAdminData('cards')" class="px-4 py-2 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-2xl shadow-soft font-black whitespace-nowrap">Bekleyen Kart</button>
+                <!-- ŞİKAYET BUTONU KALDIRILDI -->
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden min-h-[420px]">
+                <div id="adminContentArea" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <div class="p-8 text-center text-slate-400 font-black">Yükleniyor...</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <!-- Toplu Yükleme Alanları Aynı Kalacak -->
+              <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft">
+                <h3 class="font-black text-lg mb-3"><i class="fa-solid fa-file-import text-indigo-500 mr-2"></i>Toplu Soru Yükle</h3>
+                <textarea id="bulkJsonQuestions" rows="6" class="w-full p-3 rounded-2xl border dark:border-slate-800 dark:bg-slate-950 text-xs font-mono outline-none" placeholder="JSON buraya..."></textarea>
+                <button onclick="bulkUploadQuestions()" class="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 rounded-2xl">Soruları Canlıya Al</button>
+              </div>
+              
+              <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft">
+                <h3 class="font-black text-lg mb-3"><i class="fa-solid fa-layer-group text-pink-500 mr-2"></i>Toplu Kart Yükle</h3>
+                <textarea id="bulkJsonCards" rows="6" class="w-full p-3 rounded-2xl border dark:border-slate-800 dark:bg-slate-950 text-xs font-mono outline-none" placeholder="JSON buraya..."></textarea>
+                <button onclick="bulkUploadFlashcards()" class="w-full mt-3 bg-pink-600 hover:bg-pink-700 text-white font-black py-3 rounded-2xl">Kartları Canlıya Al</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    window.loadAdminData = async (type) => {
+      const container = document.getElementById("adminContentArea");
+      if (!container) return;
+      container.innerHTML = `<div class="p-8 text-center text-slate-400 font-black">Yükleniyor...</div>`;
+
+      if (currentUser.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+        container.innerHTML = `<div class="p-8 text-center text-red-500 font-black">Yetkisiz.</div>`;
+        return;
+      }
+
+      let html = "";
+
+      if (type === "questions") {
+        const snap = await getDocs(query(collection(db, colPath("questionSubmissions")), where("status", "==", "pending"), orderBy("createdAt", "desc"), limit(50)));
+        if (snap.empty) html = `<div class="p-8 text-center font-black">Bekleyen soru yok.</div>`;
+        else {
+          snap.forEach(d => {
+            const q = d.data();
+            html += `
+              <div class="p-6">
+                <div class="flex justify-between mb-2">
+                  <span class="text-xs font-black bg-blue-100 text-blue-700 px-2 py-1 rounded-xl">${q.lesson}</span>
+                  <span class="text-xs text-slate-500 font-black">${q.authorName}</span>
+                </div>
+                <p class="font-black mb-3">${q.text}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm font-black mb-4">
+                  ${(q.options || []).map((o, i) => `<div class="${i === q.correct ? 'text-green-600' : ''}">${String.fromCharCode(65 + i)}) ${o}</div>`).join("")}
+                </div>
+                <div class="flex gap-2">
+                  <button onclick="adminAction('question','${d.id}','approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-2xl font-black">Onayla</button>
+                  <button onclick="adminRejectPrompt('question','${d.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-2xl font-black">Reddet</button>
+                </div>
+              </div>
+            `;
+          });
+        }
+      }
+
+      if (type === "cards") {
+        const snap = await getDocs(query(collection(db, colPath("flashcardSubmissions")), where("status", "==", "pending"), orderBy("createdAt", "desc"), limit(50)));
+        if (snap.empty) html = `<div class="p-8 text-center font-black">Bekleyen kart yok.</div>`;
+        else {
+          snap.forEach(d => {
+            const c = d.data();
+            html += `
+              <div class="p-6 flex justify-between items-start gap-3">
+                <div class="min-w-0">
+                  <div class="text-xs font-black text-slate-500 mb-1">${c.lesson || "General"} • ${c.authorName}</div>
+                  <div class="font-black text-lg truncate">${c.front}</div>
+                  <div class="text-sm text-slate-600 dark:text-slate-400 font-black truncate">${c.back}</div>
+                </div>
+                <div class="flex gap-2 shrink-0">
+                  <button onclick="adminAction('card','${d.id}','approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-2xl font-black">Onayla</button>
+                  <button onclick="adminRejectPrompt('card','${d.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-2xl font-black">Reddet</button>
+                </div>
+              </div>
+            `;
+          });
+        }
+      }
+
+      if (type === "reports") {
+        const snap = await getDocs(query(collection(db, colPath("reports")), orderBy("createdAt", "desc"), limit(80)));
+        if (snap.empty) html = `<div class="p-8 text-center font-black">Şikayet yok.</div>`;
+        else {
+          snap.forEach(d => {
+            const r = d.data();
+            html += `
+              <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                  <div class="text-xs font-black text-slate-500">${r.col} • ${r.itemId}</div>
+                  <button onclick="deleteDocByPath('${colPath("reports")}', '${d.id}')" class="text-red-500 font-black"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <div class="font-black mb-1">${escapeHtml(r.summary || "")}</div>
+                <div class="text-sm text-slate-600 dark:text-slate-400 font-black">${escapeHtml(r.reason || "")}</div>
+                <div class="text-[10px] text-slate-400 font-black mt-2">${r.createdAt?.seconds ? new Date(r.createdAt.seconds * 1000).toLocaleString() : ""}</div>
+              </div>
+            `;
+          });
+        }
+      }
+
+      container.innerHTML = html || `<div class="p-8 text-center font-black">Veri yok.</div>`;
+    };
+
+    window.deleteDocByPath = async (baseCol, id) => {
+      if (!confirm("Silinsin mi?")) return;
+      await deleteDoc(doc(db, baseCol, id));
+      loadAdminData("reports");
+    };
+
+    window.adminRejectPrompt = async (type, id) => {
+      const note = prompt("Red sebebi (opsiyonel):") || "";
+      await adminAction(type, id, "reject", note);
+    };
+
+    window.adminAction = async (type, id, action, note = "") => {
+      if (currentUser.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return alert("Yetkisiz.");
+
+      const subCol = type === "question" ? colPath("questionSubmissions") : colPath("flashcardSubmissions");
+      const ref = doc(db, subCol, id);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return alert("Bulunamadı.");
+      const data = snap.data();
+
+      if (action === "reject") {
+        await updateDoc(ref, { status: "rejected", adminNote: note || "" });
+        await addUserNotification(data.uid, "Onay Durumu", `Gönderin reddedildi. ${note ? "Sebep: " + note : ""}`, "error");
+      } else {
+        await updateDoc(ref, { status: "approved", adminNote: "" });
+
+        if (type === "question") {
+          await addDoc(collection(db, colPath("questions")), {
+            lesson: data.lesson,
+            text: data.text,
+            options: data.options,
+            correct: data.correct,
+            authorName: data.authorName,
+            uid: data.uid,
+            createdAt: serverTimestamp()
+          });
+          await addUserNotification(data.uid, "Onay Durumu", "Sorun onaylandı ve yayına alındı.", "success");
+        } else {
+          await addDoc(collection(db, colPath("flashcards")), {
+            lesson: data.lesson || "General",
+            front: data.front,
+            back: data.back,
+            authorName: data.authorName,
+            uid: data.uid,
+            createdAt: serverTimestamp()
+          });
+          await addUserNotification(data.uid, "Onay Durumu", "Kartın onaylandı ve yayına alındı.", "success");
+        }
+      }
+
+      alert("İşlem tamam.");
+      loadAdminData(type === "question" ? "questions" : "cards");
+    };
+
+    async function addUserNotification(uid, title, message, type) {
+      await addDoc(collection(db, colPath("notifications")), {
+        uid,
+        title,
+        message,
+        type,
+        read: false,
+        createdAt: serverTimestamp()
+      });
+    }
+
+    window.bulkUploadQuestions = async () => {
+      if (currentUser.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return alert("Yetkisiz.");
+
+      const el = document.getElementById("bulkJsonQuestions");
+      const input = el.value.trim();
+      if (!input) return alert("JSON boş.");
+
+      try {
+        const arr = JSON.parse(input);
+        if (!Array.isArray(arr) || arr.length === 0) throw new Error("Liste boş / format hatalı.");
+        if (!confirm(`${arr.length} soru canlıya eklenecek. Emin misin?`)) return;
+
+        const batch = writeBatch(db);
+        let count = 0;
+
+        arr.forEach(q => {
+          if (q.lesson && q.text && Array.isArray(q.options) && q.correct !== undefined) {
+            const r = doc(collection(db, colPath("questions")));
+            batch.set(r, {
+              lesson: q.lesson,
+              text: q.text,
+              options: q.options,
+              correct: Number(q.correct),
+              authorName: "Sistem",
+              uid: currentUser.uid,
+              createdAt: serverTimestamp()
+            });
+            count++;
+          }
+        });
+
+        if (!count) throw new Error("Geçerli soru bulunamadı.");
+        await batch.commit();
+        el.value = "";
+        alert(`✅ ${count} soru yüklendi.`);
+      } catch (e) {
+        alert("❌ " + e.message);
+      }
+    };
+
+    window.bulkUploadFlashcards = async () => {
+      if (currentUser.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return alert("Yetkisiz.");
+
+      const el = document.getElementById("bulkJsonCards");
+      const input = el.value.trim();
+      if (!input) return alert("JSON boş.");
+
+      try {
+        const arr = JSON.parse(input);
+        if (!Array.isArray(arr) || arr.length === 0) throw new Error("Liste boş / format hatalı.");
+        if (!confirm(`${arr.length} kart canlıya eklenecek. Emin misin?`)) return;
+
+        const batch = writeBatch(db);
+        let count = 0;
+
+        arr.forEach(c => {
+          if (c.front && c.back) {
+            const r = doc(collection(db, colPath("flashcards")));
+            batch.set(r, {
+              lesson: c.lesson || "General",
+              front: c.front,
+              back: c.back,
+              authorName: "Sistem",
+              uid: currentUser.uid,
+              createdAt: serverTimestamp()
+            });
+            count++;
+          }
+        });
+
+        if (!count) throw new Error("Geçerli kart bulunamadı.");
+        await batch.commit();
+        el.value = "";
+        alert(`✅ ${count} kart yüklendi.`);
+      } catch (e) {
+        alert("❌ " + e.message);
+      }
+    };
+
+    // ==========================
+    // REPORT + DELETE LIVE ITEM
+    // ==========================
+    window.openReportModal = (col, id, summary) => {
+      reportPayload = { col, id, summary: summary || "" };
+      document.getElementById("reportSummary").innerText = reportPayload.summary || "(Özet yok)";
+      document.getElementById("reportReason").value = "";
+      document.getElementById("reportModal").classList.remove("hidden");
+    };
+
+    window.closeReportModal = () => {
+      document.getElementById("reportModal").classList.add("hidden");
+    };
+
+    window.submitReport = async () => {
+      const reason = document.getElementById("reportReason").value.trim();
+      await addDoc(collection(db, colPath("reports")), {
+        uid: currentUser.uid,
+        col: reportPayload.col,
+        itemId: reportPayload.id,
+        summary: reportPayload.summary || "",
+        reason,
+        createdAt: serverTimestamp()
+      });
+      closeReportModal();
+      alert("Şikayet gönderildi.");
+      notifyAdmin(`[YKS] Şikayet geldi: ${reportPayload.col} / ${reportPayload.id}`);
+    };
+
+    window.deleteLiveItem = async (col, id) => {
+      if (currentUser.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return alert("Yetkisiz.");
+      if (!id) return;
+      if (!confirm("Bu canlı veriyi sileceksin. Emin misin?")) return;
+
+      const liveCol = col === "questions" ? colPath("questions") : colPath("flashcards");
+      await deleteDoc(doc(db, liveCol, id));
+      alert("Silindi.");
+
+      // refresh current page
+      const active = document.querySelector("aside nav button.active-nav")?.id?.replace("nav-", "") || "quiz";
+      loadPage(active);
+    };
+
+    // ==========================
+    // ADMIN NOTIFY HELPERS
+    // ==========================
+    async function notifyAdmin(msg) {
+      // admin kullanıcı doc'larını bul
+      const snap = await getDocs(query(collection(db, "users"), where("email", "==", ADMIN_EMAIL)));
+      snap.forEach(async (d) => {
+        await addDoc(collection(db, colPath("notifications")), {
+          uid: d.id,
+          title: "Yönetici Uyarısı",
+          message: msg,
+          type: "warning",
+          read: false,
+          createdAt: serverTimestamp()
+        });
+      });
+    }
+
+    // ==========================
+    // START DEFAULT
+    // ==========================
+    // (auth state change loads quiz)
+
+    // ==========================
+    // SMART PROGRAM (Drag & Drop)
+    // ==========================
+    let programData = { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [], Sat: [], Sun: [] };
+
+    function renderProgram() {
+      return `
+        <div class="h-[calc(100vh-100px)] flex flex-col">
+          <div class="flex justify-between items-center mb-4">
+             <div>
+               <h2 class="text-2xl font-black">Haftalık Akıllı Program</h2>
+               <p class="text-xs text-slate-500 dark:text-slate-400 font-black">Konuları günlere sürükle veya tıkla.</p>
+             </div>
+             <div class="flex gap-2">
+               <button onclick="saveProgram()" class="bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-xl font-black text-sm"><i class="fa-solid fa-save mr-2"></i>Kaydet</button>
+               <button onclick="clearProgram()" class="bg-red-100 text-red-600 px-4 py-2 rounded-xl font-black text-sm"><i class="fa-solid fa-trash mr-2"></i>Sıfırla</button>
+             </div>
+          </div>
+
+          <div class="flex-1 flex gap-4 overflow-hidden">
+            <!-- TOPIC POOL -->
+            <div class="w-1/3 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 flex flex-col shadow-soft">
+              <div class="p-4 border-b border-slate-100 dark:border-slate-800 font-black">Konu Havuzu</div>
+              <div class="p-2 overflow-x-auto whitespace-nowrap border-b border-slate-50 dark:border-slate-800">
+                <select id="poolFilter" onchange="filterTopicPool()" class="text-sm bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2 outline-none font-bold w-full">
+                  <option value="All">Tüm Dersler</option>
+                  ${Object.keys(YKS_TOPICS).map(k => `<option value="${k}">${k}</option>`).join("")}
+                </select>
+              </div>
+              <div id="topicPoolList" class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar"></div>
+            </div>
+
+            <!-- WEEKLY CALENDAR -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar">
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                ${["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"].map((day, idx) => {
+        const enDay = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][idx];
+        return `
+                     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 min-h-[200px] flex flex-col" 
+                          ondragover="allowDrop(event)" ondrop="drop(event, '${enDay}')">
+                        <div class="p-3 border-b border-slate-100 dark:border-slate-800 font-black text-center ${idx > 4 ? 'text-red-500' : 'text-slate-700 dark:text-slate-300'}">${day}</div>
+                        <div id="day-${enDay}" class="flex-1 p-2 space-y-1"></div>
+                     </div>
+                   `;
+      }).join("")}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Program Helpers
+    window.filterTopicPool = () => {
+      const cat = document.getElementById("poolFilter").value;
+      const list = document.getElementById("topicPoolList");
+      list.innerHTML = "";
+
+      Object.keys(YKS_TOPICS).forEach(key => {
+        if (cat === "All" || cat === key) {
+          YKS_TOPICS[key].forEach(topic => {
+            const div = document.createElement("div");
+            div.className = "p-2 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-black cursor-grab active:cursor-grabbing select-none";
+            div.draggable = true;
+            div.innerText = topic;
+            div.setAttribute("data-topic", topic);
+            div.setAttribute("data-cat", key);
+
+            // Drag Start
+            div.addEventListener("dragstart", (e) => {
+              e.dataTransfer.setData("text/plain", JSON.stringify({ topic, cat: key }));
+            });
+
+            // Click to add (Mobile friendly alternative)
+            div.addEventListener("click", () => {
+              const day = prompt("Hangi güne eklensin? (1-7 arası sayı girin)\n1: Pzt ... 7: Pazar");
+              if (day && day >= 1 && day <= 7) {
+                const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+                addToDay(days[day - 1], topic, key);
+              }
+            });
+
+            list.appendChild(div);
+          });
+        }
+      });
+    };
+
+    window.allowDrop = (ev) => ev.preventDefault();
+
+    window.drop = (ev, dayKey) => {
+      ev.preventDefault();
+      try {
+        const data = JSON.parse(ev.dataTransfer.getData("text/plain"));
+        addToDay(dayKey, data.topic, data.cat);
+      } catch (e) { }
+    };
+
+    function addToDay(dayKey, topic, cat) {
+      // Add to local state
+      if (!programData[dayKey]) programData[dayKey] = [];
+      // Avoid duplicates in same day
+      if (programData[dayKey].find(x => x.topic === topic && x.cat === cat)) return;
+
+      programData[dayKey].push({ topic, cat });
+      renderDay(dayKey);
+    }
+
+    function renderDay(dayKey) {
+      const container = document.getElementById(`day-${dayKey}`);
+      if (!container) return;
+      container.innerHTML = "";
+      programData[dayKey].forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "group relative p-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/30 rounded-xl text-[11px] font-black text-indigo-900 dark:text-indigo-200";
+        div.innerHTML = `
+            <span>${item.topic}</span>
+            <button onclick="removeFromDay('${dayKey}', ${index})" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-red-500"><i class="fa-solid fa-times"></i></button>
+          `;
+        container.appendChild(div);
+      });
+    }
+
+    window.removeFromDay = (dayKey, index) => {
+      programData[dayKey].splice(index, 1);
+      renderDay(dayKey);
+    };
+
+    window.saveProgram = async () => {
+      await setDoc(doc(db, userExamPath(currentUser.uid, "program"), "weekly"), { ...programData });
+      alert("Program kaydedildi!");
+    };
+
+    window.clearProgram = async () => {
+      if (!confirm("Program sıfırlansın mı?")) return;
+      programData = { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [], Sat: [], Sun: [] };
+      ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach(d => renderDay(d));
+      await saveProgram();
+    };
+
+    window.loadProgram = async () => {
+      // Init UI
+      filterTopicPool();
+
+      const snap = await getDoc(doc(db, userExamPath(currentUser.uid, "program"), "weekly"));
+      if (snap.exists()) {
+        programData = snap.data();
+        ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach(d => {
+          if (!programData[d]) programData[d] = [];
+          renderDay(d);
+        });
+      }
+    };
+
+    // ==========================
+    // TOPIC TRACKER (GÜNCELLENMİŞ - KAPANMA SORUNU YOK)
+    // ==========================
+    let userTopicProgress = {};
+
+    function renderTopicTracker() {
+      return `
+         <div class="max-w-5xl mx-auto pb-24">
+           <h2 class="text-2xl font-black mb-6">Konu Takip Çizelgesi</h2>
+           <div class="space-y-6">
+             ${Object.keys(YKS_TOPICS).map(lesson => `
+               <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft overflow-hidden">
+                 <button onclick="toggleAccordion('acc-${lesson.replace(/\s/g, '_')}')" class="w-full p-5 flex justify-between items-center bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+                    <span class="font-black text-lg">${lesson}</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400"></i>
+                 </button>
+                 <div id="acc-${lesson.replace(/\s/g, '_')}" class="hidden p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    ${YKS_TOPICS[lesson].map(topic => {
+        const key = `${lesson}-${topic}`;
+        const status = userTopicProgress[key] || "todo";
+        // ID oluştururken boşlukları alt çizgi yapıyoruz
+        const safeID = `tracker-card-${lesson.replace(/\s/g, '_')}-${topic.replace(/\s/g, '_')}`;
+
+        const colors = {
+          todo: "bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400",
+          doing: "bg-yellow-100 text-yellow-700 border-yellow-200",
+          done: "bg-green-100 text-green-700 border-green-200",
+          repeat: "bg-red-100 text-red-700 border-red-200"
+        };
+        const icons = {
+          todo: "fa-circle",
+          doing: "fa-person-running",
+          done: "fa-check-circle",
+          repeat: "fa-rotate-right"
+        };
+
+        return `
+                         <div class="flex items-center justify-between p-3 rounded-2xl border ${colors[status]} transition-all" id="${safeID}">
+                            <span class="text-xs font-black truncate mr-2">${topic}</span>
+                            <button onclick="cycleTopicStatus('${lesson}', '${topic}')" class="w-8 h-8 rounded-full bg-white/50 flex items-center justify-center hover:scale-110 transition">
+                               <i class="fa-solid ${icons[status]}"></i>
+                            </button>
+                         </div>
+                       `;
+      }).join("")}
+                 </div>
+               </div>
+             `).join("")}
+           </div>
+         </div>
+       `;
+    }
+
+    window.toggleAccordion = (id) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle("hidden");
+    };
+
+    window.cycleTopicStatus = async (lesson, topic) => {
+      const key = `${lesson}-${topic}`;
+      const current = userTopicProgress[key] || "todo";
+      const map = { todo: "doing", doing: "done", done: "repeat", repeat: "todo" };
+      const next = map[current];
+
+      userTopicProgress[key] = next;
+
+      // 1. UI'ı anlık güncelle (Sayfa YENİLENMEZ)
+      updateTopicCardUI(lesson, topic, next);
+
+      // 2. Veritabanına kaydet
+      await setDoc(doc(db, userExamPath(currentUser.uid, "topics"), "status"), userTopicProgress, { merge: true });
+    };
+
+    function updateTopicCardUI(lesson, topic, status) {
+      const safeID = `tracker-card-${lesson.replace(/\s/g, '_')}-${topic.replace(/\s/g, '_')}`;
+      const el = document.getElementById(safeID);
+      if (!el) return;
+
+      const colors = {
+        todo: "bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400",
+        doing: "bg-yellow-100 text-yellow-700 border-yellow-200",
+        done: "bg-green-100 text-green-700 border-green-200",
+        repeat: "bg-red-100 text-red-700 border-red-200"
+      };
+      const icons = {
+        todo: "fa-circle",
+        doing: "fa-person-running",
+        done: "fa-check-circle",
+        repeat: "fa-rotate-right"
+      };
+
+      el.className = `flex items-center justify-between p-3 rounded-2xl border transition-all ${colors[status]}`;
+      const iconEl = el.querySelector("button i");
+      if (iconEl) iconEl.className = `fa-solid ${icons[status]}`;
+    }
+
+    window.loadTopicsProgress = async () => {
+      const snap = await getDoc(doc(db, userExamPath(currentUser.uid, "topics"), "status"));
+      if (snap.exists()) {
+        userTopicProgress = snap.data();
+      }
+      contentArea.innerHTML = renderTopicTracker();
+    };
+
+
+
+  </script>
+</body>
+
+</html>
