@@ -429,7 +429,8 @@
     const YKS_TOPICS = DGS_TOPICS;
 
     const ADMIN_EMAIL = "alnigamestudios@gmail.com";
-    const API_URL = ""; // SmartCoach için (istersen) buraya endpoint yaz
+    const API_KEY = "AIzaSyByWAFDvkkqMKyPz43MmnYzu8qAM7pkQ1A";
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
 
     // >>> KENDİ FIREBASE CONFIG'İNİ GİR <<<
     const firebaseConfig = {
@@ -1731,72 +1732,166 @@
       if (w) w.scrollTop = w.scrollHeight;
     }
 
+    // --- İSTATİSTİK HESAPLAYICI (SmartCoach için Gerekli) ---
+    function calculateStats() {
+      let totalTopics = 0, completed = 0;
+
+      // 1. Konu İlerlemesini Hesapla
+      if (typeof YKS_TOPICS !== 'undefined') {
+        for (let les in YKS_TOPICS) {
+          totalTopics += YKS_TOPICS[les].length;
+          // userTopicProgress tanımlı mı kontrol et
+          if (typeof userTopicProgress !== 'undefined' && userTopicProgress) {
+            YKS_TOPICS[les].forEach(t => {
+              // Eğer konu 'done' (tamamlandı) ise say
+              if (userTopicProgress[`${les}-${t}`] === 'done') completed++;
+            });
+          }
+        }
+      }
+
+      const totalProgress = totalTopics > 0 ? Math.round((completed / totalTopics) * 100) : 0;
+
+      // 2. Deneme Ortalamasını Hesapla
+      let avgScore = 0;
+      if (typeof mockHistory !== 'undefined' && mockHistory.length > 0) {
+        const total = mockHistory.reduce((acc, curr) => acc + (Number(curr.totalScore) || 0), 0);
+        avgScore = (total / mockHistory.length).toFixed(2);
+      } else if (userData && userData.totalScore) {
+        avgScore = userData.totalScore;
+      }
+
+      return { totalProgress, avgScore };
+    }
+
+    // --- DGS İÇİN ÖZELLEŞTİRİLMİŞ SMART COACH ---
     window.askSmartCoach = async () => {
-      const input = document.getElementById("aiInput");
-      const chatWindow = document.getElementById("chatWindow");
+      const input = document.getElementById('aiInput');
+      const chatWindow = document.getElementById('chatWindow');
       const prompt = input.value.trim();
+
       if (!prompt) return;
+      document.getElementById('emptyState')?.remove();
 
-      document.getElementById("emptyState")?.remove();
+      // 1. Kullanıcı Mesajını Ekle
+      chatWindow.insertAdjacentHTML('beforeend', `
+                <div class="flex justify-end mb-4 animate-in slide-in-from-right-2">
+                    <div class="bg-[#dcf8c6] dark:bg-[#005c4b] text-slate-800 dark:text-[#e9edef] px-4 py-2 rounded-xl rounded-tr-none text-[15px] shadow-sm max-w-[85%] font-medium">
+                        ${prompt.replace(/</g, "&lt;")}
+                        <div class="text-[10px] text-right mt-1 opacity-50">Okundu ✓✓</div>
+                    </div>
+                </div>`);
 
-      chatWindow.insertAdjacentHTML("beforeend", `
-        <div class="flex justify-end mb-2">
-          <div class="bg-[#dcf8c6] dark:bg-[#005c4b] text-slate-800 dark:text-[#e9edef] px-3 py-2 rounded-2xl rounded-tr-none text-sm shadow max-w-[85%] font-black">
-            ${escapeHtml(prompt)}
-            <div class="text-[9px] text-right mt-1 opacity-50">Okundu ✓✓</div>
-          </div>
-        </div>
-      `);
       input.value = "";
-      scrollToBottom();
+      input.style.height = 'auto';
+      window.scrollToBottom();
 
+      // 2. Düşünme Animasyonu
       const loadingId = "loading-" + Date.now();
-      chatWindow.insertAdjacentHTML("beforeend", `
-        <div class="flex justify-start mb-4 animate-pulse" id="${loadingId}">
-          <div class="bg-white dark:bg-[#202c33] px-3 py-2 rounded-2xl text-[11px] dark:text-slate-300 font-black">yazıyor...</div>
-        </div>
-      `);
-      scrollToBottom();
+      chatWindow.insertAdjacentHTML('beforeend', `
+                <div class="flex justify-start mb-4 animate-pulse" id="${loadingId}">
+                    <div class="bg-white dark:bg-[#202c33] px-4 py-2 rounded-xl text-xs dark:text-slate-400 border border-slate-100 dark:border-slate-700 shadow-sm">
+                        DGS Uzmanı düşünüyor...
+                    </div>
+                </div>`);
+      window.scrollToBottom();
 
       try {
-        let text = "";
-        if (!API_URL) {
-          // demo
-          text = `Hoca, ${prompt.length > 30 ? "güzel soru" : "tamam"} 😄\nBugün 25 dakika odak + 20 soru dene.`;
-        } else {
-          const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              exam: EXAM,
-              user: { name: userData.name, xp: userData.xp || 0, score: userData.totalScore || 0 },
-              prompt
-            })
-          });
-          const data = await res.json();
-          text = data?.text || "Hoca cevap veremedi.";
+        // İstatistikleri Çek
+        const stats = calculateStats();
+        let aiMode = "";
+
+        // --- DGS'YE ÖZEL KARAKTER ANALİZİ (Puanlar 200-350 bandında değerlendirilir) ---
+
+        // Durum 1: Yeni Başlayan veya Düşük Net (Puan < 230)
+        if (stats.avgScore < 230) {
+          aiMode = "Sen şu an 'Temel İnşa Eden Rehber' modundasın. Öğrenci DGS'nin başında veya temeli zayıf. Ona 'Sayısal Mantık' ve 'Problemler'in DGS'nin kalbi olduğunu hatırlat. Korkutmadan, temel matematik ve Türkçe paragraf rutini öner.";
+        }
+        // Durum 2: Orta Seviye ama Takılmış (Puan 230 - 280 Arası)
+        else if (stats.avgScore >= 230 && stats.avgScore < 280) {
+          aiMode = "Sen şu an 'Hız ve Taktik Koçu' modundasın. Öğrenci konuları biliyor ama DGS'de süre yetiştiremiyor olabilir. Ona turlama taktiğini, sözel mantık tablolarını hızlandırmayı ve deneme analizini anlat. Biraz daha disiplinli olması gerektiğini söyle.";
+        }
+        // Durum 3: Derece İsteyen / Hukuk-Mühendislik Hedefi (Puan > 280)
+        else if (stats.avgScore >= 280) {
+          aiMode = "Sen şu an 'Derece Mentoru' modundasın. Karşındaki öğrenci Hukuk veya iyi bir Mühendislik istiyor olabilir. Onu en ufak hatasında uyar. Full çekmeye odaklanmasını, ÖBP'nin önemini ve zor sorularla boğuşmasını söyle.";
+        }
+        // Varsayılan
+        else {
+          aiMode = "Sen 'Samimi DGS Uzmanı' modundasın. Dikey Geçiş Sınavının bir hız ve mantık sınavı olduğunu vurgulayan, motive edici bir tavır sergile.";
         }
 
+        // --- AI SİSTEM TALİMATI (PROMPT) ---
+        const systemInstruction = `
+                    ${aiMode}
+                    
+                    ÖĞRENCİ KİMLİĞİ:
+                    - İsim: ${userData.name}
+                    - Hedeflediği Puan: ${userData.targetScore || 'Belirtilmemiş'}
+                    - Mevcut Ortalaması: ${stats.avgScore} Puan (DGS Puan Türünde)
+                    - Konu İlerlemesi: %${stats.totalProgress}
+                    
+                    KURALLAR VE DGS GERÇEKLERİ:
+                    1. Kullanıcıyı ismiyle selamla (Hocam, ${userData.name}, Geleceğin Mühendisi/Avukatı vb.).
+                    2. ASLA Tarih, Coğrafya, Fizik, Kimya veya Biyoloji'den bahsetme. DGS'de sadece **Türkçe (Sözel)** ve **Matematik/Geometri (Sayısal)** vardır.
+                    3. "Sayısal Mantık" ve "Sözel Mantık" konularının bu sınavın kilidi olduğunu vurgula.
+                    4. DGS'nin bir "Bilgi" sınavından çok bir "Hız ve Zaman Yönetimi" sınavı olduğunu hatırlat.
+                    5. Cevapların kısa, maddeler halinde ve okunabilir olsun.
+                    6. Samimi ol ama "kanka" deme. Sevilen, otoriter bir abi/abla/hoca gibi konuş.
+                `;
+
+        // API İsteği
+        const requestData = {
+          contents: [{
+            parts: [{
+              text: `${systemInstruction} \n\n Kullanıcı Sorusu: ${prompt}`
+            }]
+          }]
+        };
+
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestData)
+        });
+
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Hoca şu an deneme analiz ediyor, birazdan tekrar sor.";
+
         document.getElementById(loadingId)?.remove();
-        chatWindow.insertAdjacentHTML("beforeend", `
-          <div class="flex justify-start mb-4">
-            <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-4 py-2 rounded-2xl rounded-tl-none text-sm shadow max-w-[85%] font-black border-l-4 border-primary leading-relaxed">
-              ${escapeHtml(text).replace(/\n/g, "<br>")}
-            </div>
-          </div>
-        `);
-        scrollToBottom();
+
+        // --- ÖZEL EASTER EGG (KPSS Kodundaki Gibi Korundu) ---
+        if (prompt.toLowerCase().includes("sevgilimi çok seviyorum")) {
+          setTimeout(() => {
+            chatWindow.insertAdjacentHTML('beforeend', `
+                        <div class="flex justify-start mb-6 animate-in fade-in duration-700">
+                            <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md border-l-4 border-pink-500 font-bold italic">
+                                O da seni çok seviyor, DGS'yi kazanıp geleceğinizi kurman için seni bekliyor 🤍
+                            </div>
+                        </div>`);
+            window.scrollToBottom();
+          }, 600);
+          return;
+        }
+
+        // 3. AI Cevabını Ekle
+        chatWindow.insertAdjacentHTML('beforeend', `
+                    <div class="flex justify-start mb-6 animate-in slide-in-from-left-2 duration-500">
+                        <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md max-w-[90%] border-l-4 border-primary leading-relaxed">
+                            ${formatAiResponse(text)}
+                        </div>
+                    </div>`);
+
       } catch (e) {
+        console.error(e);
         document.getElementById(loadingId)?.remove();
-        chatWindow.insertAdjacentHTML("beforeend", `
-          <div class="text-center mb-3">
-            <span class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-200 text-[11px] px-3 py-2 rounded-2xl font-black">
-              Hoca bağlantıda kopukluk oldu.
-            </span>
-          </div>
-        `);
+        chatWindow.insertAdjacentHTML('beforeend', `
+                    <div class="text-center my-4">
+                        <span class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-200 text-[10px] p-2 rounded-lg font-bold">
+                            Hoca ile bağlantı koptu. (İnternetini kontrol et veya API kotası doldu)
+                        </span>
+                    </div>`);
       }
-      scrollToBottom();
+      window.scrollToBottom();
     };
 
     function escapeHtml(str) {
@@ -2396,6 +2491,27 @@
         userTopicProgress = snap.data();
       }
       contentArea.innerHTML = renderTopicTracker();
+    };
+
+
+    // 1. EKSİK OLAN KAYDIRMA FONKSİYONU
+    window.scrollToBottom = () => {
+      const chatWindow = document.getElementById('chatWindow');
+      if (chatWindow) {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      }
+    };
+
+    // 2. CEVABI DÜZGÜN GÖSTEREN FONKSİYON (Bu da eksik olabilir, garanti olsun diye ekle)
+    window.formatAiResponse = (text) => {
+      if (!text) return "";
+      // Markdown Bold (**yazı**) -> HTML Bold
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-600 dark:text-indigo-400">$1</strong>');
+      // Satır başlarını düzelt
+      text = text.replace(/\n/g, '<br>');
+      // Maddeleri düzelt
+      text = text.replace(/^- (.*?)<br>/gm, '• $1<br>');
+      return text;
     };
 
 
