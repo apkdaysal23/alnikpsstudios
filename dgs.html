@@ -150,17 +150,29 @@
   <!-- APP SCREEN -->
   <div id="app" class="hidden flex min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
 
+    <!-- 1. PARÇA: MOBİL ARKA PLAN (Karanlık Perde) -->
+    <!-- Bunu aside'ın hemen üstüne koy -->
+    <div id="mobileBackdrop" onclick="toggleMobileNav()"
+      class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity lg:hidden backdrop-blur-sm">
+    </div>
+
     <!-- SIDEBAR (SOL MENÜ - SABİT) -->
-    <aside
-      class="w-72 hidden lg:flex flex-col h-screen sticky top-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shrink-0 overflow-y-auto custom-scrollbar z-40">
+    <aside id="mainSidebar"
+      class="fixed lg:sticky top-0 left-0 h-screen w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col shrink-0 overflow-y-auto custom-scrollbar z-50 transition-transform duration-300 -translate-x-full lg:translate-x-0">
+
+      <!-- MOBİL İÇİN KAPATMA BUTONU -->
+      <button onclick="toggleMobileNav()"
+        class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full lg:hidden text-slate-500 hover:text-red-500 transition">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
 
       <!-- LOGO & TOGGLE -->
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center justify-between mb-6 pr-8 lg:pr-0">
         <div>
           <div class="text-[10px] font-black tracking-[0.2em] text-slate-400">AL&NI</div>
           <div
             class="text-xl font-black bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
-            DGS Studio</div>
+            DGS Studio</div> <!-- DGS Yazısı Güncellendi -->
         </div>
         <button id="toggleDark2" onclick="toggleTheme()"
           class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition text-slate-600 dark:text-slate-300">
@@ -207,7 +219,6 @@
 
       <!-- NAVIGATION -->
       <nav class="space-y-1 flex-1">
-        <!-- YENİ EKLENEN DASHBOARD BUTONU -->
         <button id="nav-dashboard" onclick="loadPage('dashboard')"
           class="w-full text-left p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 transition-all group">
           <div
@@ -288,7 +299,7 @@
         </button>
       </nav>
 
-      <!-- FOOTER ACTIONS -->
+      <!-- FOOTER ACTIONS (KPSS Linki ve Çıkış) -->
       <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
         <a href="app.html"
           class="block w-full text-left p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-xs text-slate-500 transition">
@@ -300,6 +311,7 @@
         </button>
       </div>
     </aside>
+
 
     <!-- CONTENT AREA (SAĞ TARAF) -->
     <main class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
@@ -323,26 +335,6 @@
               class="w-9 h-9 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300">
               <i class="fa-solid fa-moon"></i>
             </button>
-          </div>
-        </div>
-        <!-- MOBILE MENU -->
-        <div id="mobileNav"
-          class="hidden p-3 pt-0 pb-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-          <div class="grid grid-cols-3 gap-2">
-            <button onclick="loadPage('program'); toggleMobileNav(true)"
-              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Program</button>
-            <button onclick="loadPage('topics'); toggleMobileNav(true)"
-              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Takip</button>
-            <button onclick="loadPage('quiz'); toggleMobileNav(true)"
-              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Quiz</button>
-            <button onclick="loadPage('flashcards'); toggleMobileNav(true)"
-              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Cards</button>
-            <button onclick="loadPage('mocks'); toggleMobileNav(true)"
-              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Mock</button>
-            <button onclick="loadPage('coach'); toggleMobileNav(true)"
-              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs">Coach</button>
-            <button id="mobileAdminBtn" onclick="loadPage('admin'); toggleMobileNav(true)"
-              class="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 font-bold text-xs hidden">Admin</button>
           </div>
         </div>
       </div>
@@ -736,10 +728,22 @@
     // MOBILE NAV
     // ==========================
     window.toggleMobileNav = (forceClose = false) => {
-      const el = document.getElementById("mobileNav");
-      if (!el) return;
-      if (forceClose) { el.classList.add("hidden"); return; }
-      el.classList.toggle("hidden");
+      const sidebar = document.getElementById("mainSidebar");
+      const backdrop = document.getElementById("mobileBackdrop");
+
+      if (!sidebar || !backdrop) return;
+
+      const isOpen = !sidebar.classList.contains("-translate-x-full");
+
+      if (forceClose || isOpen) {
+        // Kapat
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("hidden");
+      } else {
+        // Aç
+        sidebar.classList.remove("-translate-x-full");
+        backdrop.classList.remove("hidden");
+      }
     };
 
     // ==========================
@@ -761,6 +765,7 @@
 
     window.loadPage = async (page) => {
       setActiveNav(page);
+      toggleMobileNav(true);
 
       // YENİ: Dashboard kontrolü eklendi
       if (page === "dashboard") {
