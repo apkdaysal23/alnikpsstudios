@@ -1625,56 +1625,71 @@
     }
 
     window.saveMockResult = async () => {
-      // TYT
-      const tTr = Number(document.getElementById("tytTr").value) || 0;
-      const tSos = Number(document.getElementById("tytSos").value) || 0;
-      const tMat = Number(document.getElementById("tytMat").value) || 0;
-      const tFen = Number(document.getElementById("tytFen").value) || 0;
+      // KULLANICI KONTROLÜ
+      if (!currentUser) {
+        alert("Lütfen önce giriş yapın.");
+        return;
+      }
 
-      // AYT
-      const aMat = Number(document.getElementById("aytMat").value) || 0;
-      const aFiz = Number(document.getElementById("aytFiz").value) || 0;
-      const aKim = Number(document.getElementById("aytKim").value) || 0;
-      const aBiy = Number(document.getElementById("aytBiy").value) || 0;
-      const aEdb = Number(document.getElementById("aytEdb").value) || 0;
-      const aTar1 = Number(document.getElementById("aytTar1").value) || 0;
-      const aCog1 = Number(document.getElementById("aytCog1").value) || 0;
-      const ydt = Number(document.getElementById("ydtNet").value) || 0;
+      try {
+        // 1. TYT Değerlerini Al
+        const tTr = Number(document.getElementById("tytTr")?.value) || 0;
+        const tSos = Number(document.getElementById("tytSos")?.value) || 0;
+        const tMat = Number(document.getElementById("tytMat")?.value) || 0;
+        const tFen = Number(document.getElementById("tytFen")?.value) || 0;
 
-      // Basit Katsayılar (ÖSYM her sene değiştirir, bunlar ortalamadır)
-      const tytScore = 100 + (tTr * 3.3) + (tSos * 3.4) + (tMat * 3.3) + (tFen * 3.4);
+        // 2. AYT Değerlerini Al
+        const aMat = Number(document.getElementById("aytMat")?.value) || 0;
+        const aFiz = Number(document.getElementById("aytFiz")?.value) || 0;
+        const aKim = Number(document.getElementById("aytKim")?.value) || 0;
+        const aBiy = Number(document.getElementById("aytBiy")?.value) || 0;
+        const aEdb = Number(document.getElementById("aytEdb")?.value) || 0;
+        const aTar1 = Number(document.getElementById("aytTar1")?.value) || 0;
+        const aCog1 = Number(document.getElementById("aytCog1")?.value) || 0;
+        const ydt = Number(document.getElementById("ydtNet")?.value) || 0;
 
-      // AYT Puanları (TYT'nin %40'ı + AYT'nin %60'ı mantığına yakın simülasyon)
-      // Sayısal: TYT + AYT Mat + Fen
-      const sayScore = (tytScore * 0.4) + ((aMat * 3 + aFiz * 2.8 + aKim * 2.8 + aBiy * 2.8) * 2.5) + 100;
+        // 3. Hesaplama (Yaklaşık Katsayılar)
+        const tytScore = 100 + (tTr * 3.3) + (tSos * 3.4) + (tMat * 3.3) + (tFen * 3.4);
 
-      // Eşit Ağırlık: TYT + AYT Mat + Edb/Sos1
-      const eaScore = (tytScore * 0.4) + ((aMat * 3 + aEdb * 3 + aTar1 * 2.8 + aCog1 * 2.8) * 2.5) + 100;
+        // AYT Puanları
+        const sayScore = (tytScore * 0.4) + ((aMat * 3 + aFiz * 2.8 + aKim * 2.8 + aBiy * 2.8) * 2.5) + 100;
+        const eaScore = (tytScore * 0.4) + ((aMat * 3 + aEdb * 3 + aTar1 * 2.8 + aCog1 * 2.8) * 2.5) + 100;
+        const dilScore = (tytScore * 0.4) + (ydt * 3) + 100;
 
-      // Dil: TYT + YDT
-      const dilScore = (tytScore * 0.4) + (ydt * 3) + 100;
+        // En Yüksek Puan (Max 500 Sınırı)
+        const mainScore = Math.max(tytScore, sayScore, eaScore, dilScore);
+        const finalScore = Math.min(500, Math.floor(mainScore));
 
-      // Gösterilecek ana skor (Hangisi en yüksekse onu baz alalım veya TYT)
-      const mainScore = Math.max(tytScore, sayScore, eaScore, dilScore);
-      const finalScore = Math.min(500, Math.floor(mainScore)); // Max 500
+        // 4. Veri Hazırla
+        const payload = {
+          tyt: { tr: tTr, sos: tSos, mat: tMat, fen: tFen, score: Math.floor(tytScore) },
+          ayt: { say: Math.floor(sayScore), ea: Math.floor(eaScore), dil: Math.floor(dilScore) },
+          totalScore: finalScore,
+          date: new Date().toLocaleDateString("tr-TR"),
+          createdAt: serverTimestamp()
+        };
 
-      const payload = {
-        tyt: { tr: tTr, sos: tSos, mat: tMat, fen: tFen, score: Math.floor(tytScore) },
-        ayt: { say: Math.floor(sayScore), ea: Math.floor(eaScore), dil: Math.floor(dilScore) },
-        totalScore: finalScore, // Genel başarı grafiği için en yüksek puanı alıyoruz
-        date: new Date().toLocaleDateString("tr-TR"),
-        createdAt: serverTimestamp()
-      };
+        // 5. Firestore'a Kayıt (Yollar Elle Yazıldı - Garanti Olsun)
+        // A) Deneme Geçmişine Ekle
+        await addDoc(collection(db, `users/${currentUser.uid}/exams/yks/mockExams`), payload);
 
-      await addDoc(collection(db, userExamPath(currentUser.uid, "mockExams")), payload);
+        // B) Kullanıcı Profilini Güncelle
+        await updateDoc(doc(db, "users", currentUser.uid), {
+          totalScore: finalScore,  // Profilde görünen
+          yksScore: finalScore     // Sıralama için
+        });
 
-      // Kullanıcı skorunu güncelle
-      userData.totalScore = finalScore;
-      await updateDoc(doc(db, "users", currentUser.uid), { totalScore: finalScore });
-      updateSidebar();
+        // 6. UI Güncelle
+        if (typeof updateSidebar === 'function') updateSidebar();
+        alert(`✅ Sonuç Kaydedildi!\nTYT: ${Math.floor(tytScore)}\nSAY: ${Math.floor(sayScore)}\nEA: ${Math.floor(eaScore)}`);
 
-      alert(`Sonuç Kaydedildi!\nTYT: ${Math.floor(tytScore)}\nSAY: ${Math.floor(sayScore)}\nEA: ${Math.floor(eaScore)}`);
-      loadPage("mocks");
+        // Sayfayı Yenile
+        if (typeof loadPage === 'function') loadPage("mocks");
+
+      } catch (e) {
+        console.error("YKS Kayıt Hatası:", e);
+        alert("❌ Hata oluştu: " + e.message);
+      }
     };
 
     // Chart render kısmını da güncellememiz lazım, data yapısı değişti.
@@ -2457,4 +2472,3 @@
 </body>
 
 </html>
-
