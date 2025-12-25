@@ -1608,51 +1608,65 @@
     }
 
     window.saveMockResult = async () => {
-      // Değerleri al
-      const sayNet = Number(document.getElementById("dgsSay").value) || 0;
-      const sozNet = Number(document.getElementById("dgsSoz").value) || 0;
-      let obp = Number(document.getElementById("dgsObp").value) || 0;
+      // KULLANICI KONTROLÜ
+      if (!currentUser) {
+        alert("Lütfen önce giriş yapın.");
+        return;
+      }
 
-      // ÖBP Kontrol (40 ile 80 arasında olmalı, yoksa varsayılan 50 alalım)
-      if (obp < 40) obp = 40;
-      if (obp > 80) obp = 80;
+      try {
+        // 1. Değerleri Al
+        const sayNet = Number(document.getElementById("dgsSay")?.value) || 0;
+        const sozNet = Number(document.getElementById("dgsSoz")?.value) || 0;
+        let obp = Number(document.getElementById("dgsObp")?.value) || 0;
 
-      // --- DGS PUAN HESAPLAMA SİMÜLASYONU (Yaklaşık Katsayılar) ---
-      // Not: ÖSYM her sene standart sapmaya göre değiştirir.
-      // Taban Puan (Yaklaşık): Sayısal 135, Eşit Ağırlık 133, Sözel 120 civarı başlar.
+        // ÖBP Kontrol (40-80 Arası)
+        if (obp < 40) obp = 40;
+        if (obp > 80) obp = 80;
 
-      const obpPuan = obp * 0.6; // ÖBP katkısı
+        // 2. Hesaplama
+        const obpPuan = obp * 0.6;
 
-      // Sayısal Puan: (Say Net x 3) + (Söz Net x 0.6) + ÖBP
-      const sayScore = 135 + (sayNet * 3.1) + (sozNet * 0.5) + obpPuan;
+        // Sayısal, Sözel, EA Puanları
+        const sayScore = 135 + (sayNet * 3.1) + (sozNet * 0.5) + obpPuan;
+        const sozScore = 120 + (sozNet * 2.8) + (sayNet * 0.5) + obpPuan;
+        const eaScore = 133 + (sayNet * 1.7) + (sozNet * 1.7) + obpPuan;
 
-      // Sözel Puan: (Söz Net x 3) + (Say Net x 0.6) + ÖBP
-      const sozScore = 120 + (sozNet * 2.8) + (sayNet * 0.5) + obpPuan;
+        // En yükseğini al ve 2 ondalık basamak tut
+        const rawFinal = Math.max(sayScore, sozScore, eaScore);
+        const finalScore = Number(rawFinal.toFixed(2));
 
-      // EA Puan: (Say Net x 1.8) + (Söz Net x 1.8) + ÖBP
-      const eaScore = 133 + (sayNet * 1.7) + (sozNet * 1.7) + obpPuan;
+        // 3. Veri Hazırla
+        const payload = {
+          say: Number(sayScore.toFixed(2)),
+          soz: Number(sozScore.toFixed(2)),
+          ea: Number(eaScore.toFixed(2)),
+          totalScore: finalScore,
+          date: new Date().toLocaleDateString("tr-TR"),
+          createdAt: serverTimestamp()
+        };
 
-      // Ana skor olarak en yüksek olanı kaydedelim
-      const finalScore = Math.max(sayScore, sozScore, eaScore).toFixed(2);
+        // 4. Firestore'a Kayıt (Yollar Elle Yazıldı - Garanti Olsun)
+        // A) Deneme Geçmişine Ekle
+        await addDoc(collection(db, `users/${currentUser.uid}/exams/dgs/mockExams`), payload);
 
-      const payload = {
-        say: Number(sayScore.toFixed(2)),
-        soz: Number(sozScore.toFixed(2)),
-        ea: Number(eaScore.toFixed(2)),
-        totalScore: Number(finalScore), // Grafikte bu gösterilecek
-        date: new Date().toLocaleDateString("tr-TR"),
-        createdAt: serverTimestamp()
-      };
+        // B) Kullanıcı Profilini Güncelle
+        await updateDoc(doc(db, "users", currentUser.uid), {
+          totalScore: finalScore, // Profilde görünen
+          dgsScore: finalScore    // Sıralama için
+        });
 
-      await addDoc(collection(db, userExamPath(currentUser.uid, "mockExams")), payload);
+        // 5. UI Güncelle
+        if (typeof updateSidebar === 'function') updateSidebar();
+        alert(`✅ Sonuç Kaydedildi!\nSAYISAL: ${payload.say}\nSÖZEL: ${payload.soz}\nEA: ${payload.ea}`);
 
-      // Kullanıcı genel skorunu güncelle
-      userData.totalScore = Number(finalScore);
-      await updateDoc(doc(db, "users", currentUser.uid), { totalScore: Number(finalScore) });
-      updateSidebar();
+        // Sayfayı Yenile
+        if (typeof loadPage === 'function') loadPage("mocks");
 
-      alert(`Sonuç Kaydedildi!\nSAYISAL: ${payload.say}\nSÖZEL: ${payload.soz}\nEA: ${payload.ea}`);
-      loadPage("mocks");
+      } catch (e) {
+        console.error("DGS Kayıt Hatası:", e);
+        alert("❌ Hata oluştu: " + e.message);
+      }
     };
 
     // Chart render kısmını da güncellememiz lazım, data yapısı değişti.
