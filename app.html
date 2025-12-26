@@ -2465,22 +2465,61 @@
         function displayNotifications(data) {
             const list = document.getElementById('notifList');
             if (!list) return;
-            if (data.length === 0) { list.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 p-8">Bildirim yok.</div>'; return; }
+
+            if (data.length === 0) {
+                list.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 p-8">Bildirim yok.</div>';
+                return;
+            }
 
             let html = '';
             data.forEach(n => {
+                // Mesaj uzunluk kontrolü
+                const isLong = n.message.length > 150;
+                const shortMsg = isLong ? n.message.substring(0, 150) + "..." : n.message;
+
+                // Eşsiz ID oluştur (Collapse işlemi için)
+                const contentId = `notif-content-${n.id}`;
+                const btnId = `notif-btn-${n.id}`;
+
                 html += `
-                    <div class="p-4 bg-white dark:bg-slate-800 border-l-4 ${n.type === 'success' ? 'border-green-500' : (n.type === 'warning' ? 'border-yellow-500' : 'border-blue-500')} rounded shadow-sm flex gap-3 items-start transition hover:shadow-md">
-                        <input type="checkbox" class="notif-checkbox mt-1.5 w-4 h-4 accent-primary cursor-pointer" value="${n.id}">
-                        <div class="flex-1">
-                            ${n.title ? `<div class="font-bold text-sm text-slate-800 dark:text-white mb-1">${n.title}</div>` : ''}
-                            <div class="text-sm font-medium text-slate-700 dark:text-slate-200 leading-relaxed">${n.message}</div>
-                            <div class="text-xs text-slate-400 mt-2 flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${n.createdAt ? new Date(n.createdAt.seconds * 1000).toLocaleString() : ''}</div>
-                        </div>
-                    </div>`;
+            <div class="p-4 bg-white dark:bg-slate-800 border-l-4 ${n.type === 'success' ? 'border-green-500' : (n.type === 'error' ? 'border-red-500' : (n.type === 'warning' ? 'border-yellow-500' : 'border-blue-500'))} rounded shadow-sm flex gap-3 items-start transition hover:shadow-md mb-3">
+                <input type="checkbox" class="notif-checkbox mt-1.5 w-4 h-4 accent-primary cursor-pointer" value="${n.id}">
+                <div class="flex-1 overflow-hidden">
+                    ${n.title ? `<div class="font-bold text-sm text-slate-800 dark:text-white mb-1">${n.title}</div>` : ''}
+                    
+                    <!-- Kısa Metin -->
+                    <div id="${contentId}-short" class="text-sm font-medium text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">${shortMsg}</div>
+                    
+                    <!-- Uzun Metin (Gizli) -->
+                    ${isLong ? `<div id="${contentId}-full" class="hidden text-sm font-medium text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">${n.message}</div>` : ''}
+                    
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-xs text-slate-400 flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${n.createdAt ? new Date(n.createdAt.seconds * 1000).toLocaleString() : ''}</div>
+                        
+                        <!-- Genişletme Butonu -->
+                        ${isLong ? `<button id="${btnId}" onclick="window.toggleNotificationText('${n.id}')" class="text-xs font-bold text-primary hover:underline">Devamını Oku</button>` : ''}
+                    </div>
+                </div>
+            </div>`;
             });
             list.innerHTML = html;
         }
+
+        window.toggleNotificationText = (id) => {
+            const shortDiv = document.getElementById(`notif-content-${id}-short`);
+            const fullDiv = document.getElementById(`notif-content-${id}-full`);
+            const btn = document.getElementById(`notif-btn-${id}`);
+
+            if (fullDiv.classList.contains('hidden')) {
+                fullDiv.classList.remove('hidden');
+                shortDiv.classList.add('hidden');
+                btn.innerText = "Daha Az Göster";
+            } else {
+                fullDiv.classList.add('hidden');
+                shortDiv.classList.remove('hidden');
+                btn.innerText = "Devamını Oku";
+            }
+        };
 
         window.toggleSelectAllNotifications = () => {
             const checkboxes = document.querySelectorAll('.notif-checkbox');
@@ -2815,71 +2854,106 @@
         // --- 18. ADMIN PANEL (DÜZELTİLDİ: Layout & Flashcard JSON) ---
         function renderAdminPanel() {
             return `
-                <div class="max-w-6xl mx-auto">
-                    <h1 class="text-2xl font-bold mb-6 text-slate-800 dark:text-white">Yönetim Paneli</h1>
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-2xl font-bold mb-6 text-slate-800 dark:text-white">Yönetim Paneli</h1>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- SOL SÜTUN (İçerik Yönetimi ve Denetleme) -->
+                <div class="lg:col-span-2">
                     
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-2">
-                             <div class="flex gap-4 mb-4 overflow-x-auto pb-2">
-                                <button onclick="window.loadAdminData('questions')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap">Bekleyen Soru</button>
-                                <button onclick="window.loadAdminData('cards')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap">Bekleyen Kart</button>
-                                <button onclick="window.loadAdminData('forum')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap">Bekleyen Konu</button>
-                                <button onclick="window.loadAdminData('inbox')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap">Gelen Kutusu</button>
-                            </div>
-                            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden min-h-[400px]">
-                                <div id="adminContentArea" class="divide-y divide-slate-100 dark:divide-slate-700 text-slate-800 dark:text-slate-200">
-                                    <div class="p-8 text-center text-slate-400">İşlem seçiniz.</div>
-                                </div>
-                            </div>
+                    <!-- 1. Üst Menü Butonları -->
+                    <div class="flex gap-4 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+                        <button onclick="window.loadAdminData('questions')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap font-medium transition">Bekleyen Soru</button>
+                        <button onclick="window.loadAdminData('cards')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap font-medium transition">Bekleyen Kart</button>
+                        <button onclick="window.loadAdminData('forum')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap font-medium transition">Bekleyen Konu</button>
+                        <button onclick="window.loadAdminData('inbox')" class="px-4 py-2 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded shadow-sm hover:bg-slate-50 text-slate-800 dark:text-white whitespace-nowrap font-medium transition">Gelen Kutusu</button>
+                    </div>
+
+                    <!-- 2. YENİ: İçerik Denetleyicisi (Şikayetleri İnceleme Alanı) -->
+                    <div class="bg-indigo-50 dark:bg-slate-700 p-5 rounded-xl border border-indigo-100 dark:border-slate-600 mb-6 shadow-inner">
+                        <h3 class="font-bold text-slate-800 dark:text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass-location text-indigo-500"></i> İçerik Denetleyicisi
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-300 mb-3">Bildirimlerden kopyaladığınız İçerik ID'sini buraya yapıştırarak içeriği inceleyebilir ve silebilirsiniz.</p>
+                        
+                        <div class="flex flex-col md:flex-row gap-2">
+                            <select id="inspectCollection" class="p-2.5 rounded-lg border border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-800 dark:text-white text-sm outline-none cursor-pointer">
+                                <option value="questions">Soru Havuzu</option>
+                                <option value="etutQuestions">Etüt Sorusu</option>
+                                <option value="forumPosts">Forum Konusu</option>
+                                <option value="marketItems">Market Ürünü</option>
+                                <option value="flashcards">Flashcard</option>
+                            </select>
+                            <input type="text" id="inspectContentId" placeholder="İçerik ID Yapıştır..." class="flex-1 p-2.5 rounded-lg border border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-800 dark:text-white text-sm outline-none focus:border-indigo-500 transition">
+                            <button onclick="window.inspectContent()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition">
+                                <i class="fa-solid fa-search mr-1"></i> İncele
+                            </button>
                         </div>
+                        <!-- Sonuçların gösterileceği gizli alan -->
+                        <div id="inspectorResult" class="mt-4 hidden bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-600 animate-in fade-in slide-in-from-top-2"></div>
+                    </div>
 
-                        <div class="space-y-6">
-                            
-                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
-                                <h3 class="font-bold text-lg mb-4 dark:text-white">Bildirim Gönder</h3>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kullanıcı ID (Opsiyonel)</label>
-                                        <input type="text" id="adminNotifUid" placeholder="Boş bırakılırsa herkese gider" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-sm">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Başlık (Opsiyonel)</label>
-                                        <input type="text" id="adminNotifTitle" placeholder="Admin Mesajı" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-sm">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Mesaj</label>
-                                        <textarea id="adminNotifMsg" rows="3" placeholder="Bildirim metni..." class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-sm"></textarea>
-                                    </div>
-                                    <button onclick="window.adminSendNotification()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition">Gönder</button>
-                                </div>
+                    <!-- 3. Dinamik İçerik Listesi (Bekleyenler vb.) -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden min-h-[400px]">
+                        <div id="adminContentArea" class="divide-y divide-slate-100 dark:divide-slate-700 text-slate-800 dark:text-slate-200">
+                            <div class="p-8 text-center text-slate-400">
+                                <i class="fa-solid fa-arrow-up"></i><br>İşlem yapmak için yukarıdan bir kategori seçiniz.
                             </div>
-
-                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
-                                <h3 class="font-bold text-lg mb-4 dark:text-white flex items-center gap-2"><i class="fa-solid fa-file-import text-indigo-500"></i> Toplu Soru Yükle</h3>
-                                <div class="space-y-3">
-                                    <p class="text-xs text-slate-500 dark:text-slate-400">JSON Format: <code>[{"lesson":"..", "text":"..", "options":[], "correct":0}]</code></p>
-                                    <textarea id="bulkJsonData" rows="3" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-xs font-mono outline-none focus:border-indigo-500" placeholder="JSON buraya..."></textarea>
-                                    <button onclick="window.bulkUploadQuestions()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-bold transition shadow-lg shadow-indigo-500/30">
-                                        Soruları Yükle
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
-                                <h3 class="font-bold text-lg mb-4 dark:text-white flex items-center gap-2"><i class="fa-solid fa-layer-group text-pink-500"></i> Toplu Flashcard Yükle</h3>
-                                <div class="space-y-3">
-                                    <p class="text-xs text-slate-500 dark:text-slate-400">JSON Format: <code>[{"front":"Soru", "back":"Cevap"}]</code></p>
-                                    <textarea id="bulkJsonFlashcards" rows="3" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-xs font-mono outline-none focus:border-pink-500" placeholder="JSON buraya..."></textarea>
-                                    <button onclick="window.bulkUploadFlashcards()" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-2.5 rounded-lg font-bold transition shadow-lg shadow-pink-500/30">
-                                        Kartları Yükle
-                                    </button>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
                 </div>
-            `;
+
+                <!-- SAĞ SÜTUN (Araçlar) -->
+                <div class="space-y-6">
+                    
+                    <!-- Bildirim Gönder -->
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 dark:text-white flex items-center gap-2"><i class="fa-solid fa-bell text-yellow-500"></i> Bildirim Gönder</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kullanıcı ID (Opsiyonel)</label>
+                                <input type="text" id="adminNotifUid" placeholder="Boş bırakılırsa herkese gider" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-sm focus:border-primary outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Başlık</label>
+                                <input type="text" id="adminNotifTitle" placeholder="Admin Mesajı" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-sm focus:border-primary outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Mesaj</label>
+                                <textarea id="adminNotifMsg" rows="3" placeholder="Bildirim metni..." class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-sm focus:border-primary outline-none"></textarea>
+                            </div>
+                            <button onclick="window.adminSendNotification()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/30">Gönder</button>
+                        </div>
+                    </div>
+
+                    <!-- Toplu Soru Yükle -->
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 dark:text-white flex items-center gap-2"><i class="fa-solid fa-file-import text-indigo-500"></i> Toplu Soru Yükle</h3>
+                        <div class="space-y-3">
+                            <p class="text-xs text-slate-500 dark:text-slate-400">JSON Format: <code>[{"lesson":"..", "text":"..", "options":[], "correct":0}]</code></p>
+                            <textarea id="bulkJsonData" rows="3" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-xs font-mono outline-none focus:border-indigo-500" placeholder="JSON buraya..."></textarea>
+                            <button onclick="window.bulkUploadQuestions()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-bold transition shadow-lg shadow-indigo-500/30">
+                                Soruları Yükle
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Toplu Flashcard Yükle -->
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 dark:text-white flex items-center gap-2"><i class="fa-solid fa-layer-group text-pink-500"></i> Toplu Flashcard Yükle</h3>
+                        <div class="space-y-3">
+                            <p class="text-xs text-slate-500 dark:text-slate-400">JSON Format: <code>[{"front":"Soru", "back":"Cevap"}]</code></p>
+                            <textarea id="bulkJsonFlashcards" rows="3" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-lg text-xs font-mono outline-none focus:border-pink-500" placeholder="JSON buraya..."></textarea>
+                            <button onclick="window.bulkUploadFlashcards()" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-2.5 rounded-lg font-bold transition shadow-lg shadow-pink-500/30">
+                                Kartları Yükle
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    `;
         }
 
         // --- ADMIN HELPER FUNCTIONS ---
@@ -3640,6 +3714,116 @@
             // Madde işaretlerini güzelleştir
             text = text.replace(/^- (.*?)<br>/gm, '• $1<br>');
             return text;
+        };
+
+
+        // --- İÇERİK DENETLEME VE SİLME SİSTEMİ ---
+
+        // 1. İçeriği Veritabanından Çekip Gösteren Fonksiyon
+        window.inspectContent = async () => {
+            const collectionName = document.getElementById('inspectCollection').value;
+            const docId = document.getElementById('inspectContentId').value.trim();
+            const resultDiv = document.getElementById('inspectorResult');
+
+            if (!docId) return alert("Lütfen bir ID girin.");
+
+            resultDiv.innerHTML = '<div class="text-center text-slate-500"><i class="fa-solid fa-spinner fa-spin"></i> İçerik aranıyor...</div>';
+            resultDiv.classList.remove('hidden');
+
+            try {
+                const docRef = doc(db, collectionName, docId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+
+                    // İçerik tipine göre gösterilecek metin/başlık belirleme
+                    let contentDisplay = "";
+                    let title = "";
+
+                    if (collectionName === 'questions') { title = "Soru"; contentDisplay = `<b>Ders:</b> ${data.lesson}<br><b>Soru:</b> ${data.text}`; }
+                    else if (collectionName === 'forumPosts') { title = "Forum Konusu"; contentDisplay = `<b>Başlık:</b> ${data.title}<br><b>İçerik:</b> ${data.content}`; }
+                    else if (collectionName === 'etutQuestions') { title = "Etüt Sorusu"; contentDisplay = `<b>Ders:</b> ${data.lesson}<br><b>Metin:</b> ${data.text}`; if (data.image) contentDisplay += `<br><img src="${data.image}" class="h-32 mt-2 rounded">`; }
+                    else if (collectionName === 'marketItems') { title = "Market Ürünü"; contentDisplay = `<b>Ürün:</b> ${data.title}<br><b>Açıklama:</b> ${data.description}<br><b>Fiyat:</b> ${data.price} XP`; }
+                    else { title = "İçerik"; contentDisplay = JSON.stringify(data); }
+
+                    // Sahibinin adını güvenli çek
+                    const ownerName = data.authorName || data.sellerName || "Bilinmiyor";
+                    const ownerId = data.uid || data.sellerId || "yok";
+
+                    resultDiv.innerHTML = `
+                <div class="text-sm">
+                    <div class="flex justify-between items-start mb-2 border-b pb-2 dark:border-slate-600">
+                        <span class="font-bold text-indigo-600 dark:text-indigo-400">${title} Bulundu</span>
+                        <span class="text-xs bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">Yazar: ${ownerName}</span>
+                    </div>
+                    <div class="mb-4 text-slate-700 dark:text-slate-300 p-2 bg-slate-50 dark:bg-slate-900 rounded border border-slate-100 dark:border-slate-700">
+                        ${contentDisplay}
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="window.adminDeleteContent('${collectionName}', '${docId}', '${ownerId}', '${title}')" 
+                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-xs font-bold transition flex items-center gap-2">
+                            <i class="fa-solid fa-trash-can"></i> İçeriği Kaldır ve Bildir
+                        </button>
+                    </div>
+                </div>
+            `;
+                } else {
+                    resultDiv.innerHTML = '<div class="text-center text-red-500 font-bold">❌ İçerik bulunamadı! Koleksiyonu veya ID\'yi kontrol edin.</div>';
+                }
+            } catch (e) {
+                console.error(e);
+                resultDiv.innerHTML = `<div class="text-center text-red-500">Hata: ${e.message}</div>`;
+            }
+        };
+
+        // 2. İçeriği Silip Kullanıcıya Bildirim Atan Fonksiyon
+        window.adminDeleteContent = async (colName, docId, ownerUid, contentTitle) => {
+            // Silme sebebini sor (Zorunlu)
+            const reason = prompt("DİKKAT: Bu içerik kalıcı olarak silinecek!\n\nKullanıcıya gönderilecek silme sebebini yazın:", "Topluluk kurallarına aykırı içerik / Telif hakkı ihlali");
+
+            if (reason === null) return; // İptal
+            if (reason.trim().length < 5) return alert("Lütfen geçerli bir sebep belirtin (Kullanıcıya bildirilecek).");
+
+            if (!confirm("İşlemi onaylıyor musunuz?")) return;
+
+            try {
+                const batch = writeBatch(db);
+
+                // 1. Dokümanı Sil
+                const contentRef = doc(db, colName, docId);
+                batch.delete(contentRef);
+
+                // 2. Kullanıcıya Bildirim Gönder (Eğer kullanıcı ID'si varsa)
+                if (ownerUid && ownerUid !== 'yok') {
+                    const notifRef = doc(collection(db, "notifications"));
+                    batch.set(notifRef, {
+                        uid: ownerUid,
+                        title: "⚠️ İçeriğiniz Kaldırıldı",
+                        message: `Sayın kullanıcımız, '${contentTitle}' başlıklı/içerikli paylaşımınız yöneticiler tarafından şu gerekçeyle kaldırılmıştır:\n\n"${reason}"\n\nLütfen topluluk kurallarına dikkat ediniz.`,
+                        type: "error",
+                        read: false,
+                        createdAt: serverTimestamp()
+                    });
+                }
+
+                await batch.commit();
+
+                // UI Temizle
+                document.getElementById('inspectorResult').innerHTML = `
+            <div class="p-4 bg-green-100 text-green-700 rounded text-center border border-green-200">
+                <i class="fa-solid fa-check-circle"></i> İçerik başarıyla silindi ve kullanıcı bilgilendirildi.
+            </div>
+        `;
+
+                // Eğer admin "Soru Havuzu" veya "Forum" listesine bakıyorsa orayı da yenile
+                if (colName === 'questions') window.loadAdminData('questions');
+                if (colName === 'forumPosts') window.loadAdminData('forum');
+
+            } catch (e) {
+                console.error(e);
+                alert("Silme işlemi sırasında hata oluştu: " + e.message);
+            }
         };
     </script>
 </body>
