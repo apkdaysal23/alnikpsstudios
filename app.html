@@ -575,7 +575,7 @@
         };
 
         // --- AL&NI AI ENGINE: GÜNCEL VE ZIRHLI YAPI ---
-        const API_KEY = "AIzaSyDEx5fJnx_ANx3u25vmrlciEs9m-Va93VE";
+        const API_KEY = "AIzaSyByWAFDvkkqMKyPz43MmnYzu8qAM7pkQ1A";
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
 
         const app = initializeApp(firebaseConfig);
@@ -2032,74 +2032,80 @@
         // --- 11. FLASHCARDS (YENİLENMİŞ OYUN MODU) ---
         function renderCards() {
             return `
-                <div class="max-w-4xl mx-auto h-full flex flex-col">
-                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6 shrink-0">
-                        <button onclick="window.switchCardTab('browse')" id="tabCardBrowse" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Kartlara Göz At</button>
-                        <button onclick="window.switchCardTab('submit')" id="tabCardSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Kart Gönder</button>
+        <div class="max-w-4xl mx-auto h-full flex flex-col">
+            <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6 shrink-0">
+                <button onclick="window.switchCardTab('browse')" id="tabCardBrowse" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Kartlara Göz At</button>
+                <button onclick="window.switchCardTab('submit')" id="tabCardSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200 transition">Kart Gönder</button>
+            </div>
+
+            <div id="contentCardBrowse" class="hidden flex-1 flex flex-col items-center">
+                <div id="flashcardStartScreen" class="w-full max-w-md text-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700">
+                    <i class="fa-solid fa-layer-group text-5xl text-primary mb-4"></i>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Flashcard Çalışması</h3>
+                    <p class="text-slate-500 dark:text-slate-400 mb-6">Kategorini seç ve kartları çevirmeye başla!</p>
+                    <select id="flashcardCategorySelect" class="w-full p-3 border dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-900 dark:text-white outline-none mb-4">
+                        <option value="All">Tüm Dersler</option>
+                        <option value="Tarih">Tarih</option>
+                        <option value="Coğrafya">Coğrafya</option>
+                        <option value="Vatandaşlık">Vatandaşlık</option>
+                        <option value="Türkçe">Türkçe</option>
+                        <option value="Matematik">Matematik</option>
+                        <option value="General">Genel</option>
+                    </select>
+                    <button onclick="window.startFlashcardGame()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3 rounded-xl transition shadow-lg shadow-orange-500/30">Başla</button>
+                </div>
+
+                <div id="flashcardGameArea" class="hidden w-full max-w-lg flex flex-col items-center flex-1 justify-center min-h-[400px]">
+                    <div class="w-full flex justify-between items-center mb-4 px-4">
+                        <button onclick="window.switchCardTab('browse')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-arrow-left"></i> Çık</button>
+                        <span class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1 rounded-full text-xs font-bold" id="fcCategoryBadge">Genel</span>
                     </div>
-
-                    <div id="contentCardBrowse" class="hidden flex-1 flex flex-col items-center">
-                        <div id="flashcardStartScreen" class="w-full max-w-md text-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700">
-                            <i class="fa-solid fa-layer-group text-5xl text-primary mb-4"></i>
-                            <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Flashcard Çalışması</h3>
-                            <p class="text-slate-500 dark:text-slate-400 mb-6">Kategorini seç ve kartları çevirmeye başla!</p>
-                            <select id="flashcardCategorySelect" class="w-full p-3 border dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-900 dark:text-white outline-none mb-4">
-                                <option value="All">Tüm Dersler</option>
-                                <option value="Tarih">Tarih</option>
-                                <option value="Coğrafya">Coğrafya</option>
-                                <option value="Vatandaşlık">Vatandaşlık</option>
-                                <option value="Türkçe">Türkçe</option>
-                                <option value="Matematik">Matematik</option>
-                                <option value="General">Genel</option>
-                            </select>
-                            <button onclick="window.startFlashcardGame()" class="w-full bg-primary hover:bg-primaryDark text-white font-bold py-3 rounded-xl transition shadow-lg shadow-orange-500/30">Başla</button>
-                        </div>
-
-                        <div id="flashcardGameArea" class="hidden w-full max-w-lg flex flex-col items-center flex-1 justify-center min-h-[400px]">
-                            <div class="w-full flex justify-between items-center mb-4 px-4">
-                                <button onclick="window.switchCardTab('browse')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-arrow-left"></i> Çık</button>
-                                <span class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1 rounded-full text-xs font-bold" id="fcCategoryBadge">Genel</span>
-                            </div>
-                            
-                            <div class="flip-card w-full h-80 perspective cursor-pointer group mb-8" onclick="this.classList.toggle('flipped')">
-                                <div class="flip-card-inner relative w-full h-full shadow-xl rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-transform duration-500">
-                                    <div class="flip-card-front flex flex-col items-center justify-center p-8 text-center bg-white dark:bg-slate-800 rounded-2xl">
-                                        <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
-                                            <button onclick="window.reportContent('card', currentCard.id)" class="text-slate-300 hover:text-yellow-500 transition" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
-                                            ${currentUser.email === ADMIN_EMAIL ? `<button onclick="window.deleteLiveItem('flashcards', currentCard.id)" class="text-red-300 hover:text-red-500 transition" title="Yönetici Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
-                                        </div>
-                                        <h3 class="font-bold text-slate-800 dark:text-white text-2xl" id="fcFront">...</h3>
-                                        <p class="text-xs text-slate-400 mt-4 uppercase tracking-widest">Çevirmek için dokun</p>
-                                    </div>
-                                    <div class="flip-card-back flex flex-col items-center justify-center p-8 text-center bg-primary text-white rounded-2xl">
-                                        <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
-                                             <button onclick="window.reportContent('card', currentCard.id, document.getElementById('fcFront').innerText)" class="text-white/50 hover:text-white transition" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
-                                             ${currentUser.email === ADMIN_EMAIL ? `<button onclick="window.deleteLiveItem('flashcards', currentCard.id)" class="text-white/50 hover:text-white transition" title="Yönetici Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
-                                        </div>
-                                        <p class="font-bold text-2xl" id="fcBack">...</p>
-                                    </div>
+                    
+                    <div class="flip-card w-full h-80 perspective cursor-pointer group mb-8" onclick="this.classList.toggle('flipped')">
+                        <div class="flip-card-inner relative w-full h-full shadow-xl rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-transform duration-500">
+                            <!-- KARTIN ÖN YÜZÜ -->
+                            <div class="flip-card-front flex flex-col items-center justify-center p-8 text-center bg-white dark:bg-slate-800 rounded-2xl">
+                                <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
+                                    <!-- BURASI DEĞİŞTİ -->
+                                    <button onclick="window.handleActiveItemReport('flashcard')" class="text-slate-300 hover:text-yellow-500 transition" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
+                                    
+                                    ${currentUser.email === ADMIN_EMAIL ? `<button onclick="window.deleteLiveItem('flashcards', currentCard.id)" class="text-red-300 hover:text-red-500 transition" title="Yönetici Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
                                 </div>
+                                <h3 class="font-bold text-slate-800 dark:text-white text-2xl" id="fcFront">...</h3>
+                                <p class="text-xs text-slate-400 mt-4 uppercase tracking-widest">Çevirmek için dokun</p>
                             </div>
-
-                            <button onclick="window.nextCard()" class="bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-3 px-12 rounded-full shadow-lg transition transform hover:-translate-y-1">
-                                Sıradaki Kart <i class="fa-solid fa-arrow-right ml-2"></i>
-                            </button>
+                            <!-- KARTIN ARKA YÜZÜ -->
+                            <div class="flip-card-back flex flex-col items-center justify-center p-8 text-center bg-primary text-white rounded-2xl">
+                                <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
+                                    <!-- BURASI DEĞİŞTİ -->
+                                    <button onclick="window.handleActiveItemReport('flashcard')" class="text-white/50 hover:text-white transition" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
+                                    
+                                    ${currentUser.email === ADMIN_EMAIL ? `<button onclick="window.deleteLiveItem('flashcards', currentCard.id)" class="text-white/50 hover:text-white transition" title="Yönetici Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                </div>
+                                <p class="font-bold text-2xl" id="fcBack">...</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="contentCardSubmit" class="hidden pb-32">
-                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 mb-6">
-                            <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white">Kart Önerisi Gönder</h3>
-                            <div class="space-y-4">
-                                <input id="cardFront" type="text" placeholder="Ön Yüz (Soru/Kavram)" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
-                                <input id="cardBack" type="text" placeholder="Arka Yüz (Cevap/Açıklama)" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
-                                <button onclick="window.submitCard()" class="w-full bg-slate-800 dark:bg-slate-700 text-white font-bold py-3 rounded-lg hover:bg-slate-900 transition">Yönetici Onayına Gönder</button>
-                            </div>
-                        </div>
-                        <div class="mt-8"><h3 class="font-bold text-md mb-4 text-slate-800 dark:text-white">Gönderimlerin</h3><div id="myCardsList" class="space-y-3"></div></div>
+                    <button onclick="window.nextCard()" class="bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-3 px-12 rounded-full shadow-lg transition transform hover:-translate-y-1">
+                        Sıradaki Kart <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="contentCardSubmit" class="hidden pb-32">
+                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 mb-6">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white">Kart Önerisi Gönder</h3>
+                    <div class="space-y-4">
+                        <input id="cardFront" type="text" placeholder="Ön Yüz (Soru/Kavram)" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                        <input id="cardBack" type="text" placeholder="Arka Yüz (Cevap/Açıklama)" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                        <button onclick="window.submitCard()" class="w-full bg-slate-800 dark:bg-slate-700 text-white font-bold py-3 rounded-lg hover:bg-slate-900 transition">Yönetici Onayına Gönder</button>
                     </div>
                 </div>
-            `;
+                <div class="mt-8"><h3 class="font-bold text-md mb-4 text-slate-800 dark:text-white">Gönderimlerin</h3><div id="myCardsList" class="space-y-3"></div></div>
+            </div>
+        </div>
+    `;
         }
 
         window.switchCardTab = (tab) => {
@@ -2582,7 +2588,7 @@
 
                             <div class="bg-white dark:bg-slate-800 p-5 md:p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 relative">
                                 <div class="absolute top-3 right-3 flex gap-1">
-                                    <button onclick="window.openReportModal('questions', currentQuestion.id, currentQuestion.text)" class="text-slate-300 hover:text-yellow-500 transition p-2" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
+                                    <button onclick="window.handleActiveItemReport('question')" class="text-slate-300 hover:text-yellow-500 transition p-2" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>
                                     ${currentUser.email === ADMIN_EMAIL ? `<button onclick="window.deleteLiveItem('questions', currentQuestion.id)" class="text-red-300 hover:text-red-500 transition p-2" title="Yönetici Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
                                 </div>
 
@@ -2878,12 +2884,24 @@
                         
                         <div class="flex flex-col md:flex-row gap-2">
                             <select id="inspectCollection" class="p-2.5 rounded-lg border border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-800 dark:text-white text-sm outline-none cursor-pointer">
-                                <option value="questions">Soru Havuzu</option>
-                                <option value="etutQuestions">Etüt Sorusu</option>
-                                <option value="forumPosts">Forum Konusu</option>
-                                <option value="marketItems">Market Ürünü</option>
-                                <option value="flashcards">Flashcard</option>
-                            </select>
+    <optgroup label="KPSS (Ana Modül)">
+        <option value="questions">KPSS Soru Havuzu</option>
+        <option value="flashcards">KPSS Flashcard</option>
+        <option value="etutQuestions">KPSS Etüt Sorusu</option>
+        <option value="forumPosts">Forum Konusu</option>
+        <option value="marketItems">Market Ürünü</option>
+    </optgroup>
+    
+    <optgroup label="DGS Modülü">
+        <option value="exams/dgs/questions">DGS Sorusu</option>
+        <option value="exams/dgs/flashcards">DGS Flashcard</option>
+    </optgroup>
+
+    <optgroup label="YKS Modülü">
+        <option value="exams/yks/questions">YKS Sorusu</option>
+        <option value="exams/yks/flashcards">YKS Flashcard</option>
+    </optgroup>
+</select>
                             <input type="text" id="inspectContentId" placeholder="İçerik ID Yapıştır..." class="flex-1 p-2.5 rounded-lg border border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-800 dark:text-white text-sm outline-none focus:border-indigo-500 transition">
                             <button onclick="window.inspectContent()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition">
                                 <i class="fa-solid fa-search mr-1"></i> İncele
@@ -3825,8 +3843,20 @@
                 alert("Silme işlemi sırasında hata oluştu: " + e.message);
             }
         };
+
+        // --- APP.HTML EN ALTA EKLENECEK FONKSİYON ---
+        window.handleActiveItemReport = (type) => {
+            if (type === 'question') {
+                if (!currentQuestion) return alert("Şu an aktif bir soru yok.");
+                // reportContent fonksiyonunu çağırıyoruz (Mevcut şikayet sistemin)
+                window.reportContent('Soru Havuzu', currentQuestion.id, currentQuestion.text);
+            }
+            else if (type === 'flashcard') {
+                if (!currentCard) return alert("Şu an aktif bir kart yok.");
+                window.reportContent('Flashcard', currentCard.id, currentCard.front);
+            }
+        };
     </script>
 </body>
 
 </html>
-
