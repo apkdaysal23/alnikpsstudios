@@ -389,7 +389,7 @@
     // ==========================
     // AL&NI AI ENGINE (YKS SÜRÜMÜ)
     // ==========================
-    const API_KEY = "AIzaSyDEx5fJnx_ANx3u25vmrlciEs9m-Va93VE"; // Buraya kendi keyini koyabilirsin
+    const API_KEY = "AIzaSyByWAFDvkkqMKyPz43MmnYzu8qAM7pkQ1A"; // Buraya kendi keyini koyabilirsin
     const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
 
     // İstatistik Hesaplayıcı (AI'ya veri beslemek için)
@@ -937,7 +937,7 @@
 
               <div class="bg-white dark:bg-slate-900 p-5 md:p-8 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 relative">
                 <div class="absolute top-3 right-3 flex gap-1">
-                  <button onclick="openReportModal('questions', currentQuestion?.id, currentQuestion?.text)" class="text-slate-300 hover:text-yellow-500 transition p-2" title="Şikayet Et">
+                  <button onclick="window.handleLiveReport('question')" class="text-slate-300 hover:text-yellow-500 transition p-2" title="Şikayet Et">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                   </button>
                   ${isAdmin ? `
@@ -1209,109 +1209,128 @@
     function renderFlashcards() {
       const isAdmin = currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
       return `
-        <div class="max-w-4xl mx-auto h-full flex flex-col">
-          <div class="flex border-b border-slate-200 dark:border-slate-800 mb-6 shrink-0">
-            <button onclick="switchCardTab('browse')" id="tabCardBrowse" class="flex-1 py-4 text-center text-slate-600 dark:text-slate-300 font-black tab-btn-active">Kartlara Göz At</button>
-            <button onclick="switchCardTab('submit')" id="tabCardSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-black hover:text-slate-700 dark:hover:text-slate-200">Kart Gönder</button>
+    <div class="max-w-4xl mx-auto h-full flex flex-col">
+      <div class="flex border-b border-slate-200 dark:border-slate-800 mb-6 shrink-0">
+        <button onclick="switchCardTab('browse')" id="tabCardBrowse" class="flex-1 py-4 text-center text-slate-600 dark:text-slate-300 font-black tab-btn-active">Kartlara Göz At</button>
+        <button onclick="switchCardTab('submit')" id="tabCardSubmit" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-black hover:text-slate-700 dark:hover:text-slate-200">Kart Gönder</button>
+      </div>
+
+      <div id="contentCardBrowse" class="flex-1 flex flex-col items-center">
+        <div id="flashcardStartScreen" class="w-full max-w-md text-center p-8 bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800">
+          <i class="fa-solid fa-layer-group text-5xl text-primary mb-4"></i>
+          <h3 class="text-xl font-black mb-2">Flashcard</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Kategorini seç ve başla.</p>
+
+          <select id="flashcardCategorySelect" class="w-full p-3 border dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-950 dark:text-white outline-none mb-4">
+            <option value="All">Tüm Dersler</option>
+            ${typeof YKS_TOPICS !== 'undefined' ?
+          // YKS İÇİN
+          `<option value="TYT Türkçe">TYT Türkçe</option>
+               <option value="TYT Matematik">TYT Matematik</option>
+               <option value="TYT Sosyal">TYT Sosyal</option>
+               <option value="TYT Fen">TYT Fen</option>
+               <option value="AYT Matematik">AYT Matematik</option>
+               <option value="AYT Fizik">AYT Fizik</option>
+               <option value="AYT Kimya">AYT Kimya</option>
+               <option value="AYT Biyoloji">AYT Biyoloji</option>
+               <option value="AYT Edebiyat">AYT Edebiyat</option>
+               <option value="AYT Tarih">AYT Tarih</option>
+               <option value="AYT Coğrafya">AYT Coğrafya</option>`
+          :
+          // DGS İÇİN
+          `<option value="DGS Matematik">DGS Matematik</option>
+               <option value="DGS Geometri">DGS Geometri</option>
+               <option value="DGS Türkçe">DGS Türkçe</option>`
+        }
+            <option value="General">Genel</option>
+          </select>
+
+          <button onclick="startFlashcardGame()" class="w-full bg-primary hover:bg-primaryDark text-white font-black py-3 rounded-2xl transition">
+            Başla
+          </button>
+        </div>
+
+        <div id="flashcardGameArea" class="hidden w-full max-w-lg flex flex-col items-center flex-1 justify-center min-h-[420px]">
+          <div class="w-full flex justify-between items-center mb-4 px-4">
+            <button onclick="switchCardTab('browse')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white font-black">
+              <i class="fa-solid fa-arrow-left"></i> Çık
+            </button>
+            <span class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1 rounded-full text-xs font-black" id="fcCategoryBadge">Genel</span>
           </div>
 
-          <div id="contentCardBrowse" class="flex-1 flex flex-col items-center">
-            <div id="flashcardStartScreen" class="w-full max-w-md text-center p-8 bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800">
-              <i class="fa-solid fa-layer-group text-5xl text-primary mb-4"></i>
-              <h3 class="text-xl font-black mb-2">Flashcard</h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Kategorini seç ve başla.</p>
-
-              <select id="flashcardCategorySelect" class="w-full p-3 border dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-950 dark:text-white outline-none mb-4">
-                <option value="All">Tüm Dersler</option>
-                <option value="TYT Türkçe">TYT Türkçe</option>
-                <option value="TYT Matematik">TYT Matematik</option>
-                <option value="TYT Sosyal">TYT Sosyal</option>
-                <option value="TYT Fen">TYT Fen</option>
-                <option value="AYT Matematik">AYT Matematik</option>
-                <option value="AYT Fizik">AYT Fizik</option>
-                <option value="AYT Kimya">AYT Kimya</option>
-                <option value="AYT Biyoloji">AYT Biyoloji</option>
-                <option value="AYT Edebiyat">AYT Edebiyat</option>
-                <option value="AYT Tarih">AYT Tarih</option>
-                <option value="AYT Coğrafya">AYT Coğrafya</option>
-                <option value="General">Genel</option>
-              </select>
-
-              <button onclick="startFlashcardGame()" class="w-full bg-primary hover:bg-primaryDark text-white font-black py-3 rounded-2xl transition">
-                Başla
-              </button>
-            </div>
-
-            <div id="flashcardGameArea" class="hidden w-full max-w-lg flex flex-col items-center flex-1 justify-center min-h-[420px]">
-              <div class="w-full flex justify-between items-center mb-4 px-4">
-                <button onclick="switchCardTab('browse')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white font-black">
-                  <i class="fa-solid fa-arrow-left"></i> Çık
-                </button>
-                <span class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1 rounded-full text-xs font-black" id="fcCategoryBadge">Genel</span>
-              </div>
-
-              <div class="flip-card w-full h-80 cursor-pointer group mb-6" onclick="this.classList.toggle('flipped')">
-                <div class="flip-card-inner relative w-full h-full shadow-xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-transform duration-500">
-                  <div class="flip-card-front flex flex-col items-center justify-center p-8 text-center bg-white dark:bg-slate-900 rounded-3xl">
-                    <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
-                      <button onclick="openReportModal('flashcards', currentCard?.id, currentCard?.front)" class="text-slate-300 hover:text-yellow-500 transition" title="Şikayet Et">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                      </button>
-                      ${isAdmin ? `
-                        <button onclick="deleteLiveItem('flashcards', currentCard?.id)" class="text-red-300 hover:text-red-500 transition" title="Yönetici Sil">
-                          <i class="fa-solid fa-trash"></i>
-                        </button>` : ``}
-                    </div>
-                    <h3 class="font-black text-slate-900 dark:text-white text-2xl" id="fcFront">...</h3>
-                    <p class="text-xs text-slate-400 mt-4 uppercase tracking-widest font-black">Çevirmek için dokun</p>
-                  </div>
-
-                  <div class="flip-card-back flex flex-col items-center justify-center p-8 text-center bg-primary text-white rounded-3xl">
-                    <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
-                      <button onclick="openReportModal('flashcards', currentCard?.id, currentCard?.front)" class="text-white/60 hover:text-white transition" title="Şikayet Et">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                      </button>
-                      ${isAdmin ? `
-                        <button onclick="deleteLiveItem('flashcards', currentCard?.id)" class="text-white/60 hover:text-white transition" title="Yönetici Sil">
-                          <i class="fa-solid fa-trash"></i>
-                        </button>` : ``}
-                    </div>
-                    <p class="font-black text-2xl" id="fcBack">...</p>
-                  </div>
+          <div class="flip-card w-full h-80 cursor-pointer group mb-6" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner relative w-full h-full shadow-xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-transform duration-500">
+              
+              <!-- ÖN YÜZ -->
+              <div class="flip-card-front flex flex-col items-center justify-center p-8 text-center bg-white dark:bg-slate-900 rounded-3xl">
+                <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
+                  <!-- GÜNCELLENEN BUTON -->
+                  <button onclick="window.handleLiveReport('flashcard')" class="text-slate-300 hover:text-yellow-500 transition" title="Şikayet Et">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                  </button>
+                  ${isAdmin ? `
+                    <button onclick="deleteLiveItem('flashcards', currentCard?.id)" class="text-red-300 hover:text-red-500 transition" title="Yönetici Sil">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>` : ``}
                 </div>
+                <h3 class="font-black text-slate-900 dark:text-white text-2xl" id="fcFront">...</h3>
+                <p class="text-xs text-slate-400 mt-4 uppercase tracking-widest font-black">Çevirmek için dokun</p>
               </div>
 
-              <button onclick="nextCard()" class="bg-slate-900 dark:bg-slate-800 hover:bg-black dark:hover:bg-slate-700 text-white font-black py-3 px-12 rounded-full shadow-lg transition">
-                Sıradaki Kart <i class="fa-solid fa-arrow-right ml-2"></i>
-              </button>
+              <!-- ARKA YÜZ -->
+              <div class="flip-card-back flex flex-col items-center justify-center p-8 text-center bg-primary text-white rounded-3xl">
+                <div class="absolute top-4 right-4 flex gap-2 z-20" onclick="event.stopPropagation()">
+                  <!-- GÜNCELLENEN BUTON -->
+                  <button onclick="window.handleLiveReport('flashcard')" class="text-white/60 hover:text-white transition" title="Şikayet Et">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                  </button>
+                  ${isAdmin ? `
+                    <button onclick="deleteLiveItem('flashcards', currentCard?.id)" class="text-white/60 hover:text-white transition" title="Yönetici Sil">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>` : ``}
+                </div>
+                <p class="font-black text-2xl" id="fcBack">...</p>
+              </div>
             </div>
           </div>
 
-          <div id="contentCardSubmit" class="hidden pb-32 w-full">
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 mb-6">
-              <h3 class="font-black text-lg mb-4">Kart Gönder (Onay)</h3>
-              <div class="space-y-4">
-                <select id="cardLesson" class="w-full p-3 border dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-950 dark:text-white">
-                  <option value="General">Genel</option>
-                  <option>TYT Türkçe</option><option>TYT Matematik</option><option>TYT Sosyal</option><option>TYT Fen</option>
-                  <option>AYT Matematik</option><option>AYT Fizik</option><option>AYT Kimya</option><option>AYT Biyoloji</option>
-                  <option>AYT Edebiyat</option><option>AYT Tarih</option><option>AYT Coğrafya</option>
-                </select>
-                <input id="cardFront" type="text" placeholder="Ön yüz" class="w-full p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
-                <input id="cardBack" type="text" placeholder="Arka yüz" class="w-full p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
-                <button onclick="submitCard()" class="w-full bg-slate-900 dark:bg-slate-800 text-white font-black py-3 rounded-2xl hover:bg-black transition">
-                  Yönetici Onayına Gönder
-                </button>
-              </div>
-            </div>
+          <button onclick="nextCard()" class="bg-slate-900 dark:bg-slate-800 hover:bg-black dark:hover:bg-slate-700 text-white font-black py-3 px-12 rounded-full shadow-lg transition">
+            Sıradaki Kart <i class="fa-solid fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </div>
 
-            <div class="mt-6">
-              <h3 class="font-black text-md mb-3">Gönderimlerin</h3>
-              <div id="myCardsList" class="space-y-3"></div>
-            </div>
+      <div id="contentCardSubmit" class="hidden pb-32 w-full">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-soft border border-slate-100 dark:border-slate-800 mb-6">
+          <h3 class="font-black text-lg mb-4">Kart Gönder (Onay)</h3>
+          <div class="space-y-4">
+            <select id="cardLesson" class="w-full p-3 border dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-950 dark:text-white">
+              <option value="General">Genel</option>
+              ${typeof YKS_TOPICS !== 'undefined' ?
+          // YKS
+          `<option>TYT Türkçe</option><option>TYT Matematik</option><option>TYT Sosyal</option><option>TYT Fen</option>
+               <option>AYT Matematik</option><option>AYT Fizik</option><option>AYT Kimya</option><option>AYT Biyoloji</option>
+               <option>AYT Edebiyat</option><option>AYT Tarih</option><option>AYT Coğrafya</option>`
+          :
+          // DGS
+          `<option>DGS Matematik</option><option>DGS Geometri</option><option>DGS Türkçe</option>`
+        }
+            </select>
+            <input id="cardFront" type="text" placeholder="Ön yüz" class="w-full p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
+            <input id="cardBack" type="text" placeholder="Arka yüz" class="w-full p-3 border dark:border-slate-800 dark:bg-slate-950 dark:text-white rounded-2xl">
+            <button onclick="submitCard()" class="w-full bg-slate-900 dark:bg-slate-800 text-white font-black py-3 rounded-2xl hover:bg-black transition">
+              Yönetici Onayına Gönder
+            </button>
           </div>
         </div>
-      `;
+
+        <div class="mt-6">
+          <h3 class="font-black text-md mb-3">Gönderimlerin</h3>
+          <div id="myCardsList" class="space-y-3"></div>
+        </div>
+      </div>
+    </div>
+  `;
     }
 
     window.switchCardTab = (tab) => {
@@ -2158,17 +2177,30 @@
 
     window.submitReport = async () => {
       const reason = document.getElementById("reportReason").value.trim();
-      await addDoc(collection(db, colPath("reports")), {
+
+      // Hangi modüldeyiz? (Dosyaya göre DGS veya YKS olarak algılar)
+      const moduleName = typeof EXAM !== 'undefined' ? EXAM.toUpperCase() : "MODÜL";
+
+      // Şikayet Detayları
+      const reportData = {
         uid: currentUser.uid,
-        col: reportPayload.col,
+        module: moduleName, // DGS mi YKS mi olduğunu belirtiyoruz
+        col: reportPayload.col, // questions veya flashcards
         itemId: reportPayload.id,
         summary: reportPayload.summary || "",
-        reason,
+        reason: reason,
         createdAt: serverTimestamp()
-      });
+      };
+
+      // A) Şikayeti GLOBAL 'reports' koleksiyonuna ekle (Admin panelinde kolay görünmesi için)
+      await addDoc(collection(db, "reports"), reportData);
+
+      // B) Admine Bildirim Gönder
+      const msg = `🚨 [${moduleName}] YENİ ŞİKAYET!\nTür: ${reportPayload.col}\nID: ${reportPayload.id}\nSebep: ${reason}`;
+      await notifyAdmin(msg);
+
       closeReportModal();
-      alert("Şikayet gönderildi.");
-      notifyAdmin(`[YKS] Şikayet geldi: ${reportPayload.col} / ${reportPayload.id}`);
+      alert("Şikayetiniz yöneticilere iletildi.");
     };
 
     window.deleteLiveItem = async (col, id) => {
@@ -2189,18 +2221,27 @@
     // ADMIN NOTIFY HELPERS
     // ==========================
     async function notifyAdmin(msg) {
-      // admin kullanıcı doc'larını bul
-      const snap = await getDocs(query(collection(db, "users"), where("email", "==", ADMIN_EMAIL)));
-      snap.forEach(async (d) => {
-        await addDoc(collection(db, colPath("notifications")), {
+      // Admin kullanıcısını bul
+      const q = query(collection(db, "users"), where("email", "==", ADMIN_EMAIL));
+      const snap = await getDocs(q);
+
+      const batch = writeBatch(db);
+
+      snap.forEach((d) => {
+        // BURASI ÖNEMLİ: colPath('notifications') YERİNE, direkt "notifications" yazıyoruz.
+        // Böylece app.html'deki adminin gördüğü ana bildirim kutusuna düşer.
+        const ref = doc(collection(db, "notifications"));
+        batch.set(ref, {
           uid: d.id,
-          title: "Yönetici Uyarısı",
+          title: "⚠️ İçerik Bildirimi",
           message: msg,
-          type: "warning",
+          type: "error", // Kırmızı renkli önemli bildirim
           read: false,
           createdAt: serverTimestamp()
         });
       });
+
+      await batch.commit();
     }
 
     // ==========================
@@ -2465,6 +2506,18 @@
       }
       contentArea.innerHTML = renderTopicTracker();
     };
+    // --- DGS.HTML ve YKS.HTML EN ALTA EKLENECEK ---
+    window.handleLiveReport = (type) => {
+      if (type === 'question') {
+        if (!currentQuestion) return alert("Soru yüklenmedi.");
+        // Mevcut modal sistemini tetikliyoruz ama global değişkenden veriyi alarak
+        window.openReportModal('questions', currentQuestion.id, currentQuestion.text);
+      }
+      else if (type === 'flashcard') {
+        if (!currentCard) return alert("Kart yüklenmedi.");
+        window.openReportModal('flashcards', currentCard.id, currentCard.front);
+      }
+    };
 
 
 
@@ -2472,4 +2525,3 @@
 </body>
 
 </html>
-
