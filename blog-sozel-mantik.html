@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="tr" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sözel Mantık Kabus Değil: 3 Değişkenli Tablo Tekniği | Al&Ni Exam Studio</title>
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1105930817107200"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#f59e0b', secondary: '#d97706', darkBg: '#0f172a', darkCard: '#1e293b' }, fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .prose h2 {
+            scroll-margin-top: 100px;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 antialiased">
+    <nav
+        class="fixed top-0 w-full z-50 bg-white/90 dark:bg-darkCard/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3 font-black text-xl dark:text-white">
+                <div class="w-10 h-10 bg-primary rounded-xl text-white flex justify-center items-center shadow-lg">M
+                </div> Al&Ni <span class="text-primary">Mantık</span>
+            </a>
+            <a href="index.html" class="text-sm font-bold text-slate-500 hover:text-primary transition"><i
+                    class="fa-solid fa-arrow-left mr-2"></i>Ana Sayfa</a>
+        </div>
+    </nav>
+    <header class="relative pt-32 pb-20 px-6 bg-amber-950 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&q=80&w=1200"
+            class="absolute inset-0 w-full h-full object-cover opacity-20">
+        <div class="absolute inset-0 bg-gradient-to-t from-amber-950 via-transparent to-transparent"></div>
+        <div class="max-w-4xl mx-auto relative z-10 text-center">
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold uppercase tracking-widest mb-6 border border-amber-500/30">
+                DGS • ALES • KPSS</div>
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">Sözel Mantık Sorularında Kalem
+                Oynatmadan Çözmek İmkansız: Tablo Kurma Sanatı</h1>
+        </div>
+    </header>
+    <main class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <aside class="hidden lg:block lg:col-span-3">
+            <div
+                class="sticky top-28 bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                <h4 class="font-bold dark:text-white mb-4">Adımlar</h4>
+                <ul class="space-y-3 text-sm text-slate-500">
+                    <li><a href="#degisken" class="hover:text-primary">Değişkenleri Bul</a></li>
+                    <li><a href="#tablo" class="hover:text-primary">Tabloyu Sabitle</a></li>
+                    <li><a href="#ihtimal" class="hover:text-primary">İhtimalleri Yaz</a></li>
+                </ul>
+            </div>
+        </aside>
+        <article
+            class="lg:col-span-9 prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary">
+            <p class="lead text-xl text-slate-600 dark:text-slate-300">DGS ve ALES'in en çok puan getiren kısmı Sözel
+                Mantık'tır. Adayların çoğu "çok vakit alıyor" diye atlar. Oysa doğru tabloyu kurduğunuzda 4 soruyu 2
+                dakikada çözersiniz.</p>
+            <h2 id="degisken" class="text-3xl mt-12">1. Değişkenleri Tespit Et</h2>
+            <p>Soruyu okurken hemen şunu sor: <strong>"Burada kaç farklı grup var?"</strong><br>Örn: Ayşe, Burak, Can
+                (Kişiler) - Pazartesi, Salı (Günler) - Sinema, Tiyatro (Etkinlik). İşte 3 değişken.</p>
+            <h2 id="tablo" class="text-3xl mt-12">2. Az Olanı Tabloya Sabitle</h2>
+            <p>Altın Kural: <strong>Sayıca en az olan veya sırası kesin olan (Günler, Katlar, Sıralar) tablo başlığı
+                    yapılır.</strong> Asla kişileri başlığa yazmayın, çünkü kişiler değişkendir.</p>
+            <div class="not-prose bg-slate-100 dark:bg-slate-800 p-6 rounded-xl my-6 border-l-4 border-primary">
+                <h4 class="font-bold mb-2">Örnek Tablo Yapısı:</h4>
+                <div class="grid grid-cols-3 gap-2 text-center text-sm font-mono">
+                    <div class="bg-white dark:bg-darkCard p-2 rounded border border-slate-300">PAZARTESİ</div>
+                    <div class="bg-white dark:bg-darkCard p-2 rounded border border-slate-300">SALI</div>
+                    <div class="bg-white dark:bg-darkCard p-2 rounded border border-slate-300">ÇARŞAMBA</div>
+                    <div class="text-slate-400">Ayşe?</div>
+                    <div class="text-primary font-bold">Burak</div>
+                    <div class="text-slate-400">Can/Deniz</div>
+                </div>
+            </div>
+            <h2 id="ihtimal" class="text-3xl mt-12">3. Kesin ve İhtimalleri Ayır</h2>
+            <p>Tabloya kesin bilgileri siyah kalemle, "olabilir" dediklerinizi parantez içinde (Ayşe/Fatma) şeklinde
+                yazın. Öncülleri okurken "Kesinlikle yanlıştır" diyorsa, parantezli kısımlara bakın.</p>
+            <div class="mt-16 bg-slate-900 rounded-3xl p-8 text-center text-white">
+                <h3 class="text-2xl font-bold mb-4">Mantık Sorusu Çöz</h3><a href="index.html#auth-section"
+                    class="bg-primary text-white px-8 py-3 rounded-xl font-bold">Uygulamaya Git</a>
+            </div>
+        </article>
+    </main>
+    <footer class="bg-white dark:bg-darkCard border-t border-slate-200 dark:border-slate-800 py-12 text-center">
+        <p class="text-slate-500 text-sm">© 2025 Al&Ni Exam Studio.</p>
+    </footer>
+</body>
+
+</html>

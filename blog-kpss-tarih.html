@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="tr" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPSS Tarih'te Çağrışımsal Öğrenme ve 5 Kritik Hata | Al&Ni Exam Studio</title>
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1105930817107200"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#f97316', darkBg: '#0f172a', darkCard: '#1e293b' }, fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .prose h2 {
+            scroll-margin-top: 100px;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 antialiased">
+
+    <!-- Navbar -->
+    <nav
+        class="fixed top-0 w-full z-50 bg-white/90 dark:bg-darkCard/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3 font-black text-xl dark:text-white">
+                <div class="w-10 h-10 bg-primary rounded-xl text-white flex justify-center items-center shadow-lg">A
+                </div>
+                Al&Ni <span class="text-primary">Blog</span>
+            </a>
+            <a href="index.html" class="text-sm font-bold text-slate-500 hover:text-primary transition"><i
+                    class="fa-solid fa-arrow-left mr-2"></i>Uygulamaya Dön</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Kapak) -->
+    <header class="relative pt-32 pb-20 px-6 bg-slate-900 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&q=80&w=1200"
+            class="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+        <div class="max-w-4xl mx-auto relative z-10 text-center">
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold uppercase tracking-widest mb-6 border border-orange-500/30">
+                KPSS Lisans & Ön Lisans</div>
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">KPSS Tarih Çalışırken Beyniniz
+                Size Oyun Oynuyor Olabilir mi?</h1>
+            <div class="flex items-center justify-center gap-6 text-slate-400 text-sm">
+                <span><i class="fa-regular fa-calendar mr-2"></i>2 Ocak 2025</span>
+                <span><i class="fa-regular fa-clock mr-2"></i>6 Dakika Okuma</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- İçerik Alanı -->
+    <main class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12">
+
+        <!-- Sidebar (Masaüstünde Sabit İçindekiler) -->
+        <aside class="hidden lg:block lg:col-span-3">
+            <div class="sticky top-28 space-y-8">
+                <div
+                    class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                    <h4
+                        class="font-bold text-slate-900 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-700 pb-2">
+                        İçindekiler</h4>
+                    <ul class="space-y-3 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="#hata1" class="hover:text-primary transition block">1. İzole Ezber Hatası</a></li>
+                        <li><a href="#hata2" class="hover:text-primary transition block">2. Ebbinghaus Unutma Eğrisi</a>
+                        </li>
+                        <li><a href="#hata3" class="hover:text-primary transition block">3. "Aşırı Detay" Tuzağı</a>
+                        </li>
+                        <li><a href="#hata4" class="hover:text-primary transition block">4. Soru Kökü Analizsizliği</a>
+                        </li>
+                        <li><a href="#hata5" class="hover:text-primary transition block">5. Kronolojik Bağlantı
+                                Kopukluğu</a></li>
+                    </ul>
+                </div>
+                <!-- Banner -->
+                <div class="bg-gradient-to-br from-primary to-red-600 rounded-2xl p-6 text-white text-center shadow-lg">
+                    <i class="fa-solid fa-brain text-4xl mb-4 text-white/80"></i>
+                    <h5 class="font-bold text-lg mb-2">Eksiklerini Bul!</h5>
+                    <p class="text-xs opacity-90 mb-4">SmartCoach AI hangi tarih konusunda zayıf olduğunu analiz etsin.
+                    </p>
+                    <a href="index.html#auth-section"
+                        class="inline-block w-full bg-white text-primary font-bold py-3 rounded-xl hover:bg-slate-100 transition">Ücretsiz
+                        Analiz Et</a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Makale Metni -->
+        <article
+            class="lg:col-span-9 prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary">
+            <p class="lead text-xl text-slate-600 dark:text-slate-300">
+                Tarih, KPSS'nin en belirleyici dersidir çünkü standart sapması yüksektir. Ancak adayların %70'i tarihi
+                "ezber dersi" olarak kodladığı için başarısız olur. Bilişsel psikolojiye göre beyin, anlamlı bağlar
+                kurmadığı bilgiyi 24 saat içinde siler. İşte bilimsel verilerle en büyük 5 hata.
+            </p>
+
+            <h2 id="hata1" class="text-3xl text-slate-900 dark:text-white mt-12 flex items-center gap-3">
+                <span
+                    class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-lg">1</span>
+                Olay Örgüsü Kurmadan "İzole Ezber" Yapmak
+            </h2>
+            <p>
+                Beynimizdeki nöronlar, yeni bilgiyi eski bilgiye bağlayarak (sinaps) öğrenir. Örneğin; "1453 İstanbul'un
+                Fethi" bilgisini tek başına ezberlerseniz, sınav stresinde unutursunuz. Ancak bunu <strong>"Bizans'ın
+                    surlarının zayıflığı + Şahi Topları + Coğrafi Keşiflerin Başlangıcı"</strong> zinciriyle
+                öğrenirseniz (Çağrışımsal Öğrenme), birini unutsanız diğeri ipucu verir.
+            </p>
+            <blockquote class="border-l-4 border-primary bg-orange-50 dark:bg-orange-900/10 p-4 italic rounded-r-lg">
+                "Tarih ezberlenecek bir telefon rehberi değildir; neden-sonuç ilişkisine dayalı bir senaryodur."
+            </blockquote>
+
+            <h2 id="hata2" class="text-3xl text-slate-900 dark:text-white mt-12 flex items-center gap-3">
+                <span
+                    class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-lg">2</span>
+                Tekrarı Ertelemek (Ebbinghaus Unutma Eğrisi)
+            </h2>
+            <p>
+                Alman psikolog Hermann Ebbinghaus'un çalışmalarına göre; öğrendiğiniz bir bilginin <strong>%60'ını
+                    sadece 1 saat içinde unutursunuz.</strong> 1 hafta sonra ise %80'i silinir.
+            </p>
+            <div
+                class="bg-slate-100 dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 my-6">
+                <h4 class="text-lg font-bold mb-4">Bilimsel Tekrar Metodu (Spaced Repetition):</h4>
+                <ul class="list-none space-y-2 pl-0">
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> 1. Tekrar: Konu
+                        çalıştıktan hemen sonra (10 dk)</li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> 2. Tekrar:
+                        Uyumadan önce (Beyin uykuda işler)</li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-check text-green-500"></i> 3. Tekrar: 1
+                        hafta sonra (Kalıcı hafızaya geçiş)</li>
+                </ul>
+            </div>
+
+            <h2 id="hata3" class="text-3xl text-slate-900 dark:text-white mt-12 flex items-center gap-3">
+                <span
+                    class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-lg">3</span>
+                "Aşırı Detay" (Overlearning) Tuzağı
+            </h2>
+            <p>
+                ÖSYM, akademik tarihçilik sormaz; "Milli Eğitim Müfredatı" sınırlarını sorar. Piyasada "zor soru
+                bankası" adı altında satılan, akademik dipnotlardan oluşturulmuş kaynaklar sizi yorar.
+                <br><strong>Çözüm:</strong> Al&Ni Exam Studio'daki konu analizleri, sadece ÖSYM'nin son 10 yılda sorduğu
+                kavram haritasına odaklanır. Gereksiz yükten kurtulun.
+            </p>
+
+            <h2 id="hata4" class="text-3xl text-slate-900 dark:text-white mt-12 flex items-center gap-3">
+                <span
+                    class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-lg">4</span>
+                Soru Kökünü ve Anahtarı Görmemek
+            </h2>
+            <p>
+                Tarih sorularında "Yalnız bu bilgilere dayanarak" ifadesi bir emirdir. O an bildiğiniz diğer her şeyi
+                unutmalısınız. Sadece paragrafta ne varsa o. Adaylar genellikle kendi yorumlarını katarak hataya
+                düşerler.
+            </p>
+
+            <h2 id="hata5" class="text-3xl text-slate-900 dark:text-white mt-12 flex items-center gap-3">
+                <span
+                    class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-lg">5</span>
+                Kronolojik Bağlantıyı Koparmak
+            </h2>
+            <p>
+                "Atatürk İlkeleri"ni çalışırken, o ilkenin hangi inkılapla bağlantılı olduğunu ve o inkılabın hangi dış
+                politika olayı sırasında gerçekleştiğini bilmelisiniz. Zaman çizelgesi (Timeline) kullanmadan çalışmak,
+                haritasız okyanusa açılmaya benzer.
+            </p>
+
+            <!-- Sonuç ve CTA -->
+            <div class="mt-16 p-8 bg-slate-900 rounded-3xl text-center relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
+                </div>
+                <h3 class="text-2xl font-bold text-white relative z-10 mb-4">Bu Hataları Yapmayı Bırakın</h3>
+                <p class="text-slate-400 relative z-10 mb-8 max-w-xl mx-auto">Sistemimize giriş yapın, yapay zeka sizin
+                    için en uygun tarih çalışma programını ve tekrar periyotlarını oluştursun.</p>
+                <a href="index.html#auth-section"
+                    class="relative z-10 inline-flex items-center justify-center px-8 py-4 bg-primary text-white font-bold rounded-xl hover:bg-primaryDark transition shadow-lg shadow-orange-500/25">
+                    Hemen Başla <i class="fa-solid fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+
+        </article>
+    </main>
+
+    <footer class="bg-white dark:bg-darkCard border-t border-slate-200 dark:border-slate-800 py-12 text-center">
+        <div class="max-w-7xl mx-auto px-6">
+            <p class="text-slate-500 text-sm">© 2025 Al&Ni Exam Studio. Google AdSense Politikalarına uygundur.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>
