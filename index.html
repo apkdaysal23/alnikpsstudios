@@ -78,6 +78,11 @@
         .faq-item:hover {
             border-color: #f97316;
         }
+
+        /* Blog Kartları İçin Efekt */
+        .article-card:hover .article-img {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
@@ -98,6 +103,9 @@
 
             <div class="hidden lg:flex items-center gap-8 text-sm font-semibold uppercase tracking-wider">
                 <a href="#features" class="hover:text-primary transition-colors">Özellikler</a>
+                <!-- YENİ EKLENEN MENU LINKI -->
+                <a href="#blog-section" class="text-primary font-bold hover:text-primaryDark transition-colors">Sınav
+                    Rehberi</a>
                 <a href="#about" class="hover:text-primary transition-colors">Hakkımızda</a>
                 <a href="#faq" class="hover:text-primary transition-colors">Destek & SSS</a>
                 <a href="#contact" class="hover:text-primary transition-colors">İletişim</a>
@@ -264,6 +272,103 @@
                         <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Soru Arşivi Oluşturma</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- !!! ANA SAYFA VİTRİNİ (SADECE 3 TANE) !!! -->
+    <section id="blog-section" class="py-24 bg-slate-50 dark:bg-darkBg border-y border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div>
+                    <span class="text-primary font-bold uppercase tracking-widest text-xs">Al&Ni Akademi</span>
+                    <h2 class="text-4xl font-bold mt-2 dark:text-white">Sınav Başarı Rehberi</h2>
+                    <p class="text-slate-500 mt-4 max-w-xl">KPSS, YKS ve DGS süreçlerinde ihtiyacınız olan bilimsel
+                        çalışma teknikleri.</p>
+                </div>
+                <!-- Masaüstü Tümünü Gör Butonu -->
+                <a href="blog.html"
+                    class="hidden md:inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-primary transition group">
+                    Tüm Yazıları Gör (13) <i
+                        class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <!-- 3'lü VİTRİN -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+
+                <!-- 1. Tarih -->
+                <article
+                    class="bg-white dark:bg-darkCard rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 article-card border border-slate-100 dark:border-slate-700 flex flex-col h-full group cursor-pointer"
+                    onclick="window.location.href='blog.html'">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&q=80&w=800"
+                            class="w-full h-full object-cover article-img transition-transform duration-700 group-hover:scale-110"
+                            alt="Tarih">
+                        <div
+                            class="absolute top-4 left-4 bg-white/90 text-slate-900 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                            Popüler</div>
+                    </div>
+                    <div class="p-8 flex-1 flex flex-col">
+                        <h3 class="text-xl font-bold mb-3 dark:text-white leading-tight">Tarih: 5 Kritik Hata</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Ezberlemek yerine çağrışımsal öğrenme
+                            metodunu kullanın.</p>
+                        <span class="mt-auto text-primary font-bold text-sm">Rehbere Git <i
+                                class="fa-solid fa-chevron-right ml-1"></i></span>
+                    </div>
+                </article>
+
+                <!-- 2. Pomodoro -->
+                <article
+                    class="bg-white dark:bg-darkCard rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 article-card border border-slate-100 dark:border-slate-700 flex flex-col h-full group cursor-pointer"
+                    onclick="window.location.href='blog.html'">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=800"
+                            class="w-full h-full object-cover article-img transition-transform duration-700 group-hover:scale-110"
+                            alt="Pomodoro">
+                        <div
+                            class="absolute top-4 left-4 bg-white/90 text-slate-900 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                            Verimlilik</div>
+                    </div>
+                    <div class="p-8 flex-1 flex flex-col">
+                        <h3 class="text-xl font-bold mb-3 dark:text-white leading-tight">Pomodoro ve Nörobilim</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Dikkat sürenizi beynin doğal ritmine
+                            göre ayarlayın.</p>
+                        <span class="mt-auto text-primary font-bold text-sm">Rehbere Git <i
+                                class="fa-solid fa-chevron-right ml-1"></i></span>
+                    </div>
+                </article>
+
+                <!-- 3. Uyku (GÖRSEL DÜZELDİ) -->
+                <article
+                    class="bg-white dark:bg-darkCard rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 article-card border border-slate-100 dark:border-slate-700 flex flex-col h-full group cursor-pointer"
+                    onclick="window.location.href='blog.html'">
+                    <div class="h-48 overflow-hidden relative">
+                        <!-- YENİ GÖRSEL BURADA -->
+                        <img src="https://images.unsplash.com/photo-1541781777631-fa9531908431?auto=format&fit=crop&q=80&w=800"
+                            class="w-full h-full object-cover article-img transition-transform duration-700 group-hover:scale-110"
+                            alt="Uyku Düzeni">
+                        <div
+                            class="absolute top-4 left-4 bg-white/90 text-slate-900 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                            Sağlık</div>
+                    </div>
+                    <div class="p-8 flex-1 flex flex-col">
+                        <h3 class="text-xl font-bold mb-3 dark:text-white leading-tight">Sabah 5 Efsanesi</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Kronotipinizi bulun. Gececi misiniz
+                            yoksa sabahçı mı?</p>
+                        <span class="mt-auto text-primary font-bold text-sm">Rehbere Git <i
+                                class="fa-solid fa-chevron-right ml-1"></i></span>
+                    </div>
+                </article>
+
+            </div>
+
+            <!-- Mobil Tümünü Gör Butonu -->
+            <div class="text-center md:hidden">
+                <a href="blog.html"
+                    class="inline-flex items-center justify-center gap-2 bg-slate-900 dark:bg-primary text-white px-8 py-4 rounded-2xl font-bold w-full active:scale-95 transition shadow-xl">
+                    Tüm Kütüphaneye Git (13) <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
         </div>
     </section>
