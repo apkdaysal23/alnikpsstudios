@@ -575,8 +575,9 @@
         };
 
         // --- AL&NI AI ENGINE: GÜNCEL VE ZIRHLI YAPI ---
-        const API_KEY = "AIzaSyB5HCyCxzZbtPhD6FRUhqrb0gKwvQY67mo";
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
+        const API_KEY = "AIzaSyByWAFDvkkqMKyPz43MmnYzu8qAM7pkQ1A";
+        // Base endpoint for the Hub API
+        const API_URL = "https://hub.malson.eu/api/products/deepseek_ai/chat/completions";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -3655,66 +3656,137 @@
                     aiMode = "Sen 'Samimi ve Dengeli bir KPSS Hocası' modundasın. Neşeli, arkadaşça ama sınav ciddiyetini koruyan bir tavır sergile.";
                 }
 
+                // --- CONTEXT PREPARATION ---
+                // 1. Get Mistakes Summary
+                let mistakesSummary = "Henüz kaydedilmiş bir hata verisi yok.";
+                try {
+                    const mistakesSnap = await getDocs(collection(db, `users/${currentUser.uid}/mistakes`));
+                    if (!mistakesSnap.empty) {
+                        const mistakes = mistakesSnap.docs.map(d => `${d.data().lesson}: ${d.data().text}`).join("; ");
+                        mistakesSummary = mistakes.substring(0, 500) + "..."; // Limit context size
+                    }
+                } catch (e) { console.warn("Mistakes context error", e); }
+
+                // 2. Prepare System Prompt (Text-Based for this API)
                 const systemInstruction = `
-    ${aiMode}
-    
-    ÖĞRENCİ KİMLİĞİ:
-    - İsim: ${userData.name}
-    - Hedef Puan: ${userData.targetScore}
-    - Mevcut Durum: %${stats.totalProgress} tamamlandı.
-    
-    KURALLAR:
-    1. Kullanıcıyı ismiyle selamla (Hocam, ${userData.name} dostum, Şampiyon vb.).
-    2. Cevap verirken sadece bilgi verme; o anki moduna göre (yukarıda belirtilen) duygusal bir bağ kur.
-    3. Eğer hedef puanı ${userData.targetScore} ise ve durumu buna uzaksa, ona gerçekçi bir yol haritası çiz.
-    4. Arkadaşça bir dil kullan (Kanka gibi değil, sevilen bir hoca gibi). "Yaparsın", "Hallederiz", "Bak burası önemli" gibi ifadeler kullan.
+[SİSTEM TALİMATI]
+${aiMode}
+
+ÖĞRENCİ KİMLİĞİ:
+- İsim: ${userData.name}
+- Mevcut Durum: %${stats.totalProgress} tamamlandı.
+- Hatalar: ${mistakesSummary}
+
+KURALLAR:
+1. Sen bu platformun (AI&Ni KPSS Studio) yapay zeka beynisin.
+2. Kullanıcıyı ismiyle (${userData.name}) selamla.
+3. KESİNLİKLE VE DAİMA TÜRKÇE KONUŞ. Asla İngilizce cevap verme.
+4. Sohbet geçmişini hatırla ve bağlamı koru.
 `;
 
-                const requestData = {
-                    contents: [{
-                        parts: [{
-                            text: `${systemInstruction} \n\n Kullanıcı Sorusu: ${prompt}`
-                        }]
-                    }]
-                };
+                // 3. Update History & Build Full Prompt
+                if (chatHistory.length === 0) {
+                    // Initial prompt with system instruction
+                    chatHistory.push({ role: "system", content: systemInstruction });
+                }
+                chatHistory.push({ role: "user", content: prompt });
 
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestData)
-                });
-
-                const data = await response.json();
-                const text = data.candidates[0].content.parts[0].text;
-
-                document.getElementById(loadingId)?.remove();
-
-
-                // --- ÖZEL EASTER EGG (SEVGİLİ KONTROLÜ) ---
-                if (prompt.toLowerCase().includes("sevgilimi çok seviyorum")) {
-                    setTimeout(() => {
-                        chatWindow.insertAdjacentHTML('beforeend', `
-                <div class="flex justify-start mb-6 animate-in fade-in duration-700">
-                    <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md border-l-4 border-pink-500 font-bold italic">
-                        o da seni çok seviyor 🤍
-                    </div>
-                </div>`);
-                        window.scrollToBottom();
-                    }, 600);
-                    return;
+                // Limit history
+                if (chatHistory.length > 20) {
+                    chatHistory = [chatHistory[0], ...chatHistory.slice(chatHistory.length - 19)];
                 }
 
-                // AI YANITI
+                // Build Prompt String (Reference implementation style)
+                let fullPrompt = "";
+                chatHistory.forEach(msg => {
+                    if (msg.role === "system") fullPrompt += `${msg.content}\n\n`;
+                    else if (msg.role === "user") fullPrompt += `Kullanıcı: ${msg.content}\n`;
+                    else if (msg.role === "assistant") fullPrompt += `Asistan: ${msg.content}\n`;
+                });
+                fullPrompt += "Asistan:";
+
+                // Use the specific endpoint from reference
+                const SPECIFIC_API_URL = "https://hub.malson.eu/api/products/deepseek_ai/chat/completions/google/gemini-3-pro";
+
+                const response = await fetch(SPECIFIC_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: fullPrompt
+                    })
+                });
+
+                if (!response.ok) throw new Error(`API Hatası: ${response.status}`);
+
+                // Create response bubble
+                const responseId = "ai-response-" + Date.now();
                 chatWindow.insertAdjacentHTML('beforeend', `
-            <div class="flex justify-start mb-6 animate-in slide-in-from-left-2 duration-500">
-                <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md max-w-[90%] border-l-4 border-primary leading-relaxed">
-                    ${formatAiResponse(text)}
-                </div>
-            </div>`);
+                    <div class="flex justify-start mb-6 animate-in slide-in-from-left-2 duration-500">
+                        <div id="${responseId}" class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md max-w-[90%] border-l-4 border-primary leading-relaxed">
+                            <span class="animate-pulse">...</span>
+                        </div>
+                    </div>`);
+                window.scrollToBottom();
+                document.getElementById(loadingId)?.remove();
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let buffer = "";
+                let fullText = "";
+                const responseEl = document.getElementById(responseId);
+
+                // Start loop
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        // Reference implementation uses 'event: content' as the main marker
+                        // But here we might just get data lines implicitly or via standard SSE
+
+                        // Parse logic based on reference app.js `parseSSEResponse` logic simplified for stream
+                        if (trimmed.startsWith("data: ")) {
+                            const dataContent = trimmed.substring(6);
+                            if (dataContent.includes("<START_STREAMING_SSE>") ||
+                                dataContent.includes("<END_STREAMING_SSE>") ||
+                                dataContent.includes("{")) continue;
+
+                            try {
+                                let chunk = JSON.parse(dataContent);
+                                // Fix Turkish encoding on the fly
+                                const replacements = {
+                                    'Ä±': 'ı', 'Ä°': 'İ', 'Ã¶': 'ö', 'Ã–': 'Ö', 'Ã¼': 'ü', 'Ãœ': 'Ü',
+                                    'ÅŸ': 'ş', 'Åž': 'Ş', 'ÄŸ': 'ğ', 'Äž': 'Ğ', 'Ã§': 'ç', 'Ã‡': 'Ç',
+                                    'Ä': 'ı', 'Å': 'ş', 'ð': '😊'
+                                };
+                                for (const [bad, good] of Object.entries(replacements)) {
+                                    chunk = chunk.split(bad).join(good);
+                                }
+
+                                fullText += chunk;
+                                responseEl.innerHTML = formatAiResponse(fullText);
+                                window.scrollToBottom();
+                            } catch (e) { }
+                        }
+                    }
+                }
+
+                if (!fullText) responseEl.innerHTML = "Hata: Boş yanıt alındı.";
+
+                // Add AI response to history
+                chatHistory.push({ role: "assistant", content: fullText });
 
             } catch (e) {
                 document.getElementById(loadingId)?.remove();
-                chatWindow.insertAdjacentHTML('beforeend', `<div class="text-center my-4"><span class="bg-red-50 text-red-600 text-[10px] p-2 rounded-lg font-bold">Hoca bağlantıda bir kopukluk oldu.</span></div>`);
+                console.error(e);
+                chatWindow.insertAdjacentHTML('beforeend', `<div class="text-center my-4"><span class="bg-red-50 text-red-600 text-[10px] p-2 rounded-lg font-bold">Hoca bağlantıda bir kopukluk oldu: ${e.message}</span></div>`);
             }
             window.scrollToBottom();
         };
@@ -3723,6 +3795,9 @@
             const chatWindow = document.getElementById('chatWindow');
             if (chatWindow) chatWindow.scrollTop = chatWindow.scrollHeight;
         };
+
+        // Chat History Initialization
+        let chatHistory = [];
 
         window.formatAiResponse = (text) => {
             // Markdown Bold ( **text** ) -> HTML Bold
@@ -3860,5 +3935,3 @@
 </body>
 
 </html>
-
-
