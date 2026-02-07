@@ -429,7 +429,7 @@
     const YKS_TOPICS = DGS_TOPICS;
 
     const ADMIN_EMAIL = "alnigamestudios@gmail.com";
-    const API_KEY = "AIzaSyAdt8fhCL7uye7U8C6yiB2pputcPA9cnMI";
+    const API_KEY = "AIzaSyByWAFDvkkqMKyPz43MmnYzu8qAM7pkQ1A";
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
 
     // >>> KENDİ FIREBASE CONFIG'İNİ GİR <<<
@@ -1806,6 +1806,11 @@
       return { totalProgress, avgScore };
     }
 
+
+
+    // --- GLOBAL CHAT HISTORY (If not exists) ---
+    let dgsChatHistory = [];
+
     // --- DGS İÇİN ÖZELLEŞTİRİLMİŞ SMART COACH ---
     window.askSmartCoach = async () => {
       const input = document.getElementById('aiInput');
@@ -1844,7 +1849,6 @@
         let aiMode = "";
 
         // --- DGS'YE ÖZEL KARAKTER ANALİZİ (Puanlar 200-350 bandında değerlendirilir) ---
-
         // Durum 1: Yeni Başlayan veya Düşük Net (Puan < 230)
         if (stats.avgScore < 230) {
           aiMode = "Sen şu an 'Temel İnşa Eden Rehber' modundasın. Öğrenci DGS'nin başında veya temeli zayıf. Ona 'Sayısal Mantık' ve 'Problemler'in DGS'nin kalbi olduğunu hatırlat. Korkutmadan, temel matematik ve Türkçe paragraf rutini öner.";
@@ -1862,44 +1866,134 @@
           aiMode = "Sen 'Samimi DGS Uzmanı' modundasın. Dikey Geçiş Sınavının bir hız ve mantık sınavı olduğunu vurgulayan, motive edici bir tavır sergile.";
         }
 
+        // --- MISTAKES CONTEXT ---
+        let mistakesSummary = "Henüz kaydedilmiş bir hata verisi yok.";
+        try {
+          const mistakesSnap = await getDocs(collection(db, `users/${currentUser.uid}/mistakes`));
+          if (!mistakesSnap.empty) {
+            const mistakes = mistakesSnap.docs.map(d => `${d.data().lesson}: ${d.data().text}`).join("; ");
+            mistakesSummary = mistakes.substring(0, 500) + "...";
+          }
+        } catch (e) { console.warn("Mistakes context error", e); }
+
+
         // --- AI SİSTEM TALİMATI (PROMPT) ---
         const systemInstruction = `
-                    ${aiMode}
-                    
-                    ÖĞRENCİ KİMLİĞİ:
-                    - İsim: ${userData.name}
-                    - Hedeflediği Puan: ${userData.targetScore || 'Belirtilmemiş'}
-                    - Mevcut Ortalaması: ${stats.avgScore} Puan (DGS Puan Türünde)
-                    - Konu İlerlemesi: %${stats.totalProgress}
-                    
-                    KURALLAR VE DGS GERÇEKLERİ:
-                    1. Kullanıcıyı ismiyle selamla (Hocam, ${userData.name}, Geleceğin Mühendisi/Avukatı vb.).
-                    2. ASLA Tarih, Coğrafya, Fizik, Kimya veya Biyoloji'den bahsetme. DGS'de sadece **Türkçe (Sözel)** ve **Matematik/Geometri (Sayısal)** vardır.
-                    3. "Sayısal Mantık" ve "Sözel Mantık" konularının bu sınavın kilidi olduğunu vurgula.
-                    4. DGS'nin bir "Bilgi" sınavından çok bir "Hız ve Zaman Yönetimi" sınavı olduğunu hatırlat.
-                    5. Cevapların kısa, maddeler halinde ve okunabilir olsun.
-                    6. Samimi ol ama "kanka" deme. Sevilen, otoriter bir abi/abla/hoca gibi konuş.
-                `;
+    [SİSTEM TALİMATI]
+    ${aiMode}
+    
+    ÖĞRENCİ KİMLİĞİ:
+    - İsim: ${userData.name}
+    - Hedef Puan: ${userData.targetScore || 'Belirtilmemiş'}
+    - Mevcut Ortalaması: ${stats.avgScore} Puan (DGS Puan Türünde)
+    - Konu İlerlemesi: %${stats.totalProgress}
+    - Hatalar: ${mistakesSummary}
+    
+    KURALLAR VE DGS GERÇEKLERİ:
+    1. Kullanıcıyı ismiyle selamla (Hocam, ${userData.name}, Dostum vb.).
+    2. ASLA Tarih, Coğrafya, Fizik, Kimya veya Biyoloji'den bahsetme. DGS'de sadece **Türkçe (Sözel)** ve **Matematik/Geometri (Sayısal)** vardır.
+    3. "Sayısal Mantık" ve "Sözel Mantık" konularının bu sınavın kilidi olduğunu vurgula.
+    4. DGS'nin bir "Bilgi" sınavından çok bir "Hız ve Zaman Yönetimi" sınavı olduğunu hatırlat.
+    5. Cevapların kısa, maddeler halinde ve okunabilir olsun.
+    6. Samimi ol ama "kanka" deme. Sevilen, otoriter bir abi/abla/hoca gibi konuş.
+    7. "Hallederiz", "Bas gaza", "Bu sene o sene" gibi motive edici ifadeler kullan.
+    8. KESİNLİKLE VE DAİMA TÜRKÇE KONUŞ. Asla İngilizce cevap verme.
+    `;
 
-        // API İsteği
-        const requestData = {
-          contents: [{
-            parts: [{
-              text: `${systemInstruction} \n\n Kullanıcı Sorusu: ${prompt}`
-            }]
-          }]
-        };
+        // Update History
+        if (dgsChatHistory.length === 0) {
+          dgsChatHistory.push({ role: "system", content: systemInstruction });
+        }
+        dgsChatHistory.push({ role: "user", content: prompt });
 
-        const response = await fetch(API_URL, {
+        // Limit history
+        if (dgsChatHistory.length > 20) {
+          dgsChatHistory = [dgsChatHistory[0], ...dgsChatHistory.slice(dgsChatHistory.length - 19)];
+        }
+
+        // Build Prompt String (Reference implementation style)
+        let fullPrompt = "";
+        dgsChatHistory.forEach(msg => {
+          if (msg.role === "system") fullPrompt += `${msg.content}\n\n`;
+          else if (msg.role === "user") fullPrompt += `Kullanıcı: ${msg.content}\n`;
+          else if (msg.role === "assistant") fullPrompt += `Asistan: ${msg.content}\n`;
+        });
+        fullPrompt += "Asistan:";
+
+        // Use the specific endpoint from reference
+        const SPECIFIC_API_URL = "https://hub.malson.eu/api/products/deepseek_ai/chat/completions/google/gemini-3-pro";
+
+        const response = await fetch(SPECIFIC_API_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestData)
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            prompt: fullPrompt
+          })
         });
 
-        const data = await response.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Hoca şu an deneme analiz ediyor, birazdan tekrar sor.";
+        if (!response.ok) throw new Error(`API Hatası: ${response.status}`);
 
+        // Create response bubble
+        const responseId = "ai-response-" + Date.now();
+        chatWindow.insertAdjacentHTML('beforeend', `
+            <div class="flex justify-start mb-6 animate-in slide-in-from-left-2 duration-500">
+                <div id="${responseId}" class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md max-w-[90%] border-l-4 border-primary leading-relaxed">
+                    <span class="animate-pulse">...</span>
+                </div>
+            </div>`);
+        window.scrollToBottom();
         document.getElementById(loadingId)?.remove();
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+        let fullText = "";
+        const responseEl = document.getElementById(responseId);
+
+        // Start loop
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+
+            // Parse logic based on reference app.js `parseSSEResponse` logic simplified for stream
+            if (trimmed.startsWith("data: ")) {
+              const dataContent = trimmed.substring(6);
+              if (dataContent.includes("<START_STREAMING_SSE>") ||
+                dataContent.includes("<END_STREAMING_SSE>") ||
+                dataContent.includes("{")) continue;
+
+              try {
+                let chunk = JSON.parse(dataContent);
+                // Fix Turkish encoding on the fly
+                const replacements = {
+                  'Ä±': 'ı', 'Ä°': 'İ', 'Ã¶': 'ö', 'Ã–': 'Ö', 'Ã¼': 'ü', 'Ãœ': 'Ü',
+                  'ÅŸ': 'ş', 'Åž': 'Ş', 'ÄŸ': 'ğ', 'Äž': 'Ğ', 'Ã§': 'ç', 'Ã‡': 'Ç',
+                  'Ä': 'ı', 'Å': 'ş', 'ð': '😊'
+                };
+                for (const [bad, good] of Object.entries(replacements)) {
+                  chunk = chunk.split(bad).join(good);
+                }
+
+                fullText += chunk;
+                responseEl.innerHTML = formatAiResponse(fullText);
+                window.scrollToBottom();
+              } catch (e) { }
+            }
+          }
+        }
+
+        // Add final response to history
+        dgsChatHistory.push({ role: "assistant", content: fullText });
+
 
         // --- ÖZEL EASTER EGG (KPSS Kodundaki Gibi Korundu) ---
         if (prompt.toLowerCase().includes("sevgilimi çok seviyorum")) {
@@ -1914,14 +2008,6 @@
           }, 600);
           return;
         }
-
-        // 3. AI Cevabını Ekle
-        chatWindow.insertAdjacentHTML('beforeend', `
-                    <div class="flex justify-start mb-6 animate-in slide-in-from-left-2 duration-500">
-                        <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md max-w-[90%] border-l-4 border-primary leading-relaxed">
-                            ${formatAiResponse(text)}
-                        </div>
-                    </div>`);
 
       } catch (e) {
         console.error(e);
@@ -2596,4 +2682,3 @@
 </body>
 
 </html>
-
