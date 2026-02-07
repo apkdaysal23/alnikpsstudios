@@ -389,7 +389,7 @@
     // ==========================
     // AL&NI AI ENGINE (YKS SÜRÜMÜ)
     // ==========================
-    const API_KEY = "AIzaSyAdt8fhCL7uye7U8C6yiB2pputcPA9cnMI"; // Buraya kendi keyini koyabilirsin
+    const API_KEY = "AIzaSyByWAFDvkkqMKyPz43MmnYzu8qAM7pkQ1A"; // Buraya kendi keyini koyabilirsin
     const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
 
     // İstatistik Hesaplayıcı (AI'ya veri beslemek için)
@@ -1788,6 +1788,9 @@
       if (w) w.scrollTop = w.scrollHeight;
     }
 
+    // --- GLOBAL YKS CHAT HISTORY ---
+    let yksChatHistory = [];
+
     window.askSmartCoach = async () => {
       const input = document.getElementById("aiInput");
       const chatWindow = document.getElementById("chatWindow");
@@ -1799,25 +1802,26 @@
 
       // 1. Kullanıcı Mesajını Ekle
       chatWindow.insertAdjacentHTML("beforeend", `
-         <div class="flex justify-end mb-4">
-           <div class="bg-[#dcf8c6] dark:bg-[#005c4b] text-slate-800 dark:text-[#e9edef] px-4 py-2 rounded-2xl rounded-tr-none text-sm shadow font-bold max-w-[85%]">
-             ${prompt.replace(/</g, "&lt;")}
-             <div class="text-[9px] text-right mt-1 opacity-50">Okundu ✓✓</div>
-           </div>
-         </div>
-       `);
+          <div class="flex justify-end mb-4 animate-in slide-in-from-right-2">
+            <div class="bg-[#dcf8c6] dark:bg-[#005c4b] text-slate-800 dark:text-[#e9edef] px-4 py-2 rounded-xl rounded-tr-none text-sm shadow font-bold max-w-[85%]">
+              ${prompt.replace(/</g, "&lt;")}
+              <div class="text-[9px] text-right mt-1 opacity-50">Okundu ✓✓</div>
+            </div>
+          </div>
+        `);
       input.value = "";
+      input.style.height = 'auto'; // Reset height
       scrollToBottom();
 
       // 2. Yükleniyor Animasyonu
       const loadingId = "loading-" + Date.now();
       chatWindow.insertAdjacentHTML("beforeend", `
-         <div class="flex justify-start mb-4 animate-pulse" id="${loadingId}">
-           <div class="bg-white dark:bg-[#202c33] px-4 py-2 rounded-2xl text-xs dark:text-slate-300 font-bold border border-slate-100 dark:border-slate-700">
-             Hoca düşünüyor...
-           </div>
-         </div>
-       `);
+          <div class="flex justify-start mb-4 animate-pulse" id="${loadingId}">
+            <div class="bg-white dark:bg-[#202c33] px-4 py-2 rounded-xl text-xs dark:text-slate-300 font-bold border border-slate-100 dark:border-slate-700 shadow-sm">
+              Hoca düşünüyor...
+            </div>
+          </div>
+        `);
       scrollToBottom();
 
       try {
@@ -1831,58 +1835,146 @@
         } else if (stats.avgScore < 250 && stats.progress > 40) {
           aiMode = "Sen şu an 'Uyarıcı Mentor' modundasın. Öğrenci konuları ilerletmiş ama netleri (250 altı) düşük. Samimi ama sert bir dille eksiklerini (deneme analizi vb.) yüzüne vur.";
         } else if (stats.avgScore >= 420) {
-          aiMode = "Sen şu an 'Derece Koçu' modundasın. Karşında ilk 10.000 hedefleyen bir öğrenci var. Rehavete kapılmasını engelle, AYT detaylarına odaklanmasını söyle.";
+          aiMode = "Sen şu an 'Derece Koçu' modundasın. Karşındaki öğrenci ilk 10.000 hedefliyor olabilir. Rehavete kapılmasını engelle, AYT detaylarına ve zor sorulara odaklanmasını söyle.";
         } else {
           aiMode = "Sen 'Samimi YKS Rehber Öğretmeni' modundasın. Neşeli, enerjik ama sınav ciddiyetini koruyan bir tavır sergile.";
         }
 
+        // --- MISTAKES ---
+        let mistakesSummary = "Henüz hata kaydedilmemiş.";
+        try {
+          // Assuming similar structure users/{uid}/mistakes
+          const mistakesSnap = await getDocs(collection(db, `users/${currentUser.uid}/mistakes`));
+          if (!mistakesSnap.empty) {
+            const mistakes = mistakesSnap.docs.map(d => `${d.data().lesson || 'Ders'}: ${d.data().text}`).join("; ");
+            mistakesSummary = mistakes.substring(0, 500) + "...";
+          }
+        } catch (e) { }
+
+        // --- SYSTEM PROMPT ---
         const systemInstruction = `
+              [SİSTEM TALİMATI]
               ${aiMode}
               
               ÖĞRENCİ KİMLİĞİ:
               - İsim: ${userData.name || "Öğrenci"}
               - Hedef: YKS (TYT/AYT)
               - Mevcut Başarı: %${stats.progress} konu bitirme, Ortalama ${stats.avgScore} Puan.
+              - Önceki Hatalar/Eksikler: ${mistakesSummary}
               
               KURALLAR:
               1. Kullanıcıyı ismiyle selamla (Hocam, ${userData.name}, Şampiyon vb.).
-              2. Cevap verirken KPSS'den değil, TYT ve AYT'den bahset.
+              2. Cevap verirken DGS veya KPSS'den değil, sadece TYT ve AYT'den bahset.
               3. Çok uzun paragraflar yazma, maddeler halinde ve okunabilir yaz.
               4. "Hallederiz", "Bas gaza", "Bu sene o sene" gibi motive edici ifadeler kullan.
+              5. KESİNLİKLE VE DAİMA TÜRKÇE KONUŞ. Asla İngilizceye dönme.
           `;
 
+        // Update History
+        if (yksChatHistory.length === 0) {
+          yksChatHistory.push({ role: "system", content: systemInstruction });
+        }
+        yksChatHistory.push({ role: "user", content: prompt });
+        if (yksChatHistory.length > 20) {
+          yksChatHistory = [yksChatHistory[0], ...yksChatHistory.slice(yksChatHistory.length - 19)];
+        }
+
+        let fullPrompt = "";
+        yksChatHistory.forEach(msg => {
+          if (msg.role === "system") fullPrompt += `${msg.content}\n\n`;
+          else if (msg.role === "user") fullPrompt += `Kullanıcı: ${msg.content}\n`;
+          else if (msg.role === "assistant") fullPrompt += `Asistan: ${msg.content}\n`;
+        });
+        fullPrompt += "Asistan:";
+
+
         // API İsteği
-        const response = await fetch(GEMINI_URL, {
+        // Using specific model URL as in verified app.html
+        const SPECIFIC_API_URL = "https://hub.malson.eu/api/products/deepseek_ai/chat/completions/google/gemini-3-pro";
+
+        const response = await fetch(SPECIFIC_API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [{
-              parts: [{ text: `${systemInstruction} \n\n Kullanıcı Sorusu: ${prompt}` }]
-            }]
+            prompt: fullPrompt
           })
         });
 
-        const data = await response.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Hoca şu an meşgul, sonra tekrar dene.";
+        if (!response.ok) throw new Error(`API Hatası: ${response.status}`);
 
+        // Create response bubble
+        const responseId = "ai-response-" + Date.now();
+        chatWindow.insertAdjacentHTML('beforeend', `
+            <div class="flex justify-start mb-6 animate-in slide-in-from-left-2 duration-500">
+                <div id="${responseId}" class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md max-w-[90%] border-l-4 border-primary leading-relaxed font-medium">
+                    <span class="animate-pulse">...</span>
+                </div>
+            </div>`);
+        scrollToBottom();
         document.getElementById(loadingId)?.remove();
 
-        // 3. AI Cevabını Ekle
-        chatWindow.insertAdjacentHTML("beforeend", `
-            <div class="flex justify-start mb-6">
-              <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-sm shadow-md max-w-[90%] border-l-4 border-primary leading-relaxed font-medium">
-                ${formatAiResponse(text)}
-              </div>
-            </div>
-          `);
-        scrollToBottom();
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+        let fullText = "";
+        const responseEl = document.getElementById(responseId);
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith("data: ")) {
+              const dataContent = trimmed.substring(6);
+              if (dataContent.includes("<START_STREAMING_SSE>") ||
+                dataContent.includes("<END_STREAMING_SSE>") ||
+                dataContent.includes("{")) continue;
+
+              try {
+                let chunk = JSON.parse(dataContent);
+                const replacements = {
+                  'Ä±': 'ı', 'Ä°': 'İ', 'Ã¶': 'ö', 'Ã–': 'Ö', 'Ã¼': 'ü', 'Ãœ': 'Ü',
+                  'ÅŸ': 'ş', 'Åž': 'Ş', 'ÄŸ': 'ğ', 'Äž': 'Ğ', 'Ã§': 'ç', 'Ã‡': 'Ç',
+                  'Ä': 'ı', 'Å': 'ş', 'ð': '😊'
+                };
+                for (const [bad, good] of Object.entries(replacements)) {
+                  chunk = chunk.split(bad).join(good);
+                }
+
+                fullText += chunk;
+                responseEl.innerHTML = formatAiResponse(fullText);
+                scrollToBottom();
+              } catch (e) { }
+            }
+          }
+        }
+
+        yksChatHistory.push({ role: "assistant", content: fullText });
+
+        // Easter Egg
+        if (prompt.toLowerCase().includes("sevgilimi çok seviyorum")) {
+          setTimeout(() => {
+            chatWindow.insertAdjacentHTML('beforeend', `
+                    <div class="flex justify-start mb-6 animate-in fade-in duration-700">
+                        <div class="bg-white dark:bg-[#202c33] text-slate-800 dark:text-[#e9edef] px-5 py-3 rounded-2xl rounded-tl-none text-[15px] shadow-md border-l-4 border-pink-500 font-bold italic">
+                            O da seni çok seviyor 🤍
+                        </div>
+                    </div>`);
+            scrollToBottom();
+          }, 600);
+        }
 
       } catch (e) {
         document.getElementById(loadingId)?.remove();
         chatWindow.insertAdjacentHTML("beforeend", `
             <div class="text-center mb-3">
               <span class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-200 text-[10px] px-3 py-1 rounded-lg font-bold">
-                Hoca ile bağlantı koptu. İnternetini kontrol et.
+                Hoca ile bağlantı koptu: ${e.message}
               </span>
             </div>
           `);
@@ -2525,4 +2617,3 @@
 </body>
 
 </html>
-
