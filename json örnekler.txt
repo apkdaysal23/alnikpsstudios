@@ -1,0 +1,198 @@
+
+Harika bir panel tasarımı olmuş. Kod yapısına (bulkUpload fonksiyonuna) baktığımda, sistemin beklediği JSON formatları şunlar:
+Soru Formatı: [{"lesson":"Ders Adı", "text":"Soru Metni", "options":["A","B","C","D","E"], "correct":0}]
+Not: correct değeri 0'dan başlar (0=A, 1=B, 2=C...)
+Kart Formatı: [{"lesson":"Ders Adı", "front":"Ön Yüz", "back":"Arka Yüz"}]
+Aşağıda YKS, DGS ve KPSS modülleri için hazırladığım, kopyalayıp paneldeki ilgili kutucuklara yapıştırabileceğin örnek JSON verileri bulunmaktadır.
+1. YKS MODÜLÜ (TYT - AYT)
+Soru Yükleme Alanı İçin JSON:
+(Tarih, Matematik ve Biyoloji örnekleri)
+code
+JSON
+[
+  {
+    "lesson": "Tarih",
+    "text": "Mustafa Kemal Atatürk 'Geldikleri gibi giderler' sözünü hangi olay üzerine söylemiştir?",
+    "options": [
+      "Çanakkale Savaşı",
+      "Mondros Ateşkesi sonrası İstanbul'un işgali",
+      "İzmir'in İşgali",
+      "Sakarya Meydan Muharebesi",
+      "Büyük Taarruz"
+    ],
+    "correct": 1
+  },
+  {
+    "lesson": "Matematik",
+    "text": "Bir sayının 3 katının 2 eksiği, aynı sayının yarısının 13 fazlasına eşittir. Bu sayı kaçtır?",
+    "options": [
+      "4",
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "correct": 2
+  },
+  {
+    "lesson": "Biyoloji",
+    "text": "Aşağıdakilerden hangisi prokaryot hücre yapısına sahip canlıların ortak özelliğidir?",
+    "options": [
+      "Mitokondri bulundurma",
+      "Çekirdek zarına sahip olma",
+      "Ribozom bulundurma",
+      "Kloroplast ile fotosentez yapma",
+      "Çok hücreli olma"
+    ],
+    "correct": 2
+  }
+]
+Kart Yükleme Alanı İçin JSON:
+(Edebiyat ve Fizik örnekleri)
+code
+JSON
+[
+  {
+    "lesson": "Edebiyat",
+    "front": "İlk yerli romanımız hangisidir ve yazarı kimdir?",
+    "back": "Taaşşuk-ı Talat ve Fitnat - Şemsettin Sami"
+  },
+  {
+    "lesson": "Edebiyat",
+    "front": "Vatan Şairi olarak bilinen yazarımız kimdir?",
+    "back": "Namık Kemal"
+  },
+  {
+    "lesson": "Fizik",
+    "front": "Skaler büyüklük nedir?",
+    "back": "Sadece sayı ve birimle ifade edilen büyüklüklerdir (Örn: Kütle, Zaman)."
+  }
+]
+2. DGS MODÜLÜ (Dikey Geçiş Sınavı)
+Soru Yükleme Alanı İçin JSON:
+(Sayısal Mantık ve Türkçe örnekleri)
+code
+JSON
+[
+  {
+    "lesson": "Matematik",
+    "text": "Ardışık 5 tek sayının toplamı 105 olduğuna göre, en büyük sayı kaçtır?",
+    "options": [
+      "19",
+      "21",
+      "23",
+      "25",
+      "27"
+    ],
+    "correct": 3
+  },
+  {
+    "lesson": "Sayısal Mantık",
+    "text": "Bir saatte akrep ile yelkovan 12:00'den sonra ilk kez saat kaçta üst üste gelir?",
+    "options": [
+      "13:05",
+      "13:05:27",
+      "13:06",
+      "13:10",
+      "13:15"
+    ],
+    "correct": 1
+  },
+  {
+    "lesson": "Türkçe",
+    "text": "Aşağıdaki cümlelerin hangisinde 'amaç-sonuç' ilişkisi vardır?",
+    "options": [
+      "Yağmur yağdığı için ıslandım.",
+      "Seni görmek üzere buraya geldim.",
+      "Çok çalışırsan kazanırsın.",
+      "Hava soğuk olduğu için mont giydim.",
+      "Kitabı okudum ve çok beğendim."
+    ],
+    "correct": 1
+  }
+]
+Kart Yükleme Alanı İçin JSON:
+(Matematik Formülleri)
+code
+JSON
+[
+  {
+    "lesson": "Matematik",
+    "front": "Küp toplamı formülü (a³ + b³)",
+    "back": "(a + b) . (a² - ab + b²)"
+  },
+  {
+    "lesson": "Geometri",
+    "front": "Eşkenar üçgenin alanı nasıl bulunur?",
+    "back": "(a²√3) / 4"
+  },
+  {
+    "lesson": "Türkçe",
+    "front": "Ünsüz Benzeşmesi (Sertleşmesi) Kuralı",
+    "back": "Fıstıkçı Şahap (f, s, t, k, ç, ş, h, p) ile biten kelimeye c, d, g ile başlayan ek gelirse ç, t, k olur."
+  }
+]
+3. KPSS MODÜLÜ (Genel Kültür - Genel Yetenek)
+Soru Yükleme Alanı İçin JSON:
+(Vatandaşlık, Tarih ve Coğrafya örnekleri)
+code
+JSON
+[
+  {
+    "lesson": "Vatandaşlık",
+    "text": "1982 Anayasası'na göre yasama yetkisi kime aittir?",
+    "options": [
+      "Cumhurbaşkanı",
+      "Bakanlar Kurulu",
+      "Türkiye Büyük Millet Meclisi",
+      "Anayasa Mahkemesi",
+      "Yüksek Seçim Kurulu"
+    ],
+    "correct": 2
+  },
+  {
+    "lesson": "Tarih",
+    "text": "Osmanlı Devleti'nde ilk dış borç hangi savaş sırasında ve hangi ülkeden alınmıştır?",
+    "options": [
+      "93 Harbi - Rusya",
+      "Kırım Savaşı - İngiltere",
+      "Balkan Savaşları - Almanya",
+      "Trablusgarp Savaşı - İtalya",
+      "I. Dünya Savaşı - Almanya"
+    ],
+    "correct": 1
+  },
+  {
+    "lesson": "Coğrafya",
+    "text": "Türkiye'de en fazla yağış alan bölge ile en az yağış alan bölge hangisidir?",
+    "options": [
+      "Ege - Doğu Anadolu",
+      "Karadeniz - İç Anadolu",
+      "Akdeniz - Güneydoğu Anadolu",
+      "Marmara - İç Anadolu",
+      "Karadeniz - Güneydoğu Anadolu"
+    ],
+    "correct": 1
+  }
+]
+Kart Yükleme Alanı İçin JSON:
+(Güncel Bilgiler ve Anayasa)
+code
+JSON
+[
+  {
+    "lesson": "Vatandaşlık",
+    "front": "Dokunulmazlığı kaldırma yetkisi kime aittir?",
+    "back": "TBMM Genel Kurulu'na aittir."
+  },
+  {
+    "lesson": "Coğrafya",
+    "front": "Türkiye'nin en büyük gölü hangisidir?",
+    "back": "Van Gölü"
+  },
+  {
+    "lesson": "Tarih",
+    "front": "Amasya Genelgesi'ni kaleme alan kişi kimdir?",
+    "back": "Cevat Abbas"
+  }
+]

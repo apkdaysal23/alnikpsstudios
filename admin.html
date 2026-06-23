@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AL&NI CORE V5.7 | God Mode Console</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { primary: '#f97316', darkBg: '#020617', darkCard: 'rgba(15, 23, 42, 0.8)' },
+                    backdropBlur: { 'xs': '2px', 'xl': '20px', '2xl': '40px' }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top right, #0f172a, #020617);
+            background-attachment: fixed;
+        }
+
+        .admin-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .tab-active {
+            background: linear-gradient(to right, rgba(249, 115, 22, 0.2), transparent);
+            color: #f97316;
+            border-left: 4px solid #f97316;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(249, 115, 22, 0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f97316;
+        }
+
+        /* Mobile Sidebar Transition */
+        .sidebar-closed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-open {
+            transform: translateX(0);
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar-closed {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-darkBg text-slate-200 min-h-screen selection:bg-primary/40 selection:text-white overflow-hidden">
+
+    <!-- LOGIN OVERLAY -->
+    <div id="loginOverlay" class="fixed inset-0 z-[1000] flex items-center justify-center bg-[#020617]">
+        <div
+            class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10">
+        </div>
+        <div class="w-full max-w-md p-8 md:p-12 glass-panel rounded-3xl text-center relative z-10 m-4">
+            <div
+                class="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center text-white text-4xl font-black mx-auto mb-8 shadow-[0_0_30px_rgba(249,115,22,0.4)] animate-pulse">
+                A</div>
+            <h1 class="text-3xl font-black mb-2 tracking-tighter text-white uppercase italic">Core Access</h1>
+            <p class="text-slate-500 text-[10px] mb-10 uppercase tracking-[0.4em] font-black">Al&Ni Authority</p>
+
+            <div class="space-y-4">
+                <input type="email" id="admEmail" placeholder="Kurucu E-Posta"
+                    class="w-full px-4 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-primary/50 transition text-white font-bold text-sm">
+                <input type="password" id="admPass" placeholder="Core Şifresi"
+                    class="w-full px-4 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-primary/50 transition text-white font-bold text-sm">
+                <button onclick="adminLogin()"
+                    class="w-full bg-primary hover:bg-orange-600 py-4 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg text-white flex items-center justify-center gap-2">SİSTEMİ
+                    BAŞLAT <i class="fa-solid fa-power-off"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN PANEL -->
+    <div id="adminPanel" class="hidden flex h-screen overflow-hidden relative">
+
+        <!-- MOBILE OVERLAY -->
+        <div id="sidebarOverlay" onclick="toggleSidebar()"
+            class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[140] hidden lg:hidden transition-opacity"></div>
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar"
+            class="fixed lg:static inset-y-0 left-0 w-72 glass-panel border-r border-white/5 flex flex-col shrink-0 z-[150] transition-transform duration-300 sidebar-closed">
+            <div class="p-6 border-b border-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-orange-500/20">
+                        V5.7</div>
+                    <div>
+                        <h2 class="font-black text-xl leading-none text-white tracking-tighter">CORE</h2>
+                        <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest">GOD MODE</p>
+                    </div>
+                </div>
+                <button onclick="toggleSidebar()"
+                    class="lg:hidden w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <nav class="flex-1 p-3 space-y-1 overflow-y-auto custom-scroll">
+                <div class="text-[10px] font-black text-slate-600 uppercase tracking-widest px-4 py-2 mt-2">Genel
+                    Yönetim</div>
+                <button onclick="switchSection('users')" id="nav-users"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-bold transition tab-active"><i
+                        class="fa-solid fa-users-gear w-5 text-center text-base"></i> Kullanıcı Havuzu</button>
+                <button onclick="switchSection('settings')" id="nav-settings"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:bg-slate-800/50"><i
+                        class="fa-solid fa-gears w-5 text-center text-base"></i> Sistem Ayarları</button>
+
+                <button onclick="switchSection('admin_notifs')" id="nav-admin_notifs"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:bg-slate-800/50 relative">
+                    <i class="fa-solid fa-bell w-5 text-center text-base"></i> Sistem Bildirimleri
+                    <span id="adminNotifBadge" class="hidden absolute right-3 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+
+                <button onclick="switchSection('feedback')" id="nav-feedback"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:bg-slate-800/50"><i
+                        class="fa-solid fa-envelope-open-text w-5 text-center text-base"></i> Kullanıcı
+                    Yorumları</button>
+                <button onclick="switchSection('broadcast')" id="nav-broadcast"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:bg-slate-800/50"><i
+                        class="fa-solid fa-tower-broadcast w-5 text-center text-base"></i> Duyuru Paneli</button>
+
+                <div class="text-[10px] font-black text-slate-600 uppercase tracking-widest px-4 py-2 mt-4">İçerik &
+                    Sınavlar</div>
+
+                <button onclick="switchSection('inspector')" id="nav-inspector"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:bg-slate-800/50"><i
+                        class="fa-solid fa-magnifying-glass-location w-5 text-center text-base text-primary"></i> İçerik
+                    Denetleyicisi</button>
+
+                <button onclick="switchSection('bulk')" id="nav-bulk"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:bg-slate-800/50"><i
+                        class="fa-solid fa-cloud-arrow-up w-5 text-center text-base"></i> Mühimmat Yükle</button>
+
+                <button onclick="switchSection('approvals')" id="nav-approvals"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:bg-slate-800/50 relative">
+                    <i class="fa-solid fa-stamp w-5 text-center text-base"></i> Onay Bekleyenler
+                    <span id="approvalBadge"
+                        class="hidden absolute right-3 bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded-md font-black">0</span>
+                </button>
+
+                <button onclick="switchSection('live_content')" id="nav-live_content"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:bg-slate-800/50"><i
+                        class="fa-solid fa-layer-group w-5 text-center text-base"></i> Canlı İçerikler</button>
+            </nav>
+
+            <div class="p-4 border-t border-white/5 bg-slate-950/40">
+                <div class="flex items-center gap-3 mb-4">
+                    <img id="adminAvatar" src="" class="w-10 h-10 rounded-xl border border-slate-700 bg-slate-800">
+                    <div class="min-w-0">
+                        <div id="adminName" class="text-xs font-black truncate text-white uppercase">Yönetici</div>
+                        <div class="text-[9px] text-green-500 font-bold flex items-center gap-1"><span
+                                class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> ONLINE</div>
+                    </div>
+                </div>
+                <button onclick="adminLogout()"
+                    class="w-full bg-red-600/10 text-red-500 py-3 rounded-xl text-[10px] font-black hover:bg-red-600 hover:text-white transition border border-red-500/20 uppercase tracking-widest">Çıkış
+                    Yap</button>
+            </div>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <main class="flex-1 flex flex-col min-w-0 bg-transparent relative h-screen">
+            <!-- Header -->
+            <header
+                class="h-16 md:h-20 border-b border-white/5 flex items-center justify-between px-4 md:px-8 shrink-0 glass-panel z-20">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()"
+                        class="lg:hidden w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-primary"><i
+                            class="fa-solid fa-bars text-lg"></i></button>
+                    <div>
+                        <h3 id="viewTitle"
+                            class="text-xl md:text-2xl font-black tracking-tighter uppercase text-white leading-none">
+                            Console</h3>
+                        <p class="text-[9px] md:text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1"
+                            id="viewDesc">System Overview</p>
+                    </div>
+                </div>
+                <!-- Sınav Seçimi -->
+                <div class="flex items-center gap-3">
+                    <div class="hidden md:block text-[10px] font-bold text-slate-500 uppercase">Aktif Modül:</div>
+                    <select id="examSelector"
+                        class="bg-slate-900 border border-slate-700 text-white text-xs font-bold rounded-lg px-3 py-2 outline-none focus:border-primary">
+                        <option value="yks">YKS Modülü</option>
+                        <option value="dgs">DGS Modülü</option>
+                        <option value="kpss">KPSS Modülü</option>
+                    </select>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div id="contentScroll" class="flex-1 overflow-y-auto p-4 md:p-8 pb-20 custom-scroll">
+                <!-- İçerik JS ile buraya yüklenecek -->
+            </div>
+        </main>
+    </div>
+
+    <!-- USER DETAIL MODAL (LOGLAR & HAREKETLER) -->
+    <div id="userModal"
+        class="fixed inset-0 z-[600] hidden flex items-center justify-center bg-black/95 backdrop-blur-md p-4">
+        <div
+            class="bg-darkCard w-full max-w-4xl max-h-[90vh] rounded-3xl border border-white/10 flex flex-col relative overflow-hidden glass-panel shadow-2xl">
+            <!-- Header -->
+            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-slate-900/50">
+                <div>
+                    <h4 id="userModalTitle" class="text-xl font-black text-white uppercase tracking-tight">Kullanıcı
+                        Detay</h4>
+                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest" id="userModalUid">UID: ...
+                    </p>
+                </div>
+                <button onclick="closeUserModal()"
+                    class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center hover:bg-red-600 transition text-white"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Body -->
+            <div class="flex-1 overflow-y-auto custom-scroll p-6 space-y-6">
+                <!-- Stats Row -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
+                        <div class="text-[9px] text-slate-500 font-bold uppercase mb-1">XP Puanı</div>
+                        <div class="text-2xl font-black text-orange-500" id="umXP">0</div>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
+                        <div class="text-[9px] text-slate-500 font-bold uppercase mb-1">Max Skor</div>
+                        <div class="text-2xl font-black text-white" id="umScore">0</div>
+                    </div>
+                    <!-- YENİ: İHLAL SAYACI -->
+                    <div
+                        class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center relative overflow-hidden">
+                        <div class="text-[9px] text-slate-500 font-bold uppercase mb-1">İhlal (30 Gün)</div>
+                        <div class="text-2xl font-black text-red-500" id="umViolation">0</div>
+                        <div class="absolute -right-2 -bottom-2 text-[4rem] text-red-500/10"><i
+                                class="fa-solid fa-triangle-exclamation"></i></div>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
+                        <div class="text-[9px] text-slate-500 font-bold uppercase mb-1">Durum</div>
+                        <div class="text-xl font-black text-slate-300" id="umStatus">-</div>
+                    </div>
+                </div>
+
+                <!-- XP Edit Action -->
+                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex gap-4 items-center">
+                    <input type="number" id="xpEditInput"
+                        class="bg-slate-950 border border-slate-700 text-white px-4 py-2 rounded-xl w-32 font-bold"
+                        placeholder="Yeni XP">
+                    <button id="xpSaveBtn"
+                        class="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-xl font-bold text-sm transition">XP
+                        Güncelle</button>
+                </div>
+
+                <!-- Logs Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Exam History -->
+                    <div class="bg-slate-900/30 rounded-2xl border border-white/5 p-4">
+                        <h5
+                            class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-2">
+                            <span id="examLogTitle">Son Deneme Sınavları</span>
+                        </h5>
+                        <div id="logExams" class="space-y-2 text-sm"></div>
+                    </div>
+                    <!-- YENİ: GÜVENLİK LOGLARI -->
+                    <div class="bg-slate-900/30 rounded-2xl border border-white/5 p-4">
+                        <h5
+                            class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-2">
+                            Güvenlik Kayıtları (Silinenler)</h5>
+                        <div id="logSecurity" class="space-y-2 text-sm"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where, orderBy, addDoc, serverTimestamp, writeBatch, onSnapshot, limit, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVVuIdQzbPZqWaMLtkV0mRjr5qHOng460",
+            authDomain: "alnikpss.firebaseapp.com",
+            projectId: "alnikpss",
+            storageBucket: "alnikpss.firebasestorage.app",
+            messagingSenderId: "546288972320",
+            appId: "1:546288972320:web:997647b8542e41f28f8245",
+            measurementId: "G-XGCG35CPFJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const ADMIN_EMAIL = "alnigamestudios@gmail.com";
+
+        // --- STATE ---
+        let currentUser = null;
+        let userCache = [];
+        let ACTIVE_EXAM = localStorage.getItem('adminExamType') || 'yks';
+
+        document.getElementById('examSelector').value = ACTIVE_EXAM;
+        document.getElementById('examSelector').addEventListener('change', (e) => {
+            localStorage.setItem('adminExamType', e.target.value);
+            location.reload();
+        });
+
+        // --- DYNAMIC PATH HELPERS ---
+        const getExamPath = (col) => {
+            if (ACTIVE_EXAM === 'yks') return `exams/yks/${col}`;
+            if (ACTIVE_EXAM === 'dgs') return `exams/dgs/${col}`;
+            return col; // KPSS için kök
+        };
+
+        const getUserExamPath = (uid) => {
+            if (ACTIVE_EXAM === 'yks') return `users/${uid}/exams/yks/mockExams`;
+            if (ACTIVE_EXAM === 'dgs') return `users/${uid}/exams/dgs/mockExams`;
+            return `users/${uid}/mockExams`;
+        };
+
+        // --- AUTH ---
+        window.adminLogin = async () => {
+            const email = document.getElementById('admEmail').value;
+            const pass = document.getElementById('admPass').value;
+            if (email.toLowerCase() !== ADMIN_EMAIL) return alert("Yetkisiz Giriş!");
+            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Hata: " + e.message); }
+        };
+
+        window.adminLogout = async () => { await signOut(auth); location.reload(); };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user && user.email.toLowerCase() === ADMIN_EMAIL) {
+                currentUser = user;
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+
+                const snap = await getDoc(doc(db, "users", user.uid));
+                if (snap.exists()) {
+                    document.getElementById('adminName').innerText = snap.data().name || "Patron";
+                    document.getElementById('adminAvatar').src = snap.data().avatar || "https://ui-avatars.com/api/?name=Admin";
+                }
+                switchSection('users');
+                listenApprovals();
+                listenAdminNotifications();
+            } else {
+                document.getElementById('loginOverlay').classList.remove('hidden');
+                document.getElementById('adminPanel').classList.add('hidden');
+            }
+        });
+
+        // --- NAVIGATION ---
+        window.toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            const ol = document.getElementById('sidebarOverlay');
+            sb.classList.toggle('sidebar-closed');
+            sb.classList.toggle('sidebar-open');
+            ol.classList.toggle('hidden');
+        };
+
+        window.switchSection = (section) => {
+            const titles = {
+                users: 'Kullanıcılar',
+                bulk: 'Toplu Yükleme',
+                approvals: 'Onay Bekleyenler',
+                live_content: 'Canlı İçerikler',
+                broadcast: 'Duyuru',
+                feedback: 'Kullanıcı Yorumları',
+                settings: 'Ayarlar',
+                inspector: 'İçerik Denetleyicisi',
+                admin_notifs: 'Sistem Bildirimleri'
+            };
+            document.getElementById('viewTitle').innerText = titles[section] || 'Panel';
+            document.getElementById('viewDesc').innerText = `${ACTIVE_EXAM.toUpperCase()} MODÜLÜ AKTİF`;
+
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active', 'bg-slate-800/50'));
+            document.getElementById('nav-' + section)?.classList.add('tab-active', 'bg-slate-800/50');
+
+            if (window.innerWidth < 1024) toggleSidebar();
+
+            const container = document.getElementById('contentScroll');
+            container.innerHTML = '<div class="flex justify-center py-20"><i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary"></i></div>';
+
+            if (section === 'users') loadUsers();
+            if (section === 'bulk') renderBulkUpload();
+            if (section === 'approvals') window.renderApprovals('questions'); // YENİ: Varsayılan olarak soruları aç
+            if (section === 'live_content') window.renderLiveContent('market');
+            if (section === 'broadcast') renderBroadcastForm();
+            if (section === 'feedback') loadFeedback();
+            if (section === 'settings') loadSettings();
+            if (section === 'inspector') renderInspector();
+            if (section === 'admin_notifs') renderAdminNotifications();
+        };
+
+        // --- 1. KULLANICI YÖNETİMİ (DÜZELTİLDİ: INPUT FOCUS SORUNU YOK) ---
+        async function loadUsers() {
+            // Önce İskeleti Oluştur (Input kutusu burada, bir daha silinmeyecek)
+            const container = document.getElementById('contentScroll');
+            container.innerHTML = `
+        <div class="mb-6">
+            <input type="text" id="userSearchInput" oninput="window.handleSearch(this.value)" placeholder="İsim veya E-posta ara..." class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-primary shadow-lg">
+        </div>
+        <div class="overflow-x-auto rounded-2xl border border-white/5 shadow-2xl">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-900/50 text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+                    <tr><th class="p-4">Kullanıcı</th><th class="p-4">İletişim</th><th class="p-4">Durum / Son Giriş</th><th class="p-4 text-right">Eylem</th></tr>
+                </thead>
+                <tbody id="userTableBody" class="divide-y divide-white/5 text-sm">
+                    <tr><td colspan="4" class="p-4 text-center"><i class="fa-solid fa-circle-notch fa-spin"></i> Yükleniyor...</td></tr>
+                </tbody>
+            </table>
+        </div>`;
+
+            // Verileri Çek
+            const snap = await getDocs(collection(db, "users"));
+            userCache = [];
+            snap.forEach(d => userCache.push({ id: d.id, ...d.data() }));
+
+            // Satıları Doldur
+            renderUserRows(userCache);
+        }
+
+        window.handleSearch = (q) => {
+            const term = q.toLowerCase();
+            const filtered = userCache.filter(u => (u.name || "").toLowerCase().includes(term) || u.email.toLowerCase().includes(term));
+            renderUserRows(filtered);
+        };
+
+        // Sadece satırları güncelleyen yeni fonksiyon
+        function renderUserRows(users) {
+            const tbody = document.getElementById('userTableBody');
+            if (!tbody) return;
+
+            let html = '';
+            users.forEach(u => {
+                let lastSeen = u.lastLoginDate ? new Date(u.lastLoginDate.seconds * 1000).toLocaleString('tr-TR') : 'Bilinmiyor';
+                html += `
+            <tr class="hover:bg-white/5 transition group">
+                <td class="p-4"><div class="flex items-center gap-3"><img src="${u.avatar || 'https://ui-avatars.com/api/?name=User'}" class="w-10 h-10 rounded-xl border border-slate-700 object-cover"><div class="font-bold text-white">${u.name}</div></div></td>
+                <td class="p-4 text-slate-400 font-mono text-xs">${u.email}</td>
+                <td class="p-4">
+                    <div class="${u.isBanned ? 'text-red-500' : 'text-green-500'} text-[10px] font-black uppercase tracking-widest mb-1">${u.isBanned ? 'YASAKLI' : 'AKTİF'}</div>
+                    <div class="text-[10px] text-slate-500 font-mono"><i class="fa-solid fa-clock mr-1"></i> ${lastSeen}</div>
+                </td>
+                <td class="p-4 text-right">
+                    <div class="flex justify-end gap-2">
+                        <button onclick="openUserDetail('${u.id}')" class="w-8 h-8 rounded-lg bg-slate-800 text-blue-400 hover:bg-blue-600 hover:text-white transition flex items-center justify-center" title="Detaylar & Loglar"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="sendPasswordReset('${u.email}')" class="w-8 h-8 rounded-lg bg-slate-800 text-yellow-500 hover:bg-yellow-600 hover:text-white transition flex items-center justify-center" title="Şifre Sıfırla"><i class="fa-solid fa-key"></i></button>
+                        <button onclick="toggleBan('${u.id}', ${u.isBanned || false})" class="w-8 h-8 rounded-lg bg-slate-800 ${u.isBanned ? 'text-green-500 hover:bg-green-600' : 'text-red-500 hover:bg-red-600'} hover:text-white transition flex items-center justify-center"><i class="fa-solid ${u.isBanned ? 'fa-lock-open' : 'fa-ban'}"></i></button>
+                    </div>
+                </td>
+            </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        window.sendPasswordReset = async (email) => {
+            if (!confirm(`${email} adresine şifre sıfırlama linki gönderilsin mi?`)) return;
+            try { await sendPasswordResetEmail(auth, email); alert("E-posta gönderildi."); } catch (e) { alert("Hata: " + e.message); }
+        };
+
+        window.openUserDetail = async (uid) => {
+            const modal = document.getElementById('userModal');
+            const u = userCache.find(x => x.id === uid);
+            if (!u) return;
+
+            document.getElementById('userModalTitle').innerText = u.name;
+            document.getElementById('userModalUid').innerText = `UID: ${u.id} | ${ACTIVE_EXAM.toUpperCase()}`;
+            document.getElementById('umXP').innerText = u.xp || 0;
+            document.getElementById('umScore').innerText = u.totalScore || 0;
+            document.getElementById('umStatus').innerHTML = u.isBanned ? '<span class="text-red-500">ENGEL</span>' : '<span class="text-green-500">OK</span>';
+            document.getElementById('examLogTitle').innerText = `Son ${ACTIVE_EXAM.toUpperCase()} Denemeleri`;
+
+            document.getElementById('xpEditInput').value = u.xp || 0;
+            document.getElementById('xpSaveBtn').onclick = () => saveXp(uid);
+
+            const logsExams = document.getElementById('logExams');
+            const logsSecurity = document.getElementById('logSecurity');
+
+            logsExams.innerHTML = '<div class="text-center py-4"><i class="fa-solid fa-circle-notch fa-spin text-slate-500"></i></div>';
+            logsSecurity.innerHTML = '<div class="text-center py-4"><i class="fa-solid fa-circle-notch fa-spin text-slate-500"></i></div>';
+            modal.classList.remove('hidden');
+
+            try {
+                // 1. Deneme Geçmişi
+                const examPath = getUserExamPath(uid);
+                const examSnap = await getDocs(query(collection(db, examPath), orderBy("createdAt", "desc"), limit(5)));
+
+                if (examSnap.empty) logsExams.innerHTML = '<div class="text-xs text-slate-500 italic">Deneme kaydı yok.</div>';
+                else {
+                    logsExams.innerHTML = "";
+                    examSnap.forEach(d => {
+                        const ex = d.data();
+                        let detailText = "";
+                        if (ACTIVE_EXAM === 'yks') { detailText = `TYT:${ex.tyt?.score || 0} | SAY:${ex.ayt?.say || 0}`; }
+                        else if (ACTIVE_EXAM === 'dgs') { detailText = `SAY:${ex.say || 0} | SÖZ:${ex.soz || 0}`; }
+                        else { detailText = `TR:${ex.trNet || 0} | MAT:${ex.mathNet || 0}`; }
+
+                        logsExams.innerHTML += `<div class="flex justify-between items-center bg-slate-950 p-2 rounded border border-white/5"><div class="flex flex-col"><span class="text-slate-400 text-xs font-bold">${ex.date}</span><span class="text-[9px] text-slate-600">${detailText}</span></div> <span class="font-black text-primary">${ex.totalScore} Puan</span></div>`;
+                    });
+                }
+
+                // 2. Güvenlik Logları
+                const secLogsSnap = await getDocs(query(collection(db, `users/${uid}/securityLogs`), orderBy("createdAt", "desc"), limit(10)));
+                const now = new Date();
+                const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+                let violationCount = 0;
+
+                if (secLogsSnap.empty) {
+                    logsSecurity.innerHTML = '<div class="text-xs text-green-500 italic"><i class="fa-solid fa-check-circle"></i> Sicil temiz.</div>';
+                } else {
+                    logsSecurity.innerHTML = "";
+                    secLogsSnap.forEach(d => {
+                        const log = d.data();
+                        if (log.createdAt && log.createdAt.toDate() > thirtyDaysAgo) violationCount++;
+
+                        logsSecurity.innerHTML += `
+                            <div class="bg-red-500/10 p-2 rounded border border-red-500/30 flex justify-between items-center">
+                                <div>
+                                    <div class="text-[10px] text-red-400 font-bold uppercase">İÇERİK SİLİNDİ</div>
+                                    <div class="text-xs text-white">"${log.reason}"</div>
+                                </div>
+                                <div class="text-[9px] text-slate-500 font-mono">${log.createdAt ? log.createdAt.toDate().toLocaleDateString() : ''}</div>
+                            </div>
+                        `;
+                    });
+                }
+
+                document.getElementById('umViolation').innerText = violationCount;
+                if (violationCount >= 3) document.getElementById('umViolation').classList.add('animate-pulse');
+
+            } catch (e) { console.error(e); logsExams.innerHTML = `<div class="text-red-500 text-xs">Log hatası.</div>`; }
+        };
+
+        window.saveXp = async (uid) => {
+            const val = Number(document.getElementById('xpEditInput').value);
+            await updateDoc(doc(db, "users", uid), { xp: val });
+            alert("XP Güncellendi.");
+            closeUserModal();
+            loadUsers();
+        };
+
+        window.closeUserModal = () => document.getElementById('userModal').classList.add('hidden');
+        window.toggleBan = async (uid, currentStatus) => {
+            if (!confirm(currentStatus ? "Yasağı kaldır?" : "Kullanıcıyı engelle?")) return;
+            await updateDoc(doc(db, "users", uid), { isBanned: !currentStatus });
+            loadUsers();
+        };
+
+        // --- 2. TOPLU YÜKLEME ---
+        function renderBulkUpload() {
+            document.getElementById('contentScroll').innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-slate-900/50 border border-white/5 p-6 rounded-3xl">
+                        <h3 class="text-xl font-black text-white mb-4"><i class="fa-solid fa-file-import text-primary mr-2"></i>Soru Yükle (${ACTIVE_EXAM.toUpperCase()})</h3>
+                        <p class="text-xs text-slate-500 mb-4 font-mono">Format: [{"lesson":"...","text":"...","options":[...],"correct":0}]</p>
+                        <textarea id="jsonQuestions" rows="8" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-white outline-none mb-4 focus:border-primary" placeholder="JSON yapıştır..."></textarea>
+                        <button onclick="bulkUpload('questions')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold transition">Yükle</button>
+                    </div>
+                    <div class="bg-slate-900/50 border border-white/5 p-6 rounded-3xl">
+                        <h3 class="text-xl font-black text-white mb-4"><i class="fa-solid fa-layer-group text-pink-500 mr-2"></i>Kart Yükle (${ACTIVE_EXAM.toUpperCase()})</h3>
+                         <p class="text-xs text-slate-500 mb-4 font-mono">Format: [{"front":"...","back":"...","lesson":"..."}]</p>
+                        <textarea id="jsonCards" rows="8" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-white outline-none mb-4 focus:border-pink-500" placeholder="JSON yapıştır..."></textarea>
+                        <button onclick="bulkUpload('flashcards')" class="w-full bg-pink-600 hover:bg-pink-500 text-white py-3 rounded-xl font-bold transition">Yükle</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.bulkUpload = async (type) => {
+            const inputId = type === 'questions' ? 'jsonQuestions' : 'jsonCards';
+            const val = document.getElementById(inputId).value.trim();
+            if (!val) return alert("JSON boş!");
+
+            try {
+                const data = JSON.parse(val);
+                if (!Array.isArray(data)) throw new Error("Liste olmalı []");
+                if (!confirm(`${data.length} adet veri ${ACTIVE_EXAM.toUpperCase()} veritabanına eklenecek. Emin misin?`)) return;
+
+                const batch = writeBatch(db);
+                const targetCol = getExamPath(type);
+
+                data.forEach(item => {
+                    const ref = doc(collection(db, targetCol));
+                    if (type === 'questions' && (!item.text || !item.options)) return;
+                    if (type === 'flashcards' && (!item.front || !item.back)) return;
+
+                    batch.set(ref, {
+                        ...item,
+                        authorName: "Sistem",
+                        uid: "SYSTEM",
+                        createdAt: serverTimestamp(),
+                        status: 'approved',
+                        lesson: item.lesson || "Genel"
+                    });
+                });
+
+                await batch.commit();
+                alert("Yükleme Başarılı!");
+                document.getElementById(inputId).value = "";
+            } catch (e) { alert("Hata: " + e.message); }
+        };
+
+        // --- 3. ONAY İŞLEMLERİ (GÜNCELLENMİŞ SEKME YAPISI) ---
+        function listenApprovals() {
+            const qPath = getExamPath('questionSubmissions');
+            const cPath = getExamPath('flashcardSubmissions');
+            // Forum global olduğu için direkt koleksiyon
+            const fPath = 'forumPosts';
+
+            onSnapshot(query(collection(db, qPath), where("status", "==", "pending")), (s1) => {
+                onSnapshot(query(collection(db, cPath), where("status", "==", "pending")), (s2) => {
+                    onSnapshot(query(collection(db, fPath), where("status", "==", "pending")), (s3) => {
+                        const count = s1.size + s2.size + s3.size;
+                        const badge = document.getElementById('approvalBadge');
+                        if (count > 0) { badge.innerText = count; badge.classList.remove('hidden'); }
+                        else badge.classList.add('hidden');
+                    });
+                });
+            });
+        }
+
+        // YENİ: SEKME TABANLI RENDER (Global Fonksiyon)
+        window.renderApprovals = function (tab = 'questions') {
+            const container = document.getElementById('contentScroll');
+
+            // Aktif sekme stilleri
+            const btnBase = "px-6 py-2 rounded-xl text-xs font-bold transition";
+            const activeStyle = "bg-primary text-white shadow-lg shadow-orange-500/20";
+            const inactiveStyle = "bg-slate-900 text-slate-400 hover:bg-slate-800 border border-slate-800";
+
+            container.innerHTML = `
+                <!-- Üst Sekmeler -->
+                <div class="flex gap-3 mb-6 overflow-x-auto pb-2">
+                    <button onclick="window.renderApprovals('questions')" class="${btnBase} ${tab === 'questions' ? activeStyle : inactiveStyle}">Sorular</button>
+                    <button onclick="window.renderApprovals('cards')" class="${btnBase} ${tab === 'cards' ? activeStyle : inactiveStyle}">Kartlar</button>
+                    <button onclick="window.renderApprovals('forum')" class="${btnBase} ${tab === 'forum' ? activeStyle : inactiveStyle}">Forum</button>
+                </div>
+                <!-- İçerik Alanı -->
+                <div id="approvalGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="col-span-full text-center py-20"><i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary"></i></div>
+                </div>
+            `;
+
+            if (tab === 'questions') loadPendingQuestions();
+            if (tab === 'cards') loadPendingCards();
+            if (tab === 'forum') loadPendingForum();
+        };
+
+        async function loadPendingQuestions() {
+            const grid = document.getElementById('approvalGrid');
+            const qSnap = await getDocs(query(collection(db, getExamPath('questionSubmissions')), where("status", "==", "pending")));
+
+            if (qSnap.empty) { grid.innerHTML = '<div class="col-span-full text-center text-slate-500">Onay bekleyen soru yok.</div>'; return; }
+
+            let html = '';
+            qSnap.forEach(d => {
+                const q = d.data();
+                html += `
+                    <div class="bg-slate-900/80 p-6 rounded-2xl border border-blue-500/30 shadow-lg relative group">
+                        <div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl">SORU</div>
+                        <div class="text-xs text-slate-400 mb-2 font-bold">${q.lesson} • ${q.authorName}</div>
+                        <p class="font-bold text-white mb-4 text-sm">${q.text}</p>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            ${q.options.map((o, i) => `<div class="text-xs p-2 rounded border ${i === q.correct ? 'border-green-500 text-green-400 bg-green-900/20' : 'border-slate-700 text-slate-400'}">${o}</div>`).join('')}
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="approveItem('${d.id}', 'question')" class="flex-1 bg-green-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-green-500">ONAYLA</button>
+                            <button onclick="rejectItem('${d.id}', 'question')" class="flex-1 bg-red-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-red-500">REDDET</button>
+                        </div>
+                    </div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        async function loadPendingCards() {
+            const grid = document.getElementById('approvalGrid');
+            const cSnap = await getDocs(query(collection(db, getExamPath('flashcardSubmissions')), where("status", "==", "pending")));
+
+            if (cSnap.empty) { grid.innerHTML = '<div class="col-span-full text-center text-slate-500">Onay bekleyen kart yok.</div>'; return; }
+
+            let html = '';
+            cSnap.forEach(d => {
+                const c = d.data();
+                html += `
+                    <div class="bg-slate-900/80 p-6 rounded-2xl border border-pink-500/30 shadow-lg relative group">
+                        <div class="absolute top-0 right-0 bg-pink-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl">KART</div>
+                        <div class="text-xs text-slate-400 mb-2 font-bold">${c.lesson || 'Genel'} • ${c.authorName}</div>
+                        <div class="space-y-2 mb-4">
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800"><div class="text-[9px] text-slate-500 uppercase">Ön</div><div class="text-white text-sm font-bold">${c.front}</div></div>
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800"><div class="text-[9px] text-slate-500 uppercase">Arka</div><div class="text-primary text-sm font-bold">${c.back}</div></div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="approveItem('${d.id}', 'card')" class="flex-1 bg-green-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-green-500">ONAYLA</button>
+                            <button onclick="rejectItem('${d.id}', 'card')" class="flex-1 bg-red-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-red-500">REDDET</button>
+                        </div>
+                    </div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        async function loadPendingForum() {
+            const grid = document.getElementById('approvalGrid');
+            const fSnap = await getDocs(query(collection(db, "forumPosts"), where("status", "==", "pending")));
+
+            if (fSnap.empty) { grid.innerHTML = '<div class="col-span-full text-center text-slate-500">Onay bekleyen forum konusu yok.</div>'; return; }
+
+            let html = '';
+            fSnap.forEach(d => {
+                const f = d.data();
+                html += `
+                    <div class="bg-slate-900/80 p-6 rounded-2xl border border-purple-500/30 shadow-lg relative group">
+                        <div class="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl">FORUM</div>
+                        <div class="text-xs text-slate-400 mb-2 font-bold">${f.category} • ${f.authorName}</div>
+                        <h4 class="text-white font-bold mb-2">${f.title}</h4>
+                        <p class="text-slate-400 text-xs mb-4 line-clamp-3">${f.content}</p>
+                        <div class="flex gap-2">
+                            <button onclick="approveItem('${d.id}', 'forum')" class="flex-1 bg-green-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-green-500">ONAYLA</button>
+                            <button onclick="rejectItem('${d.id}', 'forum')" class="flex-1 bg-red-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-red-500">REDDET</button>
+                        </div>
+                    </div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        window.approveItem = async (id, type) => {
+            let ref, userRef, data;
+
+            if (type === 'forum') {
+                ref = doc(db, "forumPosts", id);
+                const snap = await getDoc(ref);
+                if (!snap.exists()) return;
+                data = snap.data();
+
+                // Forum sadece statü günceller, koleksiyon değiştirmez
+                await updateDoc(ref, { status: 'approved', approvedAt: serverTimestamp() });
+                // Kullanıcıya XP yok (İstenirse eklenebilir)
+                // Bildirim
+                await addDoc(collection(db, "notifications"), {
+                    uid: data.uid,
+                    title: "✅ Konu Onaylandı",
+                    message: "Forum konun onaylandı ve yayına alındı!",
+                    type: 'success',
+                    read: false,
+                    createdAt: serverTimestamp()
+                });
+
+                // Refresh
+                window.renderApprovals('forum');
+                return;
+            }
+
+            // Soru ve Kart Mantığı (Eski)
+            const subCol = type === 'question' ? 'questionSubmissions' : 'flashcardSubmissions';
+            const mainCol = type === 'question' ? 'questions' : 'flashcards';
+
+            ref = doc(db, getExamPath(subCol), id);
+            const snap = await getDoc(ref);
+            if (!snap.exists()) return;
+            data = snap.data();
+
+            await addDoc(collection(db, getExamPath(mainCol)), {
+                ...data,
+                status: 'approved',
+                approvedAt: serverTimestamp()
+            });
+
+            await updateDoc(ref, { status: 'approved' });
+
+            await addDoc(collection(db, "notifications"), {
+                uid: data.uid,
+                title: "✅ İçerik Onaylandı",
+                message: `Gönderdiğin ${type === 'question' ? 'soru' : 'kart'} onaylandı ve yayınlandı! +XP hesabına eklendi.`,
+                type: 'success',
+                read: false,
+                createdAt: serverTimestamp()
+            });
+
+            userRef = doc(db, "users", data.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                await updateDoc(userRef, { xp: (userSnap.data().xp || 0) + 15 });
+            }
+
+            // Refresh Current Tab
+            if (type === 'question') window.renderApprovals('questions');
+            else window.renderApprovals('cards');
+        };
+
+        window.rejectItem = async (id, type) => {
+            const reason = prompt("Red sebebi:") || "Uygun görülmedi.";
+            let ref, uid;
+
+            if (type === 'forum') {
+                ref = doc(db, "forumPosts", id);
+                const snap = await getDoc(ref);
+                uid = snap.data().uid;
+                await updateDoc(ref, { status: 'rejected', adminNote: reason });
+                // Bildirim
+                await addDoc(collection(db, "notifications"), {
+                    uid: uid,
+                    title: "❌ Konu Reddedildi",
+                    message: `Forum konun reddedildi. Sebep: ${reason}`,
+                    type: 'error',
+                    read: false,
+                    createdAt: serverTimestamp()
+                });
+                window.renderApprovals('forum');
+                return;
+            }
+
+            // Soru/Kart
+            const subCol = type === 'question' ? 'questionSubmissions' : 'flashcardSubmissions';
+            ref = doc(db, getExamPath(subCol), id);
+            const snap = await getDoc(ref);
+            uid = snap.data().uid;
+
+            await updateDoc(ref, { status: 'rejected', adminNote: reason });
+
+            await addDoc(collection(db, "notifications"), {
+                uid: uid,
+                title: "❌ İçerik Reddedildi",
+                message: `Gönderin reddedildi. Sebep: ${reason}`,
+                type: 'error',
+                read: false,
+                createdAt: serverTimestamp()
+            });
+
+            if (type === 'question') window.renderApprovals('questions');
+            else window.renderApprovals('cards');
+        };
+
+        // --- 4. SİSTEM AYARLARI ---
+        async function loadSettings() {
+            const container = document.getElementById('contentScroll');
+            const snap = await getDoc(doc(db, "settings", "maintenance"));
+            const active = snap.exists() ? snap.data().active : false;
+
+            container.innerHTML = `
+                <div class="max-w-xl mx-auto bg-slate-900/50 p-10 rounded-[3rem] border border-white/5 text-center">
+                    <div class="w-32 h-32 mx-auto rounded-full flex items-center justify-center text-6xl mb-6 ${active ? 'bg-red-500/20 text-red-500' : 'bg-green-500/20 text-green-500'} transition-colors">
+                        <i class="fa-solid ${active ? 'fa-lock' : 'fa-lock-open'}"></i>
+                    </div>
+                    <h3 class="text-3xl font-black text-white mb-2">BAKIM MODU</h3>
+                    <p class="text-slate-500 text-sm mb-8 font-bold uppercase tracking-widest">${active ? 'SİSTEM KİLİTLİ' : 'SİSTEM AKTİF'}</p>
+                    <button onclick="toggleMaintenance(${!active})" class="w-full py-4 rounded-2xl font-black uppercase tracking-widest transition text-white ${active ? 'bg-green-600 hover:bg-green-500' : 'bg-red-600 hover:bg-red-500'}">
+                        ${active ? 'KİLİDİ AÇ' : 'KİLİTLE'}
+                    </button>
+                </div>
+            `;
+        }
+
+        window.toggleMaintenance = async (status) => {
+            if (confirm("Bakım modunu değiştirmek istiyor musun?")) {
+                await setDoc(doc(db, "settings", "maintenance"), { active: status, updatedAt: serverTimestamp() });
+                loadSettings();
+            }
+        };
+
+        // --- 5. İÇERİK DENETLEYİCİSİ (GÜNCELLENDİ: TÜM MODÜLLER) ---
+        function renderInspector() {
+            const container = document.getElementById('contentScroll');
+            container.innerHTML = `
+        <div class="max-w-3xl mx-auto bg-slate-900/50 p-8 rounded-3xl border border-white/5">
+            <h3 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                <i class="fa-solid fa-magnifying-glass-location text-primary"></i>
+                İçerik Denetleyicisi (God Mode)
+            </h3>
+            <p class="text-xs text-slate-500 mb-6 font-mono">Bildirimden aldığınız ID ile tüm modüllerdeki içeriği bulup silebilirsiniz.</p>
+
+            <div class="flex flex-col md:flex-row gap-4 mb-6">
+                <select id="inspCol" class="bg-slate-950 border border-slate-800 text-white text-xs font-bold rounded-xl px-4 py-3 outline-none focus:border-primary custom-scroll">
+                    <optgroup label="KPSS (Ana Modül)">
+                        <option value="questions">KPSS Soru</option>
+                        <option value="flashcards">KPSS Flashcard</option>
+                        <option value="etutQuestions">Etüt Sorusu</option>
+                        <option value="forumPosts">Forum Konusu</option>
+                        <option value="marketItems">Market Ürünü</option>
+                    </optgroup>
+                    <optgroup label="DGS Modülü">
+                        <option value="exams/dgs/questions">DGS Sorusu</option>
+                        <option value="exams/dgs/flashcards">DGS Flashcard</option>
+                    </optgroup>
+                    <optgroup label="YKS Modülü">
+                        <option value="exams/yks/questions">YKS Sorusu</option>
+                        <option value="exams/yks/flashcards">YKS Flashcard</option>
+                    </optgroup>
+                </select>
+                <input id="inspId" type="text" placeholder="İçerik ID Yapıştır..." class="flex-1 bg-slate-950 border border-slate-800 text-white text-xs font-mono rounded-xl px-4 py-3 outline-none focus:border-primary">
+                <button onclick="inspectContent()" class="bg-primary hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-bold text-xs transition uppercase tracking-widest">Sorgula</button>
+            </div>
+            
+            <div id="inspResult" class="hidden bg-slate-950/50 rounded-2xl p-6 border border-white/5 animate-pulse"></div>
+        </div>
+    `;
+        }
+
+        window.inspectContent = async () => {
+            // Select elementinden direkt YOL (path) değerini alıyoruz
+            const path = document.getElementById('inspCol').value;
+            const id = document.getElementById('inspId').value.trim();
+            const resDiv = document.getElementById('inspResult');
+
+            if (!id) return alert("ID gerekli.");
+
+            resDiv.innerHTML = '<div class="text-center text-slate-500"><i class="fa-solid fa-circle-notch fa-spin"></i> Tüm veritabanı taranıyor...</div>';
+            resDiv.classList.remove('hidden');
+
+            try {
+                const docRef = doc(db, path, id);
+                const snap = await getDoc(docRef);
+
+                if (!snap.exists()) {
+                    resDiv.innerHTML = '<div class="text-center text-red-500 font-bold uppercase">❌ Veri Bulunamadı (Kategori veya ID yanlış olabilir)</div>';
+                    return;
+                }
+
+                const d = snap.data();
+                const owner = d.authorName || d.sellerName || "Bilinmiyor";
+                const uid = d.uid || d.sellerId || "yok";
+
+                // İçerik tipine göre önizleme oluştur
+                let preview = "";
+                if (d.text) preview = `"${d.text}"`;
+                else if (d.front) preview = `Ön: "${d.front}" / Arka: "${d.back}"`;
+                else if (d.title) preview = `"${d.title}" - ${d.content || d.description || ''}`;
+                else preview = JSON.stringify(d, null, 2);
+
+                resDiv.innerHTML = `
+            <div class="flex justify-between items-start mb-4 border-b border-white/5 pb-4">
+                <div>
+                    <div class="text-[10px] text-primary font-black uppercase tracking-widest">Bulundu</div>
+                    <div class="text-white font-bold text-sm">${owner} (UID: ${uid})</div>
+                    <div class="text-[9px] text-slate-500 mt-1">Yol: ${path}</div>
+                </div>
+                <div class="text-[9px] text-slate-500 font-mono bg-slate-900 px-2 py-1 rounded">${id}</div>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-300 mb-4 overflow-x-auto whitespace-pre-wrap border border-slate-800 shadow-inner">${preview}</div>
+            <button onclick="adminDeleteContent('${path}', '${id}', '${uid}')" class="w-full bg-red-600/10 border border-red-600/30 text-red-500 py-3 rounded-xl font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition">
+                <i class="fa-solid fa-trash mr-2"></i> İçeriği Sil ve Kullanıcıyı Uyar
+            </button>
+        `;
+                resDiv.classList.remove('animate-pulse');
+
+            } catch (e) {
+                resDiv.innerHTML = `<div class="text-red-500 text-xs">Hata: ${e.message}</div>`;
+            }
+        };
+
+        window.adminDeleteContent = async (path, id, uid) => {
+            const reason = prompt("Silme sebebi (Kullanıcıya gidecek):");
+            if (!reason) return;
+
+            if (!confirm("Bu içeriği kalıcı olarak siliyorsun. Emin misin?")) return;
+
+            try {
+                // 1. İçeriği Sil
+                await deleteDoc(doc(db, path, id));
+
+                // 2. Kullanıcıya Bildirim (Eğer varsa)
+                if (uid && uid !== 'yok' && uid !== 'SYSTEM') {
+                    // Kullanıcıya bildirim
+                    await addDoc(collection(db, "notifications"), {
+                        uid: uid,
+                        title: "⚠️ İçerik Kaldırıldı",
+                        message: `Yönetici tarafından bir içeriğin kaldırıldı. Sebep: ${reason}`,
+                        type: 'error',
+                        read: false,
+                        createdAt: serverTimestamp()
+                    });
+
+                    // 3. GÜVENLİK LOGU KAYDET
+                    await addDoc(collection(db, `users/${uid}/securityLogs`), {
+                        type: 'content_deletion',
+                        reason: reason,
+                        adminId: currentUser.uid,
+                        contentId: id,
+                        createdAt: serverTimestamp()
+                    });
+
+                    // 4. OTOMATİK RİSK KONTROLÜ (Son 30 günde 3 silinme var mı?)
+                    const now = new Date();
+                    const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+
+                    const logsQuery = query(collection(db, `users/${uid}/securityLogs`), where("createdAt", ">", thirtyDaysAgo));
+                    const logsSnap = await getDocs(logsQuery);
+
+                    // Sadece silme loglarını filtrele (client-side garanti olsun)
+                    const deletionCount = logsSnap.docs.filter(d => d.data().type === 'content_deletion').length;
+
+                    if (deletionCount >= 3) {
+                        // KENDİNE (ADMİNE) UYARI GÖNDER
+                        await addDoc(collection(db, "notifications"), {
+                            uid: currentUser.uid, // Admin ID'si
+                            title: "🚨 ŞÜPHELİ KULLANICI UYARISI",
+                            message: `Kullanıcı (UID: ${uid}) son 30 gün içinde ${deletionCount} kez içerik ihlali yaptı. Lütfen kullanıcıyı inceleyin.`,
+                            type: 'warning',
+                            read: false,
+                            createdAt: serverTimestamp()
+                        });
+                        alert("⚠️ UYARI: Bu kullanıcı 'Yüksek Risk' sınırını aştı. Size özel bildirim gönderildi.");
+                    }
+                }
+
+                document.getElementById('inspResult').innerHTML = '<div class="text-center text-green-500 font-bold uppercase py-4">SİLİNDİ VE LOGLANDI.</div>';
+            } catch (e) {
+                console.error(e);
+                alert("Silme hatası (Detay konsolda): " + e.message);
+            }
+        };
+
+        // --- 6. ADMIN BİLDİRİMLERİ (SYSTEM NOTIFICATIONS) ---
+        function listenAdminNotifications() {
+            if (!currentUser) return;
+            const q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid), where("read", "==", false));
+            onSnapshot(q, (snap) => {
+                const badge = document.getElementById('adminNotifBadge');
+                if (!snap.empty) badge.classList.remove('hidden');
+                else badge.classList.add('hidden');
+            });
+        }
+
+        async function renderAdminNotifications() {
+            const container = document.getElementById('contentScroll');
+            container.innerHTML = `<div class="space-y-4 max-w-3xl mx-auto" id="adminNotifList"></div>`;
+            const list = document.getElementById('adminNotifList');
+
+            const q = query(collection(db, "notifications"), where("uid", "==", currentUser.uid), orderBy("createdAt", "desc"));
+            const snap = await getDocs(q);
+
+            if (snap.empty) {
+                list.innerHTML = '<div class="text-center text-slate-500 py-10">Hiç bildirim yok.</div>';
+                return;
+            }
+
+            snap.forEach(d => {
+                const n = d.data();
+                const isReport = n.type === 'error' || n.type === 'warning';
+
+                list.innerHTML += `
+                    <div class="bg-slate-900/60 p-5 rounded-2xl border ${isReport ? 'border-red-500/30' : 'border-white/5'} relative group">
+                         <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl ${isReport ? 'bg-red-500/10 text-red-500' : 'bg-slate-800 text-primary'} flex items-center justify-center shrink-0">
+                                <i class="fa-solid ${isReport ? 'fa-triangle-exclamation' : 'fa-bell'}"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="font-bold text-white text-sm">${n.title}</h4>
+                                    <span class="text-[10px] text-slate-500 font-mono">${n.createdAt ? new Date(n.createdAt.seconds * 1000).toLocaleString() : ''}</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1 whitespace-pre-wrap">${n.message}</p>
+                            </div>
+                         </div>
+                         <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                            <button onclick="deleteNotification('${d.id}')" class="w-6 h-6 rounded bg-slate-950 text-red-500 hover:bg-red-600 hover:text-white flex items-center justify-center transition"><i class="fa-solid fa-times"></i></button>
+                         </div>
+                    </div>
+                `;
+            });
+
+            const batch = writeBatch(db);
+            snap.docs.forEach(docSnap => {
+                if (!docSnap.data().read) batch.update(doc(db, "notifications", docSnap.id), { read: true });
+            });
+            await batch.commit();
+        }
+
+        window.deleteNotification = async (id) => {
+            await deleteDoc(doc(db, "notifications", id));
+            renderAdminNotifications();
+        };
+
+        // --- 7. CANLI İÇERİK YÖNETİMİ (YENİLENMİŞ MARKET/FORUM/ETÜT) ---
+        window.renderLiveContent = function (tab = 'market') {
+            const container = document.getElementById('contentScroll');
+
+            // Aktif sekme stilleri
+            const btnBase = "px-6 py-2 rounded-xl text-xs font-bold transition";
+            const activeStyle = "bg-primary text-white shadow-lg shadow-orange-500/20";
+            const inactiveStyle = "bg-slate-900 text-slate-400 hover:bg-slate-800 border border-slate-800";
+
+            container.innerHTML = `
+                <!-- Üst Sekmeler -->
+                <div class="flex gap-3 mb-6 overflow-x-auto pb-2">
+                    <button onclick="window.renderLiveContent('market')" class="${btnBase} ${tab === 'market' ? activeStyle : inactiveStyle}">Pazar</button>
+                    <button onclick="window.renderLiveContent('forum')" class="${btnBase} ${tab === 'forum' ? activeStyle : inactiveStyle}">Forum</button>
+                    <button onclick="window.renderLiveContent('etut')" class="${btnBase} ${tab === 'etut' ? activeStyle : inactiveStyle}">Sanal Etüt</button>
+                </div>
+                <!-- İçerik Alanı -->
+                <div id="liveContentArea" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="col-span-full text-center py-20"><i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary"></i></div>
+                </div>
+            `;
+
+            if (tab === 'market') loadLiveMarket();
+            if (tab === 'forum') loadLiveForum();
+            if (tab === 'etut') loadLiveEtut();
+        };
+
+        async function loadLiveMarket() {
+            const area = document.getElementById('liveContentArea');
+            const snap = await getDocs(collection(db, "marketItems"));
+            if (snap.empty) { area.innerHTML = '<div class="col-span-full text-center text-slate-500">İçerik yok.</div>'; return; }
+
+            let html = '';
+            snap.forEach(d => {
+                const m = d.data();
+                html += `
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-white/5 relative group hover:border-primary/50 transition">
+                    <div class="flex justify-between items-start mb-2">
+                         <div class="text-[10px] text-green-500 font-bold uppercase tracking-widest bg-green-500/10 px-2 py-1 rounded">MARKET</div>
+                         <button onclick="window.copyToClip('${d.id}')" class="text-[9px] font-mono text-slate-600 hover:text-white transition cursor-pointer" title="ID Kopyala">${d.id}</button>
+                    </div>
+                    <div class="font-bold text-white mb-1 line-clamp-1">${m.title}</div>
+                    <div class="text-sm text-slate-400 mb-4 line-clamp-2">${m.description}</div>
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-500 mt-auto">
+                        <span>${m.sellerName}</span>
+                        <span class="text-primary">${m.price} XP</span>
+                    </div>
+                    <button onclick="window.deleteDoc(window.doc(window.db, 'marketItems', '${d.id}')).then(()=>window.renderLiveContent('market'))" class="absolute bottom-4 right-4 bg-red-500/20 text-red-500 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            });
+            area.innerHTML = html;
+        }
+
+        async function loadLiveForum() {
+            const area = document.getElementById('liveContentArea');
+            const snap = await getDocs(query(collection(db, "forumPosts"), orderBy("createdAt", "desc")));
+            if (snap.empty) { area.innerHTML = '<div class="col-span-full text-center text-slate-500">İçerik yok.</div>'; return; }
+
+            let html = '';
+            snap.forEach(d => {
+                const p = d.data();
+                html += `
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-white/5 relative group hover:border-blue-500/50 transition">
+                    <div class="flex justify-between items-start mb-2">
+                         <div class="text-[10px] text-blue-500 font-bold uppercase tracking-widest bg-blue-500/10 px-2 py-1 rounded">FORUM</div>
+                         <button onclick="window.copyToClip('${d.id}')" class="text-[9px] font-mono text-slate-600 hover:text-white transition cursor-pointer" title="ID Kopyala">${d.id}</button>
+                    </div>
+                    <div class="font-bold text-white mb-1 line-clamp-1">${p.title}</div>
+                    <div class="text-xs text-slate-500 mb-2">${p.category}</div>
+                    <div class="text-sm text-slate-400 mb-4 line-clamp-2">${p.content}</div>
+                    <div class="text-xs font-bold text-slate-500 mt-auto">${p.authorName}</div>
+                    <button onclick="window.deleteDoc(window.doc(window.db, 'forumPosts', '${d.id}')).then(()=>window.renderLiveContent('forum'))" class="absolute bottom-4 right-4 bg-red-500/20 text-red-500 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            });
+            area.innerHTML = html;
+        }
+
+        async function loadLiveEtut() {
+            const area = document.getElementById('liveContentArea');
+            const snap = await getDocs(query(collection(db, "etutQuestions"), orderBy("createdAt", "desc")));
+            if (snap.empty) { area.innerHTML = '<div class="col-span-full text-center text-slate-500">İçerik yok.</div>'; return; }
+
+            let html = '';
+            snap.forEach(d => {
+                const q = d.data();
+                html += `
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-white/5 relative group hover:border-pink-500/50 transition">
+                    <div class="flex justify-between items-start mb-2">
+                         <div class="text-[10px] text-pink-500 font-bold uppercase tracking-widest bg-pink-500/10 px-2 py-1 rounded">ETÜT</div>
+                         <button onclick="window.copyToClip('${d.id}')" class="text-[9px] font-mono text-slate-600 hover:text-white transition cursor-pointer" title="ID Kopyala">${d.id}</button>
+                    </div>
+                    <div class="text-xs text-slate-500 mb-2 font-bold">${q.lesson}</div>
+                    <div class="text-sm text-slate-300 mb-4 line-clamp-3 italic">"${q.text}"</div>
+                    ${q.image ? '<div class="text-[9px] text-green-500 mb-2"><i class="fa-solid fa-image"></i> Görsel Var</div>' : ''}
+                    <div class="text-xs font-bold text-slate-500 mt-auto">${q.authorName}</div>
+                    <button onclick="window.deleteDoc(window.doc(window.db, 'etutQuestions', '${d.id}')).then(()=>window.renderLiveContent('etut'))" class="absolute bottom-4 right-4 bg-red-500/20 text-red-500 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            });
+            area.innerHTML = html;
+        }
+
+        window.copyToClip = (text) => {
+            navigator.clipboard.writeText(text);
+            alert("ID Kopyalandı: " + text);
+        };
+
+        // --- 8. DUYURU ---
+        function renderBroadcastForm() {
+            document.getElementById('contentScroll').innerHTML = `
+                <div class="max-w-2xl mx-auto bg-slate-900/50 p-8 rounded-3xl border border-white/5">
+                    <h3 class="text-2xl font-black text-white mb-6">Duyuru Gönder</h3>
+                    <input id="bcUid" type="text" placeholder="Hedef UID (Boş bırakırsan herkese gider)" class="w-full p-4 bg-slate-950 border border-slate-800 rounded-xl text-white mb-4 outline-none font-mono text-xs">
+                    <input id="bcTitle" type="text" placeholder="Başlık" class="w-full p-4 bg-slate-950 border border-slate-800 rounded-xl text-white mb-4 outline-none">
+                    <textarea id="bcMsg" rows="4" placeholder="Mesaj..." class="w-full p-4 bg-slate-950 border border-slate-800 rounded-xl text-white mb-6 outline-none"></textarea>
+                    <button onclick="sendBroadcast()" class="w-full bg-primary py-4 rounded-xl font-black text-white hover:bg-orange-600 transition">GÖNDER</button>
+                </div>`;
+        }
+
+        window.sendBroadcast = async () => {
+            const uid = document.getElementById('bcUid').value.trim();
+            const title = document.getElementById('bcTitle').value;
+            const msg = document.getElementById('bcMsg').value;
+            if (!msg) return alert("Boş mesaj gönderilemez.");
+
+            const payload = { title, message: msg, type: 'info', read: false, createdAt: serverTimestamp() };
+
+            if (uid) {
+                await addDoc(collection(db, "notifications"), { uid, ...payload });
+                alert("Kişiye özel gönderildi.");
+            } else {
+                if (confirm("Tüm kullanıcılara bildirim gidecek?")) {
+                    const users = await getDocs(collection(db, "users"));
+                    const batch = writeBatch(db);
+                    users.forEach(u => {
+                        const ref = doc(collection(db, "notifications"));
+                        batch.set(ref, { uid: u.id, ...payload });
+                    });
+                    await batch.commit();
+                    alert("Herkese gönderildi.");
+                }
+            }
+        };
+
+        // --- 9. GELEN KUTUSU (FEEDBACK) ---
+        async function loadFeedback() {
+            const container = document.getElementById('contentScroll');
+            const snap = await getDocs(query(collection(db, "feedback"), orderBy("createdAt", "desc")));
+            let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+            snap.forEach(d => {
+                const f = d.data();
+                html += `<div class="bg-slate-900/60 p-6 rounded-2xl border border-white/5 relative group">
+                    <button onclick="deleteDoc(doc(db, 'feedback', '${d.id}')).then(loadFeedback)" class="absolute top-4 right-4 text-slate-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
+                    <div class="font-bold text-primary mb-2">${f.name}</div>
+                    <p class="text-sm text-slate-300 mb-3">"${f.message}"</p>
+                    <div class="text-[10px] text-slate-600 font-mono">UID: ${f.uid}</div>
+                 </div>`;
+            });
+            container.innerHTML = html + "</div>";
+        }
+
+        // --- UTIL ---
+        window.closeAdminModal = () => document.getElementById('adminModal').classList.add('hidden');
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+        window.db = db;
+
+    </script>
+</body>
+
+</html>

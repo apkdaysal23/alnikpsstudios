@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Yönetim ve uygulama panellerini engelle
+Disallow: /admin.html
+Disallow: /app.html
+
+# Sitemap konumu
+Sitemap: https://alnikpsstudio.com.tr/sitemap.xml

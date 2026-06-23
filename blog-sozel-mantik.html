@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sözel Mantık Kabus Değil: 3 Değişkenli Tablo Tekniği | Al&Ni Exam Studio</title>
-    <!-- AdSense -->
+    <title>Sözel Mantık Kabus Değil: Tablo Kurma ve Çözüm Teknikleri | Al&Ni Exam Studio</title>
+    <meta name="description" content="DGS, ALES ve KPSS sözel mantık sorularını hızlı çözme rehberi. 3 değişkenli tablo tekniği, soru tipi analizi, eleme stratejileri ve zaman yönetimi ipuçlarıyla sözel mantıkta tam net yapın.">
+    <link rel="canonical" href="https://alnikpsstudio.com.tr/blog-sozel-mantik.html">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1105930817107200"
         crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,87 +16,221 @@
         tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#f59e0b', secondary: '#d97706', darkBg: '#0f172a', darkCard: '#1e293b' }, fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
     </script>
     <style>
-        html {
-            scroll-behavior: smooth;
-        }
-
-        .prose h2 {
-            scroll-margin-top: 100px;
-        }
+        html { scroll-behavior: smooth; }
+        .prose h2 { scroll-margin-top: 100px; }
     </style>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Sözel Mantık Kabus Değil: Tablo Kurma ve Çözüm Teknikleri",
+        "description": "DGS, ALES ve KPSS sözel mantık sorularını hızlı çözme rehberi. Tablo tekniği, soru tipleri ve zaman yönetimi.",
+        "author": { "@type": "Person", "name": "Ali Can Daysal" },
+        "publisher": { "@type": "Organization", "name": "Al&Ni Studios", "url": "https://alnikpsstudio.com.tr" },
+        "datePublished": "2025-01-25",
+        "dateModified": "2025-06-23",
+        "mainEntityOfPage": "https://alnikpsstudio.com.tr/blog-sozel-mantik.html"
+    }
+    </script>
 </head>
 
 <body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 antialiased">
-    <nav
-        class="fixed top-0 w-full z-50 bg-white/90 dark:bg-darkCard/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <nav class="fixed top-0 w-full z-50 bg-white/90 dark:bg-darkCard/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
         <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
             <a href="index.html" class="flex items-center gap-3 font-black text-xl dark:text-white">
-                <div class="w-10 h-10 bg-primary rounded-xl text-white flex justify-center items-center shadow-lg">M
-                </div> Al&Ni <span class="text-primary">Mantık</span>
+                <div class="w-10 h-10 bg-primary rounded-xl text-white flex justify-center items-center shadow-lg">M</div>
+                Al&Ni <span class="text-primary">Mantık</span>
             </a>
-            <a href="blog.html" class="text-sm font-bold text-slate-500 hover:text-primary transition"><i
-                    class="fa-solid fa-arrow-left mr-2"></i>Rehbere Dön</a>
+            <a href="blog.html" class="text-sm font-bold text-slate-500 hover:text-primary transition"><i class="fa-solid fa-arrow-left mr-2"></i>Tüm Yazılar</a>
         </div>
     </nav>
+
     <header class="relative pt-32 pb-20 px-6 bg-amber-950 overflow-hidden">
         <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&q=80&w=1200"
-            class="absolute inset-0 w-full h-full object-cover opacity-20">
+            class="absolute inset-0 w-full h-full object-cover opacity-20" alt="Mantık ve düşünme görseli">
         <div class="absolute inset-0 bg-gradient-to-t from-amber-950 via-transparent to-transparent"></div>
         <div class="max-w-4xl mx-auto relative z-10 text-center">
-            <div
-                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold uppercase tracking-widest mb-6 border border-amber-500/30">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold uppercase tracking-widest mb-6 border border-amber-500/30">
                 DGS • ALES • KPSS</div>
             <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">Sözel Mantık Sorularında Kalem
                 Oynatmadan Çözmek İmkansız: Tablo Kurma Sanatı</h1>
+            <div class="flex items-center justify-center gap-6 text-slate-400 text-sm">
+                <span><i class="fa-regular fa-calendar mr-2"></i>25 Ocak 2025</span>
+                <span><i class="fa-regular fa-clock mr-2"></i>10 Dakika Okuma</span>
+            </div>
         </div>
     </header>
+
     <main class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12">
         <aside class="hidden lg:block lg:col-span-3">
-            <div
-                class="sticky top-28 bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
-                <h4 class="font-bold dark:text-white mb-4">Adımlar</h4>
-                <ul class="space-y-3 text-sm text-slate-500">
-                    <li><a href="#degisken" class="hover:text-primary">Değişkenleri Bul</a></li>
-                    <li><a href="#tablo" class="hover:text-primary">Tabloyu Sabitle</a></li>
-                    <li><a href="#ihtimal" class="hover:text-primary">İhtimalleri Yaz</a></li>
-                </ul>
-            </div>
-        </aside>
-        <article
-            class="lg:col-span-9 prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary">
-            <p class="lead text-xl text-slate-600 dark:text-slate-300">DGS ve ALES'in en çok puan getiren kısmı Sözel
-                Mantık'tır. Adayların çoğu "çok vakit alıyor" diye atlar. Oysa doğru tabloyu kurduğunuzda 4 soruyu 2
-                dakikada çözersiniz.</p>
-            <h2 id="degisken" class="text-3xl mt-12">1. Değişkenleri Tespit Et</h2>
-            <p>Soruyu okurken hemen şunu sor: <strong>"Burada kaç farklı grup var?"</strong><br>Örn: Ayşe, Burak, Can
-                (Kişiler) - Pazartesi, Salı (Günler) - Sinema, Tiyatro (Etkinlik). İşte 3 değişken.</p>
-            <h2 id="tablo" class="text-3xl mt-12">2. Az Olanı Tabloya Sabitle</h2>
-            <p>Altın Kural: <strong>Sayıca en az olan veya sırası kesin olan (Günler, Katlar, Sıralar) tablo başlığı
-                    yapılır.</strong> Asla kişileri başlığa yazmayın, çünkü kişiler değişkendir.</p>
-            <div class="not-prose bg-slate-100 dark:bg-slate-800 p-6 rounded-xl my-6 border-l-4 border-primary">
-                <h4 class="font-bold mb-2">Örnek Tablo Yapısı:</h4>
-                <div class="grid grid-cols-3 gap-2 text-center text-sm font-mono">
-                    <div class="bg-white dark:bg-darkCard p-2 rounded border border-slate-300">PAZARTESİ</div>
-                    <div class="bg-white dark:bg-darkCard p-2 rounded border border-slate-300">SALI</div>
-                    <div class="bg-white dark:bg-darkCard p-2 rounded border border-slate-300">ÇARŞAMBA</div>
-                    <div class="text-slate-400">Ayşe?</div>
-                    <div class="text-primary font-bold">Burak</div>
-                    <div class="text-slate-400">Can/Deniz</div>
+            <div class="sticky top-28 space-y-8">
+                <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                    <h4 class="font-bold dark:text-white mb-4 border-b border-slate-100 dark:border-slate-700 pb-2">İçindekiler</h4>
+                    <ul class="space-y-3 text-sm text-slate-500">
+                        <li><a href="#neden" class="hover:text-primary transition block">1. Neden Tablo Gerekli?</a></li>
+                        <li><a href="#degisken" class="hover:text-primary transition block">2. Değişkenleri Bul</a></li>
+                        <li><a href="#tablo" class="hover:text-primary transition block">3. Tabloyu Kur</a></li>
+                        <li><a href="#ihtimal" class="hover:text-primary transition block">4. Kesin vs İhtimal</a></li>
+                        <li><a href="#tipler" class="hover:text-primary transition block">5. Soru Tipleri</a></li>
+                        <li><a href="#zaman" class="hover:text-primary transition block">6. Zaman Yönetimi</a></li>
+                    </ul>
+                </div>
+                <div class="bg-gradient-to-br from-primary to-amber-700 rounded-2xl p-6 text-white text-center shadow-lg">
+                    <i class="fa-solid fa-brain text-4xl mb-4 text-white/80"></i>
+                    <h5 class="font-bold text-lg mb-2">Mantık Analizi</h5>
+                    <p class="text-xs opacity-90 mb-4">SmartCoach AI sözel mantık performansını analiz etsin.</p>
+                    <a href="index.html#auth-section" class="inline-block w-full bg-white text-primary font-bold py-3 rounded-xl hover:bg-slate-100 transition">Ücretsiz Analiz</a>
                 </div>
             </div>
-            <h2 id="ihtimal" class="text-3xl mt-12">3. Kesin ve İhtimalleri Ayır</h2>
-            <p>Tabloya kesin bilgileri siyah kalemle, "olabilir" dediklerinizi parantez içinde (Ayşe/Fatma) şeklinde
-                yazın. Öncülleri okurken "Kesinlikle yanlıştır" diyorsa, parantezli kısımlara bakın.</p>
-            <div class="mt-16 bg-slate-900 rounded-3xl p-8 text-center text-white">
-                <h3 class="text-2xl font-bold mb-4">Mantık Sorusu Çöz</h3><a href="index.html#auth-section"
-                    class="bg-primary text-white px-8 py-3 rounded-xl font-bold">Uygulamaya Git</a>
+        </aside>
+
+        <article class="lg:col-span-9 prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary">
+            <p class="lead text-xl text-slate-600 dark:text-slate-300">DGS ve ALES'in en çok puan getiren kısmı Sözel
+                Mantık'tır. Adayların çoğu "çok vakit alıyor" diye bu soruları atlar. Oysa doğru tabloyu kurduğunuzda bir soru grubundaki 4 soruyu toplam 2 dakikada çözersiniz. Bu yazıda tablo kurma tekniğini A'dan Z'ye öğreneceksiniz.</p>
+
+            <h2 id="neden" class="text-3xl mt-12 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-lg">1</span>
+                Neden Kafadan Çözmek Başarısızlığa Yol Açar?
+            </h2>
+            <p>Sözel mantık soruları, birden fazla değişkenin birbirleriyle ilişkisini sorgular. İnsan beyninin <strong>çalışma belleği</strong> (working memory) kapasitesi ortalama <strong>7±2 birimdir</strong> (Miller Kanunu). Bir sözel mantık sorusunda genellikle 9-15 farklı bilgi parçası bulunur. Bu, çalışma belleğinin kapasitesini aşar.</p>
+            <p>Kafanızda tutmaya çalıştığınızda, bilgiler birbirine karışır. "Ayşe Pazartesi sinemaya gidiyordu, yoksa Salı mıydı?" gibi kararsızlıklar yaşarsınız. Tablo, bu sorunu ortadan kaldırır çünkü bilgiyi <strong>dış belleğe</strong> (kağıda) aktarır ve çalışma belleğinizi serbest bırakır.</p>
+            <blockquote class="border-l-4 border-primary bg-amber-50 dark:bg-amber-900/10 p-4 italic rounded-r-lg">
+                "Tablo kurmak vakit kaybı değildir; tablo kurmamak vakit kaybıdır. Doğru kurulmuş bir tablo, 4 soruyu 2 dakikada çözmenizi sağlar."
+            </blockquote>
+
+            <h2 id="degisken" class="text-3xl mt-12 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-lg">2</span>
+                Adım 1: Değişkenleri Tespit Et
+            </h2>
+            <p>Soruyu okurken hemen şu soruyu sorun: <strong>"Burada kaç farklı grup/kategori var?"</strong></p>
+            <p>Örneğin: "Ayşe, Burak, Can ve Deniz; Pazartesi, Salı ve Çarşamba günlerinde; sinema, tiyatro ve konser etkinliklerine katılacaklardır." ifadesinde 3 değişken grubu vardır:</p>
+            <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 my-6">
+                <ul class="list-none space-y-2 pl-0">
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-user text-blue-500"></i> <strong>Kişiler:</strong> Ayşe, Burak, Can, Deniz (4 eleman)</li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-calendar text-green-500"></i> <strong>Günler:</strong> Pazartesi, Salı, Çarşamba (3 eleman)</li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-masks-theater text-purple-500"></i> <strong>Etkinlikler:</strong> Sinema, Tiyatro, Konser (3 eleman)</li>
+                </ul>
+            </div>
+            <p>Değişkenleri tespit etmek, tablonuzun iskeletini oluşturur. Bu adımı atladığınızda doğru tabloyu kuramazsınız.</p>
+
+            <h2 id="tablo" class="text-3xl mt-12 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-lg">3</span>
+                Adım 2: Az Olanı Tabloya Sabitle
+            </h2>
+            <p>Altın Kural: <strong>Sayıca en az olan veya sırası kesin olan grubu (Günler, Katlar, Sıralar gibi) tablo başlığı yapın.</strong> Asla kişileri başlığa yazmayın çünkü kişiler değişkendir — hangi güne yerleşeceği bilinmiyor.</p>
+            <div class="not-prose bg-slate-100 dark:bg-slate-800 p-6 rounded-xl my-6 border-l-4 border-primary">
+                <h4 class="font-bold mb-3">Örnek Tablo Yapısı:</h4>
+                <div class="grid grid-cols-3 gap-2 text-center text-sm font-mono mb-2">
+                    <div class="bg-white dark:bg-darkCard p-3 rounded border border-slate-300 font-bold">PAZARTESİ</div>
+                    <div class="bg-white dark:bg-darkCard p-3 rounded border border-slate-300 font-bold">SALI</div>
+                    <div class="bg-white dark:bg-darkCard p-3 rounded border border-slate-300 font-bold">ÇARŞAMBA</div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-center text-sm">
+                    <div class="text-slate-400 p-2">Kişi: ?</div>
+                    <div class="text-primary font-bold p-2">Kişi: Burak</div>
+                    <div class="text-slate-400 p-2">Kişi: ?</div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-center text-sm">
+                    <div class="text-slate-400 p-2">Etkinlik: ?</div>
+                    <div class="text-slate-400 p-2">Etkinlik: ?</div>
+                    <div class="text-primary font-bold p-2">Etkinlik: Konser</div>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">Sütunlar sabit (günler), satırlar değişken (kişi ve etkinlik).</p>
+            </div>
+            <p>Tablo başlığı olarak doğal sırası olan şeyleri seçin: günler (Pazartesi→Pazar), katlar (1→5), sıralar (sol→sağ). Bu, bilgiyi organize etmeyi kolaylaştırır.</p>
+
+            <h2 id="ihtimal" class="text-3xl mt-12 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-lg">4</span>
+                Adım 3: Kesin ve İhtimalli Bilgileri Ayır
+            </h2>
+            <p>Öncülleri (sorunun koşullarını) okurken iki farklı kalem kullanın:</p>
+            <ul>
+                <li><strong>Siyah Kalem — Kesin Bilgi:</strong> "Burak Salı günü gider" → Tabloya doğrudan yaz</li>
+                <li><strong>Kurşun Kalem — İhtimal:</strong> "Ayşe, Burak'tan önce gider" → Parantez içinde (Ayşe/Can) şeklinde yaz</li>
+            </ul>
+            <p>Öncüllerdeki anahtar kelimeler size bilginin kesin mi, ihtimalli mi olduğunu söyler:</p>
+            <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 my-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-lg font-bold mb-3 text-green-600">✅ Kesin Bilgi İfadeleri</h4>
+                        <ul class="list-none space-y-1 pl-0 text-sm">
+                            <li>• "...kesinlikle gider"</li>
+                            <li>• "...sadece o gün gider"</li>
+                            <li>• "...yalnızca X ile birliktedir"</li>
+                            <li>• "...en sonda/en başta yer alır"</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold mb-3 text-amber-600">⚠️ İhtimalli Bilgi İfadeleri</h4>
+                        <ul class="list-none space-y-1 pl-0 text-sm">
+                            <li>• "...önce/sonra gider"</li>
+                            <li>• "...yan yana değildir"</li>
+                            <li>• "...aynı gün gitmez"</li>
+                            <li>• "...en az/en çok birisi"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p>Kesin bilgilerle tabloyu doldurduktan sonra, kalan boşluklara ihtimalleri yerleştirin. Çoğu zaman kesin bilgiler, ihtimalleri otomatik olarak eleyecektir.</p>
+
+            <h2 id="tipler" class="text-3xl mt-12 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-lg">5</span>
+                Sözel Mantık Soru Tipleri ve Stratejileri
+            </h2>
+            <p>ÖSYM'nin sözel mantık soruları genellikle şu kategorilere ayrılır:</p>
+            <ol>
+                <li><strong>Yerleştirme/Eşleştirme:</strong> Kişileri günlere, odalara veya etkinliklere yerleştirme. <em>Strateji:</em> Klasik tablo yöntemi.</li>
+                <li><strong>Sıralama:</strong> Kişileri veya nesneleri belirli bir sıraya dizme. <em>Strateji:</em> Yatay çizgi üzerine işaretleme.</li>
+                <li><strong>Gruplama:</strong> Elemanları gruplara ayırma. <em>Strateji:</em> Venn diyagramı veya kümeleme tablosu.</li>
+                <li><strong>Doğru/Yanlış Önermeleri:</strong> Verilen önermelerin doğruluğunu kontrol etme. <em>Strateji:</em> Her önermeyi tabloyla karşılaştırma.</li>
+            </ol>
+            <p>Her soru tipinin kendine özgü bir tablo formatı vardır. Farklı soru tiplerinde pratik yapmak, hangi soruya hangi tabloyu kuracağınızı otomatikleştirmenizi sağlar.</p>
+
+            <h2 id="zaman" class="text-3xl mt-12 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-lg">6</span>
+                Zaman Yönetimi İpuçları
+            </h2>
+            <p>Sözel mantık soruları genellikle grup halinde gelir (bir paragraf + 4 soru). Bu yapı, zaman yönetimi açısından büyük avantajdır:</p>
+            <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 my-6">
+                <h4 class="text-lg font-bold mb-4">Zamanlama Stratejisi:</h4>
+                <ul class="list-none space-y-2 pl-0">
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-stopwatch text-amber-500"></i> <strong>Tablo Kurma:</strong> Maximum 2 dakika</li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-stopwatch text-amber-500"></i> <strong>Her Soru:</strong> Maximum 30 saniye (tablo zaten hazır)</li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-stopwatch text-amber-500"></i> <strong>Toplam (1 grup):</strong> 4 dakika = 4 soru</li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-stopwatch text-amber-500"></i> <strong>Soru başına ortalama:</strong> 1 dakika/soru</li>
+                </ul>
+            </div>
+            <p>Bu, sınavdaki en verimli soru/dakika oranını sağlar. Karşılaştırma olarak: bir matematik sorusu ortalama 2-3 dakika sürer ve sadece 1 soru çözülür. Sözel mantıkta ise aynı sürede 4 soru çözersiniz.</p>
+            <p><strong>Pro İpucu:</strong> Sınavda sözel mantık gruplarını <strong>en sona bırakmayın</strong>. Tablo kurmak taze bir zihne ihtiyaç duyar. İlk 30 dakikada çözmeniz, hem motivasyonunuzu artırır hem de zaman yönetiminizi iyileştirir.</p>
+
+            <!-- CTA -->
+            <div class="mt-16 bg-slate-900 rounded-3xl p-8 text-center text-white relative overflow-hidden">
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                <h3 class="text-2xl font-bold mb-4 relative z-10">Mantık Sorularını Fethet</h3>
+                <p class="text-slate-400 mb-8 max-w-xl mx-auto relative z-10">Al&Ni Exam Studio'da sözel mantık konularını takip et, eksiklerini SmartCoach AI ile belirle ve kişiselleştirilmiş çalışma planı oluştur.</p>
+                <a href="index.html#auth-section"
+                    class="relative z-10 inline-flex items-center justify-center px-8 py-4 bg-primary text-white font-bold rounded-xl hover:bg-secondary transition shadow-lg shadow-amber-500/25">
+                    Hemen Başla <i class="fa-solid fa-arrow-right ml-2"></i>
+                </a>
             </div>
         </article>
     </main>
-    <footer class="bg-white dark:bg-darkCard border-t border-slate-200 dark:border-slate-800 py-12 text-center">
-        <p class="text-slate-500 text-sm">© 2025 Al&Ni Exam Studio.</p>
+
+    <footer class="bg-white dark:bg-darkCard border-t border-slate-200 dark:border-slate-800 py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-xs font-bold text-slate-400 tracking-wider">© 2025 AL&NI STUDIOS. Tüm Hakları Saklıdır.</p>
+                <div class="flex items-center gap-6 text-sm font-medium text-slate-500">
+                    <a href="gizlilik-politikasi.html" class="hover:text-primary transition">Gizlilik Politikası</a>
+                    <a href="kullanim-sartlari.html" class="hover:text-primary transition">Kullanım Şartları</a>
+                    <a href="hakkimizda.html" class="hover:text-primary transition">Hakkımızda</a>
+                    <a href="iletisim.html" class="hover:text-primary transition">İletişim</a>
+                    <a href="blog.html" class="hover:text-primary transition">Blog</a>
+                </div>
+            </div>
+        </div>
     </footer>
 </body>
-
 
 </html>
