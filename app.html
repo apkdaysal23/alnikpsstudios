@@ -654,6 +654,77 @@
         let pomodoroInterval;
         let pomodoroTimeLeft = 25 * 60;
         let isTimerRunning = false;
+        let pomodoroEndTime = null; // Timestamp: timer'ın biteceği zaman
+        const POMODORO_DURATION = 25 * 60; // 25 dakika (saniye)
+
+        // --- POMODORO LOCALSTORAGE RESTORE ---
+        (function restorePomodoro() {
+            const saved = localStorage.getItem('pomodoroState');
+            if (!saved) return;
+            try {
+                const state = JSON.parse(saved);
+                if (state.running && state.endTime) {
+                    const remaining = Math.round((state.endTime - Date.now()) / 1000);
+                    if (remaining > 0) {
+                        pomodoroEndTime = state.endTime;
+                        pomodoroTimeLeft = remaining;
+                        isTimerRunning = true;
+                    } else {
+                        // Süre dolmuş ama kaydetilmemiş olabilir
+                        pomodoroTimeLeft = 0;
+                        localStorage.removeItem('pomodoroState');
+                    }
+                } else if (!state.running && state.timeLeft != null) {
+                    // Durdurulmuş halde kalmış
+                    pomodoroTimeLeft = state.timeLeft;
+                }
+            } catch (e) { localStorage.removeItem('pomodoroState'); }
+        })();
+
+        // --- POMODORO: Arka plan senkronizasyonu ---
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && isTimerRunning && pomodoroEndTime) {
+                // Sekme tekrar aktif olduğunda gerçek zamanı hesapla
+                const remaining = Math.round((pomodoroEndTime - Date.now()) / 1000);
+                if (remaining <= 0) {
+                    // Arka plandayken süre dolmuş
+                    clearInterval(pomodoroInterval);
+                    isTimerRunning = false;
+                    pomodoroEndTime = null;
+                    pomodoroTimeLeft = 0;
+                    localStorage.removeItem('pomodoroState');
+                    updateTimerDisplay(0);
+                    const btn = document.getElementById('timerBtn');
+                    if (btn) btn.innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>';
+                    // Bildirim gönder
+                    if (Notification.permission === 'granted') {
+                        new Notification('🍅 Pomodoro Bitti!', { body: '+1 Seans kazandın! Tebrikler.' });
+                    }
+                    savePomodoroSession();
+                    pomodoroTimeLeft = POMODORO_DURATION;
+                    updateTimerDisplay(pomodoroTimeLeft);
+                } else {
+                    pomodoroTimeLeft = remaining;
+                    updateTimerDisplay(pomodoroTimeLeft);
+                }
+            }
+        });
+
+        function updateTimerDisplay(seconds) {
+            const display = document.getElementById('timerDisplay');
+            if (!display) return;
+            const m = Math.floor(Math.max(0, seconds) / 60).toString().padStart(2, '0');
+            const s = (Math.max(0, seconds) % 60).toString().padStart(2, '0');
+            display.innerText = `${m}:${s}`;
+        }
+
+        function savePomodoroState() {
+            localStorage.setItem('pomodoroState', JSON.stringify({
+                running: isTimerRunning,
+                endTime: pomodoroEndTime,
+                timeLeft: pomodoroTimeLeft
+            }));
+        }
         let unsubscribeNotifications = null;
         let countdownInterval;
         let activeLeaderboardTab = 'kpss';
@@ -3581,9 +3652,117 @@
 
         window.saveNote = async () => { const txt = document.getElementById('newNoteText').value; if (!txt) return; await addDoc(collection(db, `users/${currentUser.uid}/notes`), { text: txt, createdAt: serverTimestamp() }); document.getElementById('newNoteText').value = ""; loadMyNotes(); };
         window.deleteNote = async (id) => { if (confirm("Sileyim mi?")) { await deleteDoc(doc(db, `users/${currentUser.uid}/notes/${id}`)); loadMyNotes(); } };
-        window.toggleTimer = () => { if (isTimerRunning) { clearInterval(pomodoroInterval); isTimerRunning = false; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>'; } else { isTimerRunning = true; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-pause text-[10px]"></i>'; pomodoroInterval = setInterval(() => { pomodoroTimeLeft--; const m = Math.floor(pomodoroTimeLeft / 60).toString().padStart(2, '0'); const s = (pomodoroTimeLeft % 60).toString().padStart(2, '0'); document.getElementById('timerDisplay').innerText = `${m}:${s}`; if (pomodoroTimeLeft <= 0) { clearInterval(pomodoroInterval); isTimerRunning = false; alert("Pomodoro Bitti! +1 Puan"); savePomodoroSession(); pomodoroTimeLeft = 25 * 60; document.getElementById('timerDisplay').innerText = "25:00"; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>'; } }, 1000); } };
-        window.resetTimer = () => { clearInterval(pomodoroInterval); isTimerRunning = false; pomodoroTimeLeft = 25 * 60; document.getElementById('timerDisplay').innerText = "25:00"; document.getElementById('timerBtn').innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>'; };
-        async function savePomodoroSession() { const newCount = (userData.pomodoroSessions || 0) + 1; userData.pomodoroSessions = newCount; document.getElementById('pomodoroCount').innerText = newCount + " Seans"; await updateDoc(doc(db, "users", currentUser.uid), { pomodoroSessions: newCount }); }
+        // --- SAĞLAM POMODORO TIMER (timestamp tabanlı, arka planda dayanıklı) ---
+        window.toggleTimer = () => {
+            const btn = document.getElementById('timerBtn');
+            if (isTimerRunning) {
+                // DURDUR
+                clearInterval(pomodoroInterval);
+                isTimerRunning = false;
+                // Kalan süreyi hesapla ve sakla
+                if (pomodoroEndTime) {
+                    pomodoroTimeLeft = Math.max(0, Math.round((pomodoroEndTime - Date.now()) / 1000));
+                }
+                pomodoroEndTime = null;
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>';
+                savePomodoroState();
+            } else {
+                // BAŞLAT
+                isTimerRunning = true;
+                pomodoroEndTime = Date.now() + (pomodoroTimeLeft * 1000);
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-pause text-[10px]"></i>';
+                savePomodoroState();
+
+                // Bildirim izni iste (ilk seferde)
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+
+                clearInterval(pomodoroInterval);
+                pomodoroInterval = setInterval(() => {
+                    // Her tick'te GERÇEK zamana göre hesapla (throttle'a dayanıklı)
+                    const remaining = Math.round((pomodoroEndTime - Date.now()) / 1000);
+                    if (remaining <= 0) {
+                        // BİTTİ
+                        clearInterval(pomodoroInterval);
+                        isTimerRunning = false;
+                        pomodoroEndTime = null;
+                        pomodoroTimeLeft = POMODORO_DURATION;
+                        localStorage.removeItem('pomodoroState');
+                        updateTimerDisplay(0);
+                        if (btn) btn.innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>';
+                        // Bildirim
+                        if (Notification.permission === 'granted') {
+                            new Notification('🍅 Pomodoro Bitti!', { body: '+1 Seans kazandın! Tebrikler.' });
+                        }
+                        savePomodoroSession();
+                        updateTimerDisplay(pomodoroTimeLeft);
+                    } else {
+                        pomodoroTimeLeft = remaining;
+                        updateTimerDisplay(remaining);
+                    }
+                }, 1000);
+            }
+        };
+
+        window.resetTimer = () => {
+            clearInterval(pomodoroInterval);
+            isTimerRunning = false;
+            pomodoroEndTime = null;
+            pomodoroTimeLeft = POMODORO_DURATION;
+            localStorage.removeItem('pomodoroState');
+            updateTimerDisplay(pomodoroTimeLeft);
+            const btn = document.getElementById('timerBtn');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>';
+        };
+
+        async function savePomodoroSession() {
+            const newCount = (userData.pomodoroSessions || 0) + 1;
+            userData.pomodoroSessions = newCount;
+            const countEl = document.getElementById('pomodoroCount');
+            if (countEl) countEl.innerText = newCount + " Seans";
+            await updateDoc(doc(db, "users", currentUser.uid), { pomodoroSessions: newCount });
+        }
+
+        // Sayfa yüklendiğinde restore edilmiş timer'ı başlat
+        if (isTimerRunning && pomodoroEndTime) {
+            const remaining = Math.round((pomodoroEndTime - Date.now()) / 1000);
+            if (remaining > 0) {
+                updateTimerDisplay(remaining);
+                // Timer'ı otomatik başlat (zaten running state'te)
+                const btn = document.getElementById('timerBtn');
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-pause text-[10px]"></i>';
+                pomodoroInterval = setInterval(() => {
+                    const rem = Math.round((pomodoroEndTime - Date.now()) / 1000);
+                    if (rem <= 0) {
+                        clearInterval(pomodoroInterval);
+                        isTimerRunning = false;
+                        pomodoroEndTime = null;
+                        pomodoroTimeLeft = POMODORO_DURATION;
+                        localStorage.removeItem('pomodoroState');
+                        updateTimerDisplay(0);
+                        if (btn) btn.innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>';
+                        if (Notification.permission === 'granted') {
+                            new Notification('🍅 Pomodoro Bitti!', { body: '+1 Seans kazandın! Tebrikler.' });
+                        }
+                        savePomodoroSession();
+                        updateTimerDisplay(pomodoroTimeLeft);
+                    } else {
+                        pomodoroTimeLeft = rem;
+                        updateTimerDisplay(rem);
+                    }
+                }, 1000);
+            } else {
+                // Restore esnasında süre dolmuşsa
+                isTimerRunning = false;
+                pomodoroEndTime = null;
+                pomodoroTimeLeft = POMODORO_DURATION;
+                localStorage.removeItem('pomodoroState');
+            }
+        } else if (!isTimerRunning && pomodoroTimeLeft !== POMODORO_DURATION) {
+            // Durdurulmuş halde restore
+            updateTimerDisplay(pomodoroTimeLeft);
+        }
         window.cycleStatus = async (key) => { if (!userData.progress) userData.progress = {}; const current = userData.progress[key] || 'not_started'; const currentIdx = ['not_started', 'started', 'completed', 'needs_review'].indexOf(current); const next = ['not_started', 'started', 'completed', 'needs_review'][(currentIdx + 1) % 4]; userData.progress[key] = next; window.loadPage('subjects'); await updateDoc(doc(db, "users", currentUser.uid), { progress: userData.progress }); };
         window.deleteAccountRequest = async () => { if (confirm("Hesabını silmek istediğine emin misin?")) { try { await deleteDoc(doc(db, "users", currentUser.uid)); await deleteUser(currentUser); alert("Hesabınız silindi."); window.location.reload(); } catch (e) { alert("Hata: " + e.message); } } };
         window.handleLogin = async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch (e) { alert(e.message) } };
