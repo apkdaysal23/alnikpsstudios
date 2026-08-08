@@ -795,6 +795,7 @@
                     loadMyNotes();
                     listenForNotificationBadge();
                     window.loadPage('dashboard');
+                    checkPendingPomodoro(); // Arka planda bitirilmiş ama kaydedilmemiş seansları kurtar
                     await checkStreak(docRef, userData);
                 }
             } else {
@@ -3716,12 +3717,47 @@
             if (btn) btn.innerHTML = '<i class="fa-solid fa-play text-[10px]"></i>';
         };
 
+        let pendingPomodoroSave = false; // Auth beklerken kayıt kuyruğu
+
         async function savePomodoroSession() {
+            // Kullanıcı henüz giriş yapmamışsa (restore sırasında olabilir) → kuyruğa al
+            if (!currentUser || !userData) {
+                pendingPomodoroSave = true;
+                localStorage.setItem('pendingPomodoroSave', 'true');
+                return;
+            }
+
             const newCount = (userData.pomodoroSessions || 0) + 1;
             userData.pomodoroSessions = newCount;
+
+            // Sidebar sayacını güncelle
             const countEl = document.getElementById('pomodoroCount');
             if (countEl) countEl.innerText = newCount + " Seans";
-            await updateDoc(doc(db, "users", currentUser.uid), { pomodoroSessions: newCount });
+
+            // Firebase'e kaydet
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), { pomodoroSessions: newCount });
+            } catch (e) {
+                console.error("Pomodoro kayıt hatası:", e);
+                // Hata olursa localStorage'a yedekle
+                pendingPomodoroSave = true;
+                localStorage.setItem('pendingPomodoroSave', 'true');
+            }
+
+            // Bahçe sayfası açıksa otomatik yenile
+            const gardenGrid = document.getElementById('gardenGrid');
+            if (gardenGrid) {
+                loadGarden();
+            }
+        }
+
+        // Bekleyen pomodoro kaydını kontrol et (auth sonrası çağrılır)
+        function checkPendingPomodoro() {
+            if (localStorage.getItem('pendingPomodoroSave') === 'true') {
+                localStorage.removeItem('pendingPomodoroSave');
+                pendingPomodoroSave = false;
+                savePomodoroSession();
+            }
         }
 
         // Sayfa yüklendiğinde restore edilmiş timer'ı başlat
