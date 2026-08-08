@@ -3734,20 +3734,19 @@
             const countEl = document.getElementById('pomodoroCount');
             if (countEl) countEl.innerText = newCount + " Seans";
 
-            // Firebase'e kaydet
+            // Bahçe sayfası açıksa HEMEN yenile (Firebase'i bekleme)
+            const gardenGrid = document.getElementById('gardenGrid');
+            if (gardenGrid) {
+                loadGarden();
+            }
+
+            // Firebase'e kaydet (arka planda)
             try {
                 await updateDoc(doc(db, "users", currentUser.uid), { pomodoroSessions: newCount });
             } catch (e) {
                 console.error("Pomodoro kayıt hatası:", e);
-                // Hata olursa localStorage'a yedekle
                 pendingPomodoroSave = true;
                 localStorage.setItem('pendingPomodoroSave', 'true');
-            }
-
-            // Bahçe sayfası açıksa otomatik yenile
-            const gardenGrid = document.getElementById('gardenGrid');
-            if (gardenGrid) {
-                loadGarden();
             }
         }
 
