@@ -4,10 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Al&Ni KPSS Studio | Al&Ni Studios</title>
+    <title>Al&Ni KPSS Studio | Açık ve Ücretsiz Öğrenci Platformu</title>
 
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1105930817107200"
-        crossorigin="anonymous"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1129,7 +1127,7 @@
                                     <p class="text-xs text-amber-800/90 dark:text-amber-400/90 leading-relaxed">
                                         SmartCoach, Google Gemini altyapısı kullanan yapay zeka destekli bir danışmandır ve yanılabilir. 
                                         Verdiği bilgiler referans amaçlıdır. Kritik kararlar için uzman desteği almanız önerilir.
-                                        <span class="block mt-2 text-[10px] opacity-70">Al&Ni Studios © 2024 • KPSS Hazırlık Platformu</span>
+                                        <span class="block mt-2 text-[10px] opacity-70">© 2025-2026 Al&amp;Ni Exam Studio. Açık ve Ücretsiz Öğrenci Platformu.</span>
                                     </p>
                                 </div>
                             </div>
@@ -1577,18 +1575,18 @@
         <div class="max-w-4xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-shop text-pink-500 mr-2"></i>Not Pazarı</h2>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm">XP'lerinle not satın al veya kendi notlarını sat.</p>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white"><i class="fa-solid fa-book-open-reader text-pink-500 mr-2"></i>Açık Not Havuzu</h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">Sanal XP puanlarınla not indir veya hazırladığın notları paylaşarak XP kazan.</p>
                 </div>
                 <div class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-xl font-bold border border-yellow-200 shadow-sm">
-                    Cüzdan: <span id="marketWallet">${userData.xp || 0}</span> XP
+                    Mevcut Puanın: <span id="marketWallet">${userData.xp || 0}</span> XP
                 </div>
             </div>
             
             <div class="flex border-b border-slate-200 dark:border-slate-700 mb-6">
-                <button onclick="window.switchMarketTab('browse')" id="tabMarketBrowse" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-bold hover:text-pink-600 transition border-b-2 border-transparent">Mağaza</button>
-                <button onclick="window.switchMarketTab('sell')" id="tabMarketSell" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-bold hover:text-pink-600 transition border-b-2 border-transparent">Not Sat</button>
-                <button onclick="window.switchMarketTab('inventory')" id="tabMarketInv" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-bold hover:text-pink-600 transition border-b-2 border-transparent">Aldıklarım</button>
+                <button onclick="window.switchMarketTab('browse')" id="tabMarketBrowse" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-bold hover:text-pink-600 transition border-b-2 border-transparent">Notları İncele</button>
+                <button onclick="window.switchMarketTab('sell')" id="tabMarketSell" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-bold hover:text-pink-600 transition border-b-2 border-transparent">Not Paylaş</button>
+                <button onclick="window.switchMarketTab('inventory')" id="tabMarketInv" class="flex-1 py-4 text-center text-slate-500 dark:text-slate-400 font-bold hover:text-pink-600 transition border-b-2 border-transparent">İndirdiğim Notlar</button>
             </div>
             
             <div id="marketContent" class="min-h-[300px]"></div>
@@ -1606,18 +1604,17 @@
             document.getElementById(activeBtn).classList.add('tab-btn-active');
 
             if (tab === 'sell') {
-                // ... (Satış ekranı aynı kalacak) ...
                 content.innerHTML = `
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 max-w-xl mx-auto">
-                <h3 class="font-bold text-lg mb-4 dark:text-white">Not Satışa Çıkar</h3>
+                <h3 class="font-bold text-lg mb-4 dark:text-white">Yeni Ders Notu Paylaş</h3>
                 <div class="space-y-4">
                     <input id="noteTitle" type="text" placeholder="Not Başlığı (Örn: Tarih Özet)" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg outline-none focus:border-pink-500">
                     <textarea id="noteDesc" placeholder="Açıklama" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg outline-none focus:border-pink-500" rows="3"></textarea>
                     <div class="grid grid-cols-2 gap-4">
-                        <input id="notePrice" type="number" placeholder="Fiyat (XP)" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg outline-none focus:border-pink-500">
+                        <input id="notePrice" type="number" placeholder="Gerekli XP Bedeli" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg outline-none focus:border-pink-500">
                         <input id="noteLink" type="text" placeholder="Google Drive / PDF Linki" class="w-full p-3 border dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg outline-none focus:border-pink-500">
                     </div>
-                    <button onclick="window.sellNote()" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-pink-500/30">Satışa Koy</button>
+                    <button onclick="window.sellNote()" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-pink-500/30">Notu Paylaş</button>
                 </div>
             </div>`;
 
@@ -1628,7 +1625,7 @@
                 <input type="text" id="marketSearchInput" onkeyup="window.filterMarket()" placeholder="Notlarda ara..." class="w-full p-3 pl-10 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-pink-500 outline-none">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
             </div>
-            <div id="marketItemsGrid" class="text-center py-10"><i class="fa-solid fa-spinner fa-spin text-pink-500 text-2xl"></i><br><span class="text-slate-500">Mağaza yükleniyor...</span></div>
+            <div id="marketItemsGrid" class="text-center py-10"><i class="fa-solid fa-spinner fa-spin text-pink-500 text-2xl"></i><br><span class="text-slate-500">Notlar yükleniyor...</span></div>
         `;
 
                 const q = query(collection(db, "marketItems"), orderBy("createdAt", "desc"));
@@ -1645,7 +1642,7 @@
             } else if (tab === 'inventory') {
                 // ... (Envanter aynı kalacak) ...
                 const inventory = userData.inventory || [];
-                if (inventory.length === 0) { content.innerHTML = '<div class="text-center py-10 text-slate-500">Henüz bir şey satın almadın.</div>'; return; }
+                if (inventory.length === 0) { content.innerHTML = '<div class="text-center py-10 text-slate-500">Henüz bir not indirmedin.</div>'; return; }
                 content.innerHTML = '<div class="text-center py-10"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>';
                 let html = '<div class="space-y-4">';
                 for (const itemId of inventory) {
@@ -1660,13 +1657,13 @@
             }
         };
 
-        // YENİ: Market listesini render eden yardımcı fonksiyon
+        // YENİ: Not listesini render eden yardımcı fonksiyon
         window.renderMarketItems = (items) => {
             const grid = document.getElementById('marketItemsGrid');
             if (!grid) return;
 
             if (items.length === 0) {
-                grid.innerHTML = '<div class="text-center py-10 text-slate-500">Aradığınız kriterde ürün bulunamadı.</div>';
+                grid.innerHTML = '<div class="text-center py-10 text-slate-500">Aradığınız kriterde ders notu bulunamadı.</div>';
                 return;
             }
 
@@ -1685,7 +1682,7 @@
             
             <!-- ŞİKAYET VE SİLME BUTONLARI -->
             <div class="absolute top-2 right-2 flex gap-1 z-10 opacity-0 group-hover:opacity-100 transition">
-                ${!isOwn ? `<button onclick="window.reportContent('Market Ürünü', '${item.id}', '${safeTitle}')" class="bg-slate-100 dark:bg-slate-700 text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-500 p-1.5 rounded-lg text-xs shadow-sm" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>` : ''}
+                ${!isOwn ? `<button onclick="window.reportContent('Ders Notu', '${item.id}', '${safeTitle}')" class="bg-slate-100 dark:bg-slate-700 text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-500 p-1.5 rounded-lg text-xs shadow-sm" title="Şikayet Et"><i class="fa-solid fa-triangle-exclamation"></i></button>` : ''}
                 ${(isOwn || isAdmin) ? `<button onclick="window.deleteMarketItem('${item.id}')" class="bg-red-500 text-white p-1.5 rounded-lg text-xs hover:bg-red-600 shadow-sm" title="Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
             </div>
 
@@ -1696,16 +1693,16 @@
                 </div>
                 <div class="flex items-center gap-2 mb-2">
                      <div class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-500 dark:text-slate-400"><i class="fa-solid fa-user"></i> ${item.sellerName}</div>
-                     <div class="text-[10px] bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded text-green-600 dark:text-green-400"><i class="fa-solid fa-download"></i> ${item.sales || 0} Satış</div>
+                     <div class="text-[10px] bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded text-green-600 dark:text-green-400"><i class="fa-solid fa-download"></i> ${item.sales || 0} İndirme</div>
                 </div>
                 <p class="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 min-h-[40px]">${item.description}</p>
             </div>
             <div class="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-700">
                 ${isOwn
-                        ? '<button class="w-full py-2 bg-slate-200 dark:bg-slate-700 text-slate-500 rounded-lg cursor-not-allowed text-sm font-bold">Senin Ürünün</button>'
+                        ? '<button class="w-full py-2 bg-slate-200 dark:bg-slate-700 text-slate-500 rounded-lg cursor-not-allowed text-sm font-bold">Senin Paylaşımın</button>'
                         : (hasBought
                             ? `<a href="${item.link}" target="_blank" class="block w-full py-2 bg-green-500 text-white rounded-lg text-center text-sm font-bold hover:bg-green-600 shadow-green-500/20 shadow-lg">İndir / Görüntüle</a>`
-                            : `<button onclick="window.buyItem('${item.id}', ${item.price}, '${item.sellerId}', '${safeTitle}')" class="w-full py-2 bg-pink-600 text-white rounded-lg text-sm font-bold hover:bg-pink-700 transition shadow-lg shadow-pink-500/30">Satın Al</button>`
+                            : `<button onclick="window.buyItem('${item.id}', ${item.price}, '${item.sellerId}', '${safeTitle}')" class="w-full py-2 bg-pink-600 text-white rounded-lg text-sm font-bold hover:bg-pink-700 transition shadow-lg shadow-pink-500/30">XP ile Notu Aç</button>`
                         )
                     }
             </div>
@@ -1733,59 +1730,59 @@
             const price = parseInt(document.getElementById('notePrice').value);
             const link = document.getElementById('noteLink').value;
 
-            if (!title || isNaN(price) || !link) return alert("Lütfen tüm alanları doğru doldurun. Fiyat sayı olmalı.");
+            if (!title || isNaN(price) || !link) return alert("Lütfen tüm alanları doğru doldurun. Gerekli XP sayı olmalı.");
 
             try {
                 await addDoc(collection(db, "marketItems"), {
                     sellerId: currentUser.uid, sellerName: userData.name, title: title, description: desc, price: Number(price), link: link, createdAt: serverTimestamp(), sales: 0
                 });
-                alert("Notun satışa çıktı!");
+                alert("Ders notun başarıyla paylaşıldı!");
                 window.switchMarketTab('browse');
-            } catch (e) { console.error("Satış Hatası:", e); alert("Hata oluştu: " + e.message); }
+            } catch (e) { console.error("Paylaşım Hatası:", e); alert("Hata oluştu: " + e.message); }
         };
 
         window.deleteMarketItem = async (id) => {
-            if (confirm("Bu ürünü silmek istediğine emin misin?")) {
+            if (confirm("Bu ders notunu silmek istediğine emin misin?")) {
                 await deleteDoc(doc(db, "marketItems", id));
                 alert("Silindi.");
                 window.switchMarketTab('browse');
             }
         };
 
-        // --- SATIN ALMA İŞLEMİ (DÜZELTİLDİ: SATICIYA ÖDEME VE BİLDİRİM) ---
+        // --- NOT EDİNME İŞLEMİ (XP TRANSFERİ VE BİLDİRİM) ---
         window.buyItem = async (itemId, price, sellerId, itemTitle) => {
             // 1. Kontroller
             if (userData.xp < price) return alert("Yetersiz XP! Biraz daha soru çözmelisin.");
-            if (!confirm(`${price} XP karşılığında bu notu satın almak istiyor musun?`)) return;
+            if (!confirm(`${price} XP motivasyon puanı karşılığında bu notu edinmek istiyor musunuz?`)) return;
 
             try {
                 const batch = writeBatch(db);
 
-                // 2. Alıcıdan XP Düş ve Envantere Ekle
+                // 2. Kullanıcıdan XP Düş ve Envantere Ekle
                 const buyerRef = doc(db, "users", currentUser.uid);
                 batch.update(buyerRef, {
                     xp: increment(-price),
                     inventory: arrayUnion(itemId)
                 });
 
-                // 3. Satıcıya XP Ekle ve Bildirim Gönder (Kendinden almıyorsan)
+                // 3. Notu Paylaşana XP Ekle ve Bildirim Gönder (Kendinden almıyorsan)
                 if (sellerId && sellerId !== currentUser.uid) {
                     const sellerRef = doc(db, "users", sellerId);
                     batch.update(sellerRef, { xp: increment(price) });
 
-                    // Satıcıya Bildirim Oluştur
+                    // Bildirim Oluştur
                     const notifRef = doc(collection(db, "notifications"));
                     batch.set(notifRef, {
                         uid: sellerId,
-                        title: "Tebrikler! Ürününüz Satıldı 🤑",
-                        message: `"${itemTitle}" başlıklı notunuz bir kullanıcı tarafından satın alındı. Hesabınıza +${price} XP eklendi.`,
+                        title: "Tebrikler! Notunuz İndirildi 🎓",
+                        message: `"${itemTitle}" başlıklı notunuz bir öğrenci arkadaşınız tarafından edinildi. Hesabınıza +${price} XP motivasyon puanı eklendi.`,
                         type: "success",
                         read: false,
                         createdAt: serverTimestamp()
                     });
                 }
 
-                // 4. Ürünün Satış Sayacını Artır (İstatistik için)
+                // 4. İndirme Sayacını Artır (İstatistik için)
                 const itemRef = doc(db, "marketItems", itemId);
                 batch.update(itemRef, { sales: increment(1) });
 
@@ -1797,14 +1794,14 @@
                 if (!userData.inventory) userData.inventory = [];
                 userData.inventory.push(itemId);
 
-                alert("Satın alma başarılı! Notlarım sekmesinden erişebilirsin.");
+                alert("Not başarıyla edinildi! İndirdiğim Notlar sekmesinden erişebilirsin.");
                 updateSidebar();
                 document.getElementById('marketWallet').innerText = userData.xp;
                 window.switchMarketTab('inventory');
 
             } catch (e) {
-                console.error("Satın alma hatası:", e);
-                alert("Satın alma sırasında bir hata oluştu: " + e.message);
+                console.error("İşlem hatası:", e);
+                alert("İşlem sırasında bir hata oluştu: " + e.message);
             }
         };
 
@@ -2962,7 +2959,7 @@
         <option value="flashcards">KPSS Flashcard</option>
         <option value="etutQuestions">KPSS Etüt Sorusu</option>
         <option value="forumPosts">Forum Konusu</option>
-        <option value="marketItems">Market Ürünü</option>
+        <option value="marketItems">Paylaşılan Ders Notu</option>
     </optgroup>
     
     <optgroup label="DGS Modülü">
@@ -4051,7 +4048,7 @@ KURALLAR:
                     if (collectionName === 'questions') { title = "Soru"; contentDisplay = `<b>Ders:</b> ${data.lesson}<br><b>Soru:</b> ${data.text}`; }
                     else if (collectionName === 'forumPosts') { title = "Forum Konusu"; contentDisplay = `<b>Başlık:</b> ${data.title}<br><b>İçerik:</b> ${data.content}`; }
                     else if (collectionName === 'etutQuestions') { title = "Etüt Sorusu"; contentDisplay = `<b>Ders:</b> ${data.lesson}<br><b>Metin:</b> ${data.text}`; if (data.image) contentDisplay += `<br><img src="${data.image}" class="h-32 mt-2 rounded">`; }
-                    else if (collectionName === 'marketItems') { title = "Market Ürünü"; contentDisplay = `<b>Ürün:</b> ${data.title}<br><b>Açıklama:</b> ${data.description}<br><b>Fiyat:</b> ${data.price} XP`; }
+                    else if (collectionName === 'marketItems') { title = "Ders Notu"; contentDisplay = `<b>Ders Notu:</b> ${data.title}<br><b>Açıklama:</b> ${data.description}<br><b>Gerekli XP:</b> ${data.price} XP`; }
                     else { title = "İçerik"; contentDisplay = JSON.stringify(data); }
 
                     // Sahibinin adını güvenli çek
