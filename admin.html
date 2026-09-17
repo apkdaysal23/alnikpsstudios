@@ -484,6 +484,7 @@
                     <div class="flex justify-end gap-2">
                         <button onclick="openUserDetail('${u.id}')" class="w-8 h-8 rounded-lg bg-slate-800 text-blue-400 hover:bg-blue-600 hover:text-white transition flex items-center justify-center" title="Detaylar & Loglar"><i class="fa-solid fa-eye"></i></button>
                         <button onclick="sendPasswordReset('${u.email}')" class="w-8 h-8 rounded-lg bg-slate-800 text-yellow-500 hover:bg-yellow-600 hover:text-white transition flex items-center justify-center" title="Şifre Sıfırla"><i class="fa-solid fa-key"></i></button>
+                        <button onclick="giftPlant('${u.id}', '${u.name}')" class="w-8 h-8 rounded-lg bg-slate-800 text-green-400 hover:bg-green-600 hover:text-white transition flex items-center justify-center" title="Bitki Hediye Et"><i class="fa-solid fa-seedling"></i></button>
                         <button onclick="toggleBan('${u.id}', ${u.isBanned || false})" class="w-8 h-8 rounded-lg bg-slate-800 ${u.isBanned ? 'text-green-500 hover:bg-green-600' : 'text-red-500 hover:bg-red-600'} hover:text-white transition flex items-center justify-center"><i class="fa-solid ${u.isBanned ? 'fa-lock-open' : 'fa-ban'}"></i></button>
                     </div>
                 </td>
@@ -495,6 +496,25 @@
         window.sendPasswordReset = async (email) => {
             if (!confirm(`${email} adresine şifre sıfırlama linki gönderilsin mi?`)) return;
             try { await sendPasswordResetEmail(auth, email); alert("E-posta gönderildi."); } catch (e) { alert("Hata: " + e.message); }
+        };
+
+        // --- BİTKİ HEDİYE ET ---
+        window.giftPlant = async (uid, name) => {
+            try {
+                const userRef = doc(db, "users", uid);
+                const snap = await getDoc(userRef);
+                if (!snap.exists()) return alert("Kullanıcı bulunamadı!");
+                const current = snap.data().pomodoroSessions || 0;
+                await updateDoc(userRef, { pomodoroSessions: current + 1 });
+                // Cache'i de güncelle
+                const cached = userCache.find(u => u.id === uid);
+                if (cached) cached.pomodoroSessions = current + 1;
+                const plants = ['🌻', '🌲', '🌵', '🌴', '🌷', '🍄', '🌸', '🌹', '🌾', '🪴'];
+                const gift = plants[Math.floor(Math.random() * plants.length)];
+                alert(`${gift} ${name} adlı kullanıcıya bitki hediye edildi! (Toplam: ${current + 1})`);
+            } catch (e) {
+                alert("Hata: " + e.message);
+            }
         };
 
         window.openUserDetail = async (uid) => {
@@ -913,7 +933,7 @@
                         <option value="flashcards">KPSS Flashcard</option>
                         <option value="etutQuestions">Etüt Sorusu</option>
                         <option value="forumPosts">Forum Konusu</option>
-                        <option value="marketItems">Market Ürünü</option>
+                        <option value="marketItems">Paylaşılan Ders Notu</option>
                     </optgroup>
                     <optgroup label="DGS Modülü">
                         <option value="exams/dgs/questions">DGS Sorusu</option>
@@ -1120,7 +1140,7 @@
             container.innerHTML = `
                 <!-- Üst Sekmeler -->
                 <div class="flex gap-3 mb-6 overflow-x-auto pb-2">
-                    <button onclick="window.renderLiveContent('market')" class="${btnBase} ${tab === 'market' ? activeStyle : inactiveStyle}">Pazar</button>
+                    <button onclick="window.renderLiveContent('market')" class="${btnBase} ${tab === 'market' ? activeStyle : inactiveStyle}">Not Havuzu</button>
                     <button onclick="window.renderLiveContent('forum')" class="${btnBase} ${tab === 'forum' ? activeStyle : inactiveStyle}">Forum</button>
                     <button onclick="window.renderLiveContent('etut')" class="${btnBase} ${tab === 'etut' ? activeStyle : inactiveStyle}">Sanal Etüt</button>
                 </div>
@@ -1146,7 +1166,7 @@
                 html += `
                 <div class="bg-slate-900/60 p-6 rounded-2xl border border-white/5 relative group hover:border-primary/50 transition">
                     <div class="flex justify-between items-start mb-2">
-                         <div class="text-[10px] text-green-500 font-bold uppercase tracking-widest bg-green-500/10 px-2 py-1 rounded">MARKET</div>
+                         <div class="text-[10px] text-green-500 font-bold uppercase tracking-widest bg-green-500/10 px-2 py-1 rounded">NOT HAVUZU</div>
                          <button onclick="window.copyToClip('${d.id}')" class="text-[9px] font-mono text-slate-600 hover:text-white transition cursor-pointer" title="ID Kopyala">${d.id}</button>
                     </div>
                     <div class="font-bold text-white mb-1 line-clamp-1">${m.title}</div>
